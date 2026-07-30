@@ -181,6 +181,31 @@
 .subnav a:hover { background: var(--key-hover); color: var(--ink); }
 .subnav a[aria-current="page"] { background: var(--ink); color: #fdfbf6; border-color: var(--ink); }
 
+/* ---------- Trener interwałów: zadanie (tekst polecenia) ---------- */
+.task-line { font-size: 1.05rem; font-weight: 600; margin: 4px 0 18px; }
+
+/* ---------- Trener interwałów: panel budowania nuty ---------- */
+.note-builder { display: flex; flex-direction: column; align-items: center; gap: 18px; margin: 0 0 22px; }
+.note-builder-controls { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; justify-content: center; }
+.note-builder-letter { display: flex; align-items: center; gap: 14px; }
+.letter-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--border);
+    background: var(--key); color: var(--ink); font-size: 1.1rem; cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+.letter-btn:hover:not(:disabled) { background: var(--key-hover); border-color: var(--gold-soft); }
+.letter-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.accidental-group { display: flex; gap: 8px; }
+.accidental-btn {
+    min-width: 52px; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--key); color: var(--ink); font-family: inherit; font-size: 1.05rem; font-weight: 600;
+    cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.accidental-btn:hover:not(:disabled) { background: var(--key-hover); }
+.accidental-btn.is-active { background: var(--ink); color: #fdfbf6; border-color: var(--ink); }
+.accidental-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
 /* ---------- Notacja (Verovio) ---------- */
 .notation-container {
     background: var(--key);
