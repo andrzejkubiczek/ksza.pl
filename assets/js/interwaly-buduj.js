@@ -239,7 +239,8 @@
 
         const directionLabel = direction === 1 ? 'w górę' : 'w dół';
         document.getElementById('task-line').textContent =
-            'Zbuduj ' + directionLabel + ' od dźwięku ' + noteLabel(rootNote) + ': ' + INTERVAL_DEFS[currentSymbol].label + '.';
+            'Zbuduj ' + directionLabel + ' od dźwięku ' + noteLabel(rootNote) + ': ' +
+            INTERVAL_DEFS[currentSymbol].label + ' (' + currentSymbol + ').';
 
         try {
             await ensureVerovioReady();
@@ -291,7 +292,7 @@
         } else {
             feedback.className = 'feedback-msg feedback-wrong';
             feedback.textContent = 'Niestety nie. Prawidłowy drugi dźwięk to ' + noteLabel(expected) +
-                ' (' + INTERVAL_DEFS[currentSymbol].label + ' ' + directionLabel + ' od ' + noteLabel(rootNote) + ').';
+                ' (' + currentSymbol + ' ' + INTERVAL_DEFS[currentSymbol].label + ' ' + directionLabel + ' od ' + noteLabel(rootNote) + ').';
         }
 
         document.getElementById('next-btn').style.display = 'inline-flex';

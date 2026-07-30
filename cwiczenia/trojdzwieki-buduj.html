@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Trójdźwięki - zapis nutowy - ksza.pl</title>
-    <meta name="description" content="Ćwiczenie: rozpoznawanie trójdźwięków zapisanych na pięciolinii jako akord, w postaci zasadniczej i z przewrotami.">
+    <title>Trójdźwięki - zbuduj trójdźwięk - ksza.pl</title>
+    <meta name="description" content="Ćwiczenie: zbuduj wskazany trójdźwięk na pięciolinii, wybierając litery i znaki chromatyczne.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -35,17 +35,24 @@
         <div class="widget">
             <nav class="subnav" aria-label="Odmiany ćwiczenia">
                 <a href="trojdzwieki.html">Ze słuchu</a>
-                <a href="trojdzwieki-zapis.html" aria-current="page">Zapis nutowy</a>
-                <a href="trojdzwieki-buduj.html">Zbuduj trójdźwięk</a>
+                <a href="trojdzwieki-zapis.html">Zapis nutowy</a>
+                <a href="trojdzwieki-buduj.html" aria-current="page">Zbuduj trójdźwięk</a>
             </nav>
             <div class="widget-header">
-                <h1>Trójdźwięki - zapis nutowy</h1>
-                <p>Odczytaj trójdźwięk zapisany na pięciolinii (jako akord) i wskaż jego rodzaj.</p>
+                <h1>Zbuduj trójdźwięk</h1>
+                <p>Dźwięk w basie jest już zapisany. Strzałkami "Poprzednia/Następna nuta" wybierz, który z pozostałych dwóch dźwięków ustawiasz, a strzałkami góra/dół i znakiem chromatycznym - jego wysokość.</p>
             </div>
 
-            <ul class="staff" aria-hidden="true"><li></li><li></li><li></li><li></li><li></li></ul>
-
             <div class="controls-row">
+                <div class="field">
+                    <label for="level-select">Poziom</label>
+                    <div class="select-wrap">
+                        <select id="level-select">
+                            <option value="1">Postać zasadnicza</option>
+                            <option value="2">Zasadnicza + przewroty</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="field">
                     <label for="clef-select">Klucz</label>
                     <div class="select-wrap">
@@ -56,33 +63,35 @@
                         </select>
                     </div>
                 </div>
-                <div class="field">
-                    <label for="level-select">Poziom</label>
-                    <div class="select-wrap">
-                        <select id="level-select">
-                            <option value="1">Postać zasadnicza (I-IV/6, I-II/4)</option>
-                            <option value="2">Zasadnicza + przewroty (V-VI/6, III-IV/4)</option>
-                        </select>
-                    </div>
-                </div>
             </div>
+
+            <p id="task-line" class="task-line"></p>
 
             <div id="status-line" class="status-line"></div>
 
             <div id="notation-container" class="notation-container" aria-live="polite"></div>
 
-            <div id="feedback" class="feedback-msg"></div>
-
-            <div class="intervals-grid" id="triad-grid">
-                <button class="interval-choice" data-key="durowy_z"><strong>+</strong><small>Durowy</small></button>
-                <button class="interval-choice" data-key="molowy_z"><strong>o</strong><small>Molowy</small></button>
-                <button class="interval-choice" data-key="zmniejszony"><strong>&gt;</strong><small>Zmniejszony</small></button>
-                <button class="interval-choice" data-key="zwiekszony"><strong>&lt;</strong><small>Zwiększony</small></button>
-                <button class="interval-choice level-2-only" data-key="durowy_3"><strong>+<sub>3</sub></strong><small>Durowy - I przewrót</small></button>
-                <button class="interval-choice level-2-only" data-key="durowy_5"><strong>+<sub>5</sub></strong><small>Durowy - II przewrót</small></button>
-                <button class="interval-choice level-2-only" data-key="molowy_3"><strong>o<sub>3</sub></strong><small>Molowy - I przewrót</small></button>
-                <button class="interval-choice level-2-only" data-key="molowy_5"><strong>o<sub>5</sub></strong><small>Molowy - II przewrót</small></button>
+            <div class="note-builder">
+                <div class="note-cursor" role="group" aria-label="Wybór edytowanej nuty">
+                    <button type="button" id="note-prev" class="letter-btn" aria-label="Poprzednia nuta">◀</button>
+                    <span id="note-cursor-label" class="note-cursor-label">Dźwięk 2 z 3</span>
+                    <button type="button" id="note-next" class="letter-btn" aria-label="Następna nuta">▶</button>
+                </div>
+                <div class="note-builder-controls">
+                    <div class="note-builder-letter">
+                        <button type="button" id="letter-down" class="letter-btn" aria-label="Litera niżej">▼</button>
+                        <button type="button" id="letter-up" class="letter-btn" aria-label="Litera wyżej">▲</button>
+                    </div>
+                    <div class="accidental-group" role="group" aria-label="Znak chromatyczny">
+                        <button type="button" class="accidental-btn" data-alter="-1">♭</button>
+                        <button type="button" class="accidental-btn is-active" data-alter="0">♮</button>
+                        <button type="button" class="accidental-btn" data-alter="1">♯</button>
+                    </div>
+                </div>
+                <button type="button" id="check-btn" class="btn-primary">Sprawdź</button>
             </div>
+
+            <div id="feedback" class="feedback-msg"></div>
 
             <div class="puzzle-controls">
                 <button id="next-btn" class="btn-dark" style="display:none;">Następny trójdźwięk →</button>
@@ -106,6 +115,6 @@
 <script src="https://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js"></script>
 <script src="../assets/js/core.js"></script>
 <script src="../assets/js/piano-keyboard.js"></script>
-<script src="../assets/js/trojdzwieki-zapis.js"></script>
+<script src="../assets/js/trojdzwieki-buduj.js"></script>
 </body>
 </html>

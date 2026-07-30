@@ -30,8 +30,10 @@ index.html                    - strona główna
 o-projekcie.html               - opis projektu
 cwiczenia/interwaly.html       - trener interwałów (ze słuchu)
 cwiczenia/interwaly-zapis.html - trener interwałów (zapis nutowy, Verovio)
+cwiczenia/interwaly-buduj.html - trener interwałów (budowanie zapisu, Verovio)
 cwiczenia/trojdzwieki.html     - trener trójdźwięków (ze słuchu)
 cwiczenia/trojdzwieki-zapis.html - trener trójdźwięków (zapis nutowy, Verovio)
+cwiczenia/trojdzwieki-buduj.html - trener trójdźwięków (budowanie zapisu, Verovio)
 cwiczenia/gamy.html            - trener odmian gam
 cwiczenia/dyktanda.html        - dyktanda-puzzle
 assets/css/site.css            - style witryny (nagłówek, karty, stopka)
@@ -39,8 +41,10 @@ assets/css/widgets.css         - style widżetów ćwiczeń
 assets/js/core.js              - rdzeń audio (Tone.js), tempo, nawigacja mobilna
 assets/js/interwaly.js         - logika interwałów (ze słuchu)
 assets/js/interwaly-zapis.js   - logika interwałów (zapis nutowy)
+assets/js/interwaly-buduj.js   - logika interwałów (budowanie zapisu)
 assets/js/trojdzwieki.js       - logika trójdźwięków (ze słuchu)
 assets/js/trojdzwieki-zapis.js - logika trójdźwięków (zapis nutowy)
+assets/js/trojdzwieki-buduj.js - logika trójdźwięków (budowanie zapisu)
 assets/js/gamy.js              - logika gam
 assets/js/dyktanda.js          - logika dyktand (parser MusicXML, pauza)
 assets/vendor/Tonejs-Instruments.js  - DO WGRANIA - patrz PRZECZYTAJ.txt

@@ -186,6 +186,8 @@
 
 /* ---------- Trener interwałów: panel budowania nuty ---------- */
 .note-builder { display: flex; flex-direction: column; align-items: center; gap: 18px; margin: 0 0 22px; }
+.note-cursor { display: flex; align-items: center; gap: 14px; }
+.note-cursor-label { font-weight: 600; min-width: 92px; text-align: center; }
 .note-builder-controls { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; justify-content: center; }
 .note-builder-letter { display: flex; align-items: center; gap: 14px; }
 .letter-btn {
