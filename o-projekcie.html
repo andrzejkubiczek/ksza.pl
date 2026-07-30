@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>O projekcie - ksza.pl</title>
+    <meta name="description" content="ksza.pl - bezpłatne ćwiczenia wspierające naukę kształcenia słuchu, prosto w przeglądarce.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container site-header-inner">
+        <a class="brand" href="index.html">ksza.pl<small>kształcenie słuchu</small></a>
+        <button class="nav-toggle" aria-controls="site-menu" aria-expanded="false">Menu</button>
+        <nav class="site-nav" id="site-menu" aria-label="Menu główne">
+            <ul>
+                <li><a href="index.html">Start</a></li>
+                <li><a href="cwiczenia/interwaly.html">Interwały</a></li>
+                <li><a href="cwiczenia/trojdzwieki.html">Trójdźwięki</a></li>
+                <li><a href="cwiczenia/gamy.html">Gamy</a></li>
+                <li><a href="cwiczenia/dyktanda.html">Dyktanda</a></li>
+                <li><a href="o-projekcie.html" aria-current="page">O projekcie</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="container page-content">
+        <div class="card">
+            <h1>O projekcie</h1>
+            <p>
+                Kształcenie słuchu bywa najtrudniejszym przedmiotem w szkole
+                muzycznej. Nie da się go wykuć na pamięć - trzeba trenować ucho,
+                systematycznie, tak jak palce przy instrumencie.
+            </p>
+            <p>
+                ksza.pl powstało z tej potrzeby. To zestaw krótkich ćwiczeń do
+                samodzielnej pracy - między lekcjami, w drodze do domu, wieczorem
+                przy telefonie.
+            </p>
+            <p>
+                Wszystko działa od razu w przeglądarce. Bez logowania i bez
+                instalowania czegokolwiek - na komputerze, tablecie czy telefonie.
+            </p>
+            <p>Na razie dostępne są cztery ćwiczenia:</p>
+            <ul class="plain-list">
+                <li><strong>Interwały</strong> - rozpoznawanie interwałów prostych do oktawy, granych w górę, w dół, melodycznie, harmonicznie albo w obu wariantach naraz.</li>
+                <li><strong>Trójdźwięki</strong> - durowy, molowy, zmniejszony i zwiększony; w postaci zasadniczej, a na wyższym poziomie także z przewrotami.</li>
+                <li><strong>Gamy</strong> - durowa i cztery odmiany molowej: eolska, harmoniczna, dorycka i melodyczna.</li>
+                <li><strong>Dyktanda</strong> - układanie fragmentów melodii we właściwej kolejności, wyłącznie ze słuchu.</li>
+            </ul>
+            <p>
+                Interwały i trójdźwięki da się ćwiczyć na dwa sposoby: ze słuchu
+                albo czytając gotowy zapis na pięciolinii, w kluczu wiolinowym
+                lub basowym - wystarczy przełączyć zakładkę nad ćwiczeniem.
+            </p>
+            <p>
+                Każde z nich można przesłuchać na innym instrumencie - fortepianie,
+                flecie, klarnecie, skrzypcach, ksylofonie, trąbce albo fagocie. Ta
+                sama struktura brzmi inaczej za każdym razem, a rozpoznawanie jej
+                w różnych barwach to ważna część treningu.
+            </p>
+            <ul class="staff" aria-hidden="true"><li></li><li></li><li></li><li></li><li></li></ul>
+            <p>
+                Strona wciąż rośnie. Kolejne ćwiczenia pojawią się, gdy będą gotowe.
+            </p>
+        </div>
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        &copy; <span id="footer-year">2026</span> ksza.pl &middot; <a href="o-projekcie.html">O projekcie</a>
+        <br><small>Próbki instrumentów: biblioteka <a href="https://github.com/nbrosowsky/tonejs-instruments" target="_blank" rel="noopener">tonejs-instruments</a> (źródło nagrań: VSCO2, licencja CC-BY 3.0)</small>
+    </div>
+</footer>
+
+<script>document.getElementById('footer-year').textContent = new Date().getFullYear();</script>
+<script src="assets/js/core.js"></script>
+</body>
+</html>

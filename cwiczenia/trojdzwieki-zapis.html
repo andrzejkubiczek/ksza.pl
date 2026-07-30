@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Trójdźwięki - zapis nutowy - ksza.pl</title>
+    <meta name="description" content="Ćwiczenie: rozpoznawanie trójdźwięków zapisanych na pięciolinii jako akord, w postaci zasadniczej i z przewrotami.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/site.css">
+    <link rel="stylesheet" href="../assets/css/widgets.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container site-header-inner">
+        <a class="brand" href="../index.html">ksza.pl<small>kształcenie słuchu</small></a>
+        <button class="nav-toggle" aria-controls="site-menu" aria-expanded="false">Menu</button>
+        <nav class="site-nav" id="site-menu" aria-label="Menu główne">
+            <ul>
+                <li><a href="../index.html">Start</a></li>
+                <li><a href="interwaly.html">Interwały</a></li>
+                <li><a href="trojdzwieki.html" aria-current="page">Trójdźwięki</a></li>
+                <li><a href="gamy.html">Gamy</a></li>
+                <li><a href="dyktanda.html">Dyktanda</a></li>
+                <li><a href="../o-projekcie.html">O projekcie</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="container exercise-page">
+        <div class="widget">
+            <nav class="subnav" aria-label="Odmiany ćwiczenia">
+                <a href="trojdzwieki.html">Ze słuchu</a>
+                <a href="trojdzwieki-zapis.html" aria-current="page">Zapis nutowy</a>
+            </nav>
+            <div class="widget-header">
+                <h1>Trójdźwięki - zapis nutowy</h1>
+                <p>Odczytaj trójdźwięk zapisany na pięciolinii (jako akord) i wskaż jego rodzaj.</p>
+            </div>
+
+            <ul class="staff" aria-hidden="true"><li></li><li></li><li></li><li></li><li></li></ul>
+
+            <div class="controls-row">
+                <div class="field">
+                    <label for="clef-select">Klucz</label>
+                    <div class="select-wrap">
+                        <select id="clef-select">
+                            <option value="random">Losowo</option>
+                            <option value="treble">Wiolinowy</option>
+                            <option value="bass">Basowy</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="level-select">Poziom</label>
+                    <div class="select-wrap">
+                        <select id="level-select">
+                            <option value="1">Postać zasadnicza (I-IV/6, I-II/4)</option>
+                            <option value="2">Zasadnicza + przewroty (V-VI/6, III-IV/4)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div id="status-line" class="status-line"></div>
+
+            <div id="notation-container" class="notation-container" aria-live="polite"></div>
+
+            <div id="feedback" class="feedback-msg"></div>
+
+            <div class="intervals-grid" id="triad-grid">
+                <button class="interval-choice" data-key="durowy_z"><strong>+</strong><small>Durowy</small></button>
+                <button class="interval-choice" data-key="molowy_z"><strong>o</strong><small>Molowy</small></button>
+                <button class="interval-choice" data-key="zmniejszony"><strong>&gt;</strong><small>Zmniejszony</small></button>
+                <button class="interval-choice" data-key="zwiekszony"><strong>&lt;</strong><small>Zwiększony</small></button>
+                <button class="interval-choice level-2-only" data-key="durowy_3"><strong>+<sub>3</sub></strong><small>Durowy - I przewrót</small></button>
+                <button class="interval-choice level-2-only" data-key="durowy_5"><strong>+<sub>5</sub></strong><small>Durowy - II przewrót</small></button>
+                <button class="interval-choice level-2-only" data-key="molowy_3"><strong>o<sub>3</sub></strong><small>Molowy - I przewrót</small></button>
+                <button class="interval-choice level-2-only" data-key="molowy_5"><strong>o<sub>5</sub></strong><small>Molowy - II przewrót</small></button>
+            </div>
+
+            <div class="puzzle-controls">
+                <button id="next-btn" class="btn-dark" style="display:none;">Następny trójdźwięk →</button>
+            </div>
+
+            <div class="piano-keyboard-wrap">
+                <div class="piano-keyboard-mount" aria-label="Klawiatura fortepianu - pomoc do liczenia trójdźwięków"></div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        &copy; <span id="footer-year">2026</span> ksza.pl &middot; <a href="../o-projekcie.html">O projekcie</a>
+        <br><small>Zapis nutowy: silnik <a href="https://www.verovio.org/" target="_blank" rel="noopener">Verovio</a> (RISM Digital Center, licencja LGPL)</small>
+    </div>
+</footer>
+
+<script>document.getElementById('footer-year').textContent = new Date().getFullYear();</script>
+<script src="https://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js"></script>
+<script src="../assets/js/core.js"></script>
+<script src="../assets/js/piano-keyboard.js"></script>
+<script src="../assets/js/trojdzwieki-zapis.js"></script>
+</body>
+</html>
