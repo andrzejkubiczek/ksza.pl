@@ -223,6 +223,13 @@
 }
 .notation-container svg { max-width: 100%; height: auto; }
 
+.notation-wrap { position: relative; }
+.gesture-layer {
+    position: absolute; inset: 0; touch-action: none; cursor: grab;
+}
+.gesture-layer:active { cursor: grabbing; }
+.gesture-hint { font-size: 0.78rem; color: var(--muted); margin: -14px 0 18px; }
+
 /* ---------- Klawiatura fortepianu (statyczna, pomoc do liczenia) ---------- */
 .piano-keyboard-wrap { margin: 0 0 22px; }
 .piano-keyboard-mount { text-align: center; }

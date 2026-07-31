@@ -308,6 +308,56 @@
         redraw();
     }
 
+    function cycleAccidental() {
+        if (hasAnswered) return;
+        const current = editableState[currentEditIndex()].alter;
+        setAccidental(current === 0 ? 1 : current === 1 ? -1 : 0);
+    }
+
+    /* ---------- Gest: przeciągnięcie/stuknięcie jako alternatywa dla przycisków ----------
+       Działa zawsze na dźwięku aktualnie wybranym kursorem "Poprzednia/Następna
+       nuta" - wybór KTÓREGO dźwięku edytujemy zostaje przy przyciskach (patrz
+       rozmowa o kursorze), gest dokłada tylko sposób ustawienia jego wysokości.
+       Względne przesunięcie zamiast mapowania na piksel nuty - patrz uzasadnienie
+       w interwaly-buduj.js. */
+    function setupGestureLayer() {
+        const layer = document.getElementById('gesture-layer');
+        const DRAG_STEP_PX = 24;
+        const TAP_THRESHOLD_PX = 4;
+        let dragging = false;
+        let startY = 0;
+        let appliedSteps = 0;
+        let moved = false;
+
+        layer.addEventListener('pointerdown', (ev) => {
+            if (hasAnswered) return;
+            dragging = true;
+            moved = false;
+            startY = ev.clientY;
+            appliedSteps = 0;
+            layer.setPointerCapture(ev.pointerId);
+        });
+        layer.addEventListener('pointermove', (ev) => {
+            if (!dragging) return;
+            const deltaY = ev.clientY - startY;
+            if (Math.abs(deltaY) > TAP_THRESHOLD_PX) moved = true;
+            const targetSteps = Math.round(-deltaY / DRAG_STEP_PX);
+            const diff = targetSteps - appliedSteps;
+            if (diff !== 0) {
+                const dir = diff > 0 ? 1 : -1;
+                for (let i = 0; i < Math.abs(diff); i++) moveLetter(dir);
+                appliedSteps = targetSteps;
+            }
+        });
+        function endGesture() {
+            if (!dragging) return;
+            dragging = false;
+            if (!moved) cycleAccidental();
+        }
+        layer.addEventListener('pointerup', endGesture);
+        layer.addEventListener('pointercancel', endGesture);
+    }
+
     function checkAnswer() {
         if (hasAnswered) return;
         hasAnswered = true;
@@ -341,6 +391,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         generateNewQuestion();
+        setupGestureLayer();
 
         document.getElementById('level-select').addEventListener('change', generateNewQuestion);
         document.getElementById('clef-select').addEventListener('change', generateNewQuestion);

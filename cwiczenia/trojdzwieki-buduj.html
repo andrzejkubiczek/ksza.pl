@@ -69,7 +69,11 @@
 
             <div id="status-line" class="status-line"></div>
 
-            <div id="notation-container" class="notation-container" aria-live="polite"></div>
+            <div class="notation-wrap">
+                <div id="notation-container" class="notation-container" aria-live="polite"></div>
+                <div id="gesture-layer" class="gesture-layer" aria-hidden="true"></div>
+            </div>
+            <p class="gesture-hint">Można też przeciągnąć wybrany dźwięk górę/dół i stuknąć, by zmienić znak.</p>
 
             <div class="note-builder">
                 <div class="note-cursor" role="group" aria-label="Wybór edytowanej nuty">
