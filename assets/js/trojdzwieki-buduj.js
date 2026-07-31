@@ -1,13 +1,9 @@
-/* ksza.pl - trójdźwięki: budowanie zapisu nutowego
-   Odwrotność "zapis nutowy": tam uczeń czyta gotowy trójdźwięk, tutaj go
-   buduje. Bas jest dany, uczeń ustawia pozostałe dwa dźwięki - kursor
-   "Poprzednia/Następna nuta" wybiera KTÓRY, te same strzałki i przełącznik
-   ♭/♮/♯ działają na aktualnie wybranym (stan każdego pamiętany osobno).
-   Docelowo ten sam mechanizm ma obsłużyć dłuższe listy - np. uzupełnianie
-   całej melodii w przyszłych dyktandach. */
+/* ksza.pl - trójdźwięki: budowanie zapisu nutowego.
+   Bas jest dany, uczeń ustawia pozostałe dwa dźwięki - kursor "Poprzednia/
+   Następna nuta" wybiera KTÓRY, te same strzałki i przełącznik ♭/♮/♯ działają
+   na aktualnie wybranym (stan każdego pamiętany osobno). */
 (function () {
-    const LETTERS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
-    const LETTER_NATURAL_OFFSET = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+    const MT = KszaMusicTheory;
 
     const TRIAD_SHAPES = {
         durowy:      { third: { steps: 2, semitones: 4 }, fifth: { steps: 4, semitones: 7 } },
@@ -28,29 +24,10 @@
         'molowy_5':    { shape: 'molowy',      inversion: 2, level: 2, label: 'Molowy - II przewrót',    symbol: 'o₅' }
     };
 
-    /* ---------- Pisownia enharmoniczna (identyczne jak w trojdzwieki-zapis.js) ---------- */
-    function ladderEntry(diatonicIndex) {
-        const letterIdx = ((diatonicIndex % 7) + 7) % 7;
-        const octave = Math.floor(diatonicIndex / 7);
-        const letter = LETTERS[letterIdx];
-        return { letter: letter, octave: octave, naturalSemitone: octave * 12 + LETTER_NATURAL_OFFSET[letter] };
-    }
-    function diatonicIndexOf(letter, octave) { return octave * 7 + LETTERS.indexOf(letter); }
-    function absoluteSemitone(note) { return note.octave * 12 + LETTER_NATURAL_OFFSET[note.letter] + note.alter; }
-
-    function spellUp(startNote, def) {
-        const startAbs = absoluteSemitone(startNote);
-        const startIdx = diatonicIndexOf(startNote.letter, startNote.octave);
-        const target = ladderEntry(startIdx + def.steps);
-        return { letter: target.letter, alter: (startAbs + def.semitones) - target.naturalSemitone, octave: target.octave };
-    }
-
-    // Postać zasadnicza, a dla przewrotu "obrót": składnik z dołu na górę, +1
-    // oktawa. notes[0] po obrocie to zawsze faktyczny dźwięk w basie.
     function buildTriadNotes(rootNote, shapeName, inversion) {
         const shape = TRIAD_SHAPES[shapeName];
-        const third = spellUp(rootNote, shape.third);
-        const fifth = spellUp(rootNote, shape.fifth);
+        const third = MT.spellByShape(rootNote, shape.third, 1);
+        const fifth = MT.spellByShape(rootNote, shape.fifth, 1);
         const notes = [rootNote, third, fifth];
         for (let i = 0; i < inversion; i++) {
             const wrapped = notes.shift();
@@ -59,18 +36,10 @@
         return notes;
     }
 
-    /* ---------- MusicXML: trzy KOLEJNE nuty (nie akord), żeby było czytelniej ---------- */
-    function noteToPitchXml(note) {
-        const alterTag = note.alter !== 0 ? '<alter>' + note.alter + '</alter>' : '';
-        return '<pitch><step>' + note.letter + '</step>' + alterTag + '<octave>' + note.octave + '</octave></pitch>';
-    }
-    const ACCIDENTAL_NAMES = { '-2': 'flat-flat', '-1': 'flat', '1': 'sharp', '2': 'double-sharp' };
-    function accidentalTag(note) {
-        return note.alter !== 0 ? '<accidental>' + ACCIDENTAL_NAMES[String(note.alter)] + '</accidental>' : '';
-    }
+    // Trzy KOLEJNE nuty (nie akord), żeby było czytelniej.
     function buildNoteXml(note) {
-        return '<note>' + noteToPitchXml(note) +
-            '<duration>1</duration><type>quarter</type>' + accidentalTag(note) + '</note>';
+        return '<note>' + MT.noteToPitchXml(note) +
+            '<duration>1</duration><type>quarter</type>' + MT.accidentalTag(note) + '</note>';
     }
 
     function buildMeasureMusicXML(clef, notes) {
@@ -87,46 +56,8 @@
             '</measure></part></score-partwise>';
     }
 
-    /* ---------- Verovio ---------- */
-    let verovioToolkit = null;
-    let verovioReadyPromise = null;
-
-    function ensureVerovioReady() {
-        if (verovioReadyPromise) return verovioReadyPromise;
-        verovioReadyPromise = new Promise((resolve, reject) => {
-            if (typeof verovio === 'undefined') {
-                reject(new Error('Biblioteka Verovio nie została wczytana (sprawdź połączenie).'));
-                return;
-            }
-
-            let settled = false;
-            const tryInit = () => {
-                if (settled) return;
-                try {
-                    verovioToolkit = new verovio.toolkit();
-                    settled = true;
-                    clearInterval(pollId);
-                    clearTimeout(timeoutId);
-                    resolve();
-                } catch (e) { /* moduł jeszcze nie gotowy - spróbujemy ponownie */ }
-            };
-
-            verovio.module.onRuntimeInitialized = tryInit;
-            const pollId = setInterval(tryInit, 50);
-            const timeoutId = setTimeout(() => {
-                settled = true;
-                clearInterval(pollId);
-                reject(new Error('Przekroczono limit czasu ładowania Verovio.'));
-            }, 20000);
-
-            tryInit();
-        });
-        return verovioReadyPromise;
-    }
-
     function renderMeasure(clef, notes) {
-        const musicXml = buildMeasureMusicXML(clef, notes);
-        const svg = verovioToolkit.renderData(musicXml, {
+        const svg = KszaVerovio.render(buildMeasureMusicXML(clef, notes), {
             pageWidth: 900,
             pageHeight: 260,
             scale: 60,
@@ -136,15 +67,13 @@
         document.getElementById('notation-container').innerHTML = svg;
     }
 
-    /* ---------- Stan ćwiczenia ---------- */
     let currentKey = null;
     let clef = 'treble';
     let bassNote = null;
-    let expectedNotes = null;     // [bas, srodkowy, gorny] - poprawna odpowiedź
+    let expectedNotes = null;     // [bas, środkowy, górny] - poprawna odpowiedź
     let hasAnswered = false;
 
-    // Edytowalne pozycje w notes: 1 (środkowy), 2 (górny). Kursor porusza się
-    // po EDITABLE_INDICES - dłuższa lista obsłużyłaby więcej dźwięków.
+    // Edytowalne pozycje w notes: 1 (środkowy), 2 (górny).
     const EDITABLE_INDICES = [1, 2];
     let editableState = {};
     let cursorPos = 0;
@@ -168,7 +97,7 @@
 
     // H + zwiększony wymagałby podwójnego krzyżyka (kwinta = Fisis) - wykluczone.
     function pickRootLetter(shapeName) {
-        const pool = shapeName === 'zwiekszony' ? LETTERS.filter((l) => l !== 'B') : LETTERS;
+        const pool = shapeName === 'zwiekszony' ? MT.LETTERS.filter((l) => l !== 'B') : MT.LETTERS;
         return pool[Math.floor(Math.random() * pool.length)];
     }
 
@@ -176,18 +105,13 @@
 
     function candidateNoteAt(index) {
         const state = editableState[index];
-        const bassIdx = diatonicIndexOf(bassNote.letter, bassNote.octave);
-        const entry = ladderEntry(bassIdx + state.step);
+        const bassIdx = MT.diatonicIndexOf(bassNote.letter, bassNote.octave);
+        const entry = MT.ladderEntry(bassIdx + state.step);
         return { letter: entry.letter, alter: state.alter, octave: entry.octave };
     }
 
     function currentNotes() {
         return [bassNote, candidateNoteAt(1), candidateNoteAt(2)];
-    }
-
-    function noteLabel(note) {
-        const accidental = note.alter === 1 ? '♯' : note.alter === -1 ? '♭' : '';
-        return note.letter + accidental;
     }
 
     function updateCursorLabel() {
@@ -254,7 +178,7 @@
         document.getElementById('task-line').textContent = 'Zbuduj: ' + type.label + ' (' + type.symbol + ').';
 
         try {
-            await ensureVerovioReady();
+            await KszaVerovio.ensureReady();
             redraw();
         } catch (e) {
             console.error('Błąd renderowania nut:', e);
@@ -293,46 +217,6 @@
         setAccidental(current === 0 ? 1 : current === 1 ? -1 : 0);
     }
 
-    // Gest działa na dźwięku aktualnie wybranym kursorem; wybór KTÓRY zostaje
-    // przy przyciskach. Względne przesunięcie - patrz uzasadnienie w interwaly-buduj.js.
-    function setupGestureLayer() {
-        const layer = document.getElementById('gesture-layer');
-        const DRAG_STEP_PX = 24;
-        const TAP_THRESHOLD_PX = 4;
-        let dragging = false;
-        let startY = 0;
-        let appliedSteps = 0;
-        let moved = false;
-
-        layer.addEventListener('pointerdown', (ev) => {
-            if (hasAnswered) return;
-            dragging = true;
-            moved = false;
-            startY = ev.clientY;
-            appliedSteps = 0;
-            layer.setPointerCapture(ev.pointerId);
-        });
-        layer.addEventListener('pointermove', (ev) => {
-            if (!dragging) return;
-            const deltaY = ev.clientY - startY;
-            if (Math.abs(deltaY) > TAP_THRESHOLD_PX) moved = true;
-            const targetSteps = Math.round(-deltaY / DRAG_STEP_PX);
-            const diff = targetSteps - appliedSteps;
-            if (diff !== 0) {
-                const dir = diff > 0 ? 1 : -1;
-                for (let i = 0; i < Math.abs(diff); i++) moveLetter(dir);
-                appliedSteps = targetSteps;
-            }
-        });
-        function endGesture() {
-            if (!dragging) return;
-            dragging = false;
-            if (!moved) cycleAccidental();
-        }
-        layer.addEventListener('pointerup', endGesture);
-        layer.addEventListener('pointercancel', endGesture);
-    }
-
     function checkAnswer() {
         if (hasAnswered) return;
         hasAnswered = true;
@@ -357,8 +241,8 @@
             feedback.textContent = 'Doskonale! To prawidłowo zbudowany trójdźwięk.';
         } else {
             feedback.className = 'feedback-msg feedback-wrong';
-            feedback.textContent = 'Niestety nie. Prawidłowo: środkowy dźwięk to ' + noteLabel(expectedNotes[1]) +
-                ', górny to ' + noteLabel(expectedNotes[2]) + ' (' + TRIAD_TYPES[currentKey].symbol + ' ' + TRIAD_TYPES[currentKey].label + ').';
+            feedback.textContent = 'Niestety nie. Prawidłowo: środkowy dźwięk to ' + MT.noteLabel(expectedNotes[1]) +
+                ', górny to ' + MT.noteLabel(expectedNotes[2]) + ' (' + TRIAD_TYPES[currentKey].symbol + ' ' + TRIAD_TYPES[currentKey].label + ').';
         }
 
         document.getElementById('next-btn').style.display = 'inline-flex';
@@ -366,7 +250,11 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         generateNewQuestion();
-        setupGestureLayer();
+        KszaGestureLayer.setup('gesture-layer', {
+            canEdit: () => !hasAnswered,
+            moveLetter: moveLetter,
+            cycleAccidental: cycleAccidental
+        });
 
         document.getElementById('level-select').addEventListener('change', generateNewQuestion);
         document.getElementById('clef-select').addEventListener('change', generateNewQuestion);

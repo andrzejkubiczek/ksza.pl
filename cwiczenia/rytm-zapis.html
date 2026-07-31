@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Dyktanda - zapis nutowy - ksza.pl</title>
-    <meta name="description" content="Dyktanda muzyczne w formie puzzli: wysłuchaj dyktanda, przeczytaj zapis nutowy fragmentów i ułóż je we właściwej kolejności.">
+    <title>Rytm - zapis nutowy - ksza.pl</title>
+    <meta name="description" content="Rytmy w formie puzzli: wysłuchaj wzoru rytmicznego, przeczytaj zapis nutowy fragmentów i ułóż je we właściwej kolejności.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -23,9 +23,9 @@
                 <li><a href="interwaly.html">Interwały</a></li>
                 <li><a href="trojdzwieki.html">Trójdźwięki</a></li>
                 <li><a href="gamy.html">Gamy</a></li>
-                <li><a href="dyktanda.html" aria-current="page">Puzzle</a></li>
+                <li><a href="dyktanda.html">Puzzle</a></li>
                 <li><a href="dyktanda-wysokosciowe.html">Dyktanda</a></li>
-                <li><a href="rytm.html">Rytm</a></li>
+                <li><a href="rytm.html" aria-current="page">Rytm</a></li>
                 <li><a href="../o-projekcie.html">O projekcie</a></li>
             </ul>
         </nav>
@@ -36,33 +36,19 @@
     <div class="container exercise-page">
         <div class="widget">
             <nav class="subnav" aria-label="Odmiany ćwiczenia">
-                <a href="dyktanda.html">Ze słuchu</a>
-                <a href="dyktanda-zapis.html" aria-current="page">Zapis nutowy</a>
+                <a href="rytm.html">Ze słuchu</a>
+                <a href="rytm-zapis.html" aria-current="page">Zapis nutowy</a>
             </nav>
             <div class="widget-header">
-                <h1>Dyktando muzyczne - puzzle (zapis nutowy)</h1>
-                <p>Wysłuchaj dyktanda, przeczytaj zapis nutowy fragmentów, a następnie ułóż potasowane takty we właściwej kolejności.</p>
+                <h1>Rytm - puzzle (zapis nutowy)</h1>
+                <p>Wysłuchaj rytmu, przeczytaj zapis nutowy fragmentów, a następnie ułóż potasowane takty we właściwej kolejności.</p>
             </div>
 
             <div class="controls-row">
                 <div class="field">
-                    <label for="dictation-select">Dyktando</label>
+                    <label for="dictation-select">Rytm</label>
                     <div class="select-wrap">
                         <select id="dictation-select"></select>
-                    </div>
-                </div>
-                <div class="field">
-                    <label for="instrument-select">Instrument</label>
-                    <div class="select-wrap">
-                        <select id="instrument-select">
-                            <option value="piano">Fortepian</option>
-                            <option value="flute">Flet</option>
-                            <option value="clarinet">Klarnet</option>
-                            <option value="violin">Skrzypce</option>
-                            <option value="xylophone">Ksylofon</option>
-                            <option value="trumpet">Trąbka</option>
-                            <option value="bassoon">Fagot</option>
-                        </select>
                     </div>
                 </div>
                 <div class="field tempo-field">
@@ -76,7 +62,7 @@
             <div class="player-controls">
                 <button id="play-full-btn" class="btn-primary">
                     <span class="play-icon" aria-hidden="true"></span>
-                    <span>Odtwórz całe dyktando</span>
+                    <span>Odtwórz cały rytm</span>
                 </button>
                 <button id="pause-btn" class="btn-primary" style="display:none;">
                     <span class="pause-icon" aria-hidden="true"></span>
@@ -119,6 +105,6 @@
 <script src="../assets/js/core.js"></script>
 <script src="../assets/js/verovio-render.js"></script>
 <script src="../assets/js/puzzle-engine.js"></script>
-<script src="../assets/js/dyktanda-zapis.js"></script>
+<script src="../assets/js/rytm-zapis.js"></script>
 </body>
 </html>

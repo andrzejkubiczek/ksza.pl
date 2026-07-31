@@ -1,13 +1,11 @@
-/* ksza.pl - trójdźwięki: rozpoznawanie zapisu nutowego
-   Bez dźwięku, tylko wzrokowo. Trudniejsze niż interwały: PRZEWROTY -
-   pisownia dźwięków nie zmienia się między postaciami, zmienia się
-   tylko który składnik jest w basie. Budujemy zawsze od prawdziwego
-   prymu, a dla przewrotu "obracamy" gotowy akord. */
+/* ksza.pl - trójdźwięki: rozpoznawanie zapisu nutowego.
+   Trudniejsze niż interwały: PRZEWROTY - pisownia dźwięków nie zmienia się
+   między postaciami, zmienia się tylko który składnik jest w basie. Budujemy
+   zawsze od prawdziwego prymu, a dla przewrotu "obracamy" gotowy akord. */
 (function () {
-    const LETTERS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
-    const LETTER_NATURAL_OFFSET = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+    const MT = KszaMusicTheory;
 
-    // Ksztalt kazdego trojdzwieku: tercja i kwinta jako {steps, semitones} LICZONE OD PRYMY.
+    // Kształt każdego trójdźwięku: tercja i kwinta jako {steps, semitones} liczone od prymy.
     const TRIAD_SHAPES = {
         durowy:      { third: { steps: 2, semitones: 4 }, fifth: { steps: 4, semitones: 7 } },
         molowy:      { third: { steps: 2, semitones: 3 }, fifth: { steps: 4, semitones: 7 } },
@@ -28,30 +26,12 @@
         'molowy_5':    { shape: 'molowy',      inversion: 2, level: 2, label: 'Molowy - II przewrót' }
     };
 
-    /* ---------- Pisownia enharmoniczna (ta sama "drabina" co w interwałach) ---------- */
-    function ladderEntry(diatonicIndex) {
-        const letterIdx = ((diatonicIndex % 7) + 7) % 7;
-        const octave = Math.floor(diatonicIndex / 7);
-        const letter = LETTERS[letterIdx];
-        return { letter: letter, octave: octave, naturalSemitone: octave * 12 + LETTER_NATURAL_OFFSET[letter] };
-    }
-    function diatonicIndexOf(letter, octave) { return octave * 7 + LETTERS.indexOf(letter); }
-    function absoluteSemitone(note) { return note.octave * 12 + LETTER_NATURAL_OFFSET[note.letter] + note.alter; }
-
-    function spellUp(startNote, def) {
-        const startAbs = absoluteSemitone(startNote);
-        const startIdx = diatonicIndexOf(startNote.letter, startNote.octave);
-        const target = ladderEntry(startIdx + def.steps);
-        return { letter: target.letter, alter: (startAbs + def.semitones) - target.naturalSemitone, octave: target.octave };
-    }
-
-    // Buduje trojdzwiek w postaci zasadniczej (rosnaco: pryma, tercja, kwinta),
-    // a nastepnie dla przewrotu "obraca" go: skladniki z dolu wedruja na gore,
-    // kazdy podniesiony dokladnie o oktawe (to zawsze wystarcza dla trojdzwieku).
+    // Buduje trójdźwięk w postaci zasadniczej (pryma, tercja, kwinta), a dla
+    // przewrotu "obraca" go: składnik z dołu wędruje na górę, +1 oktawa.
     function buildTriadNotes(rootNote, shapeName, inversion) {
         const shape = TRIAD_SHAPES[shapeName];
-        const third = spellUp(rootNote, shape.third);
-        const fifth = spellUp(rootNote, shape.fifth);
+        const third = MT.spellByShape(rootNote, shape.third, 1);
+        const fifth = MT.spellByShape(rootNote, shape.fifth, 1);
         const notes = [rootNote, third, fifth];
         for (let i = 0; i < inversion; i++) {
             const wrapped = notes.shift();
@@ -60,18 +40,10 @@
         return notes;
     }
 
-    /* ---------- MusicXML: trzy dźwięki jako AKORD ---------- */
-    function noteToPitchXml(note) {
-        const alterTag = note.alter !== 0 ? '<alter>' + note.alter + '</alter>' : '';
-        return '<pitch><step>' + note.letter + '</step>' + alterTag + '<octave>' + note.octave + '</octave></pitch>';
-    }
-    const ACCIDENTAL_NAMES = { '-2': 'flat-flat', '-1': 'flat', '1': 'sharp', '2': 'double-sharp' };
-    function accidentalTag(note) {
-        return note.alter !== 0 ? '<accidental>' + ACCIDENTAL_NAMES[String(note.alter)] + '</accidental>' : '';
-    }
+    // Trzy dźwięki jako AKORD.
     function buildNoteXml(note, isChordTone) {
-        return '<note>' + (isChordTone ? '<chord/>' : '') + noteToPitchXml(note) +
-            '<duration>4</duration><type>whole</type>' + accidentalTag(note) + '</note>';
+        return '<note>' + (isChordTone ? '<chord/>' : '') + MT.noteToPitchXml(note) +
+            '<duration>4</duration><type>whole</type>' + MT.accidentalTag(note) + '</note>';
     }
 
     function buildMeasureMusicXML(clef, notes) {
@@ -88,48 +60,8 @@
             '</measure></part></score-partwise>';
     }
 
-    /* ---------- Verovio ---------- */
-    let verovioToolkit = null;
-    let verovioReadyPromise = null;
-
-    // onRuntimeInitialized czasem nie odpala się w porę - zabezpieczenie
-    // potrójne: próba od razu, oficjalny callback, odpytywanie co 50ms.
-    function ensureVerovioReady() {
-        if (verovioReadyPromise) return verovioReadyPromise;
-        verovioReadyPromise = new Promise((resolve, reject) => {
-            if (typeof verovio === 'undefined') {
-                reject(new Error('Biblioteka Verovio nie została wczytana (sprawdź połączenie).'));
-                return;
-            }
-
-            let settled = false;
-            const tryInit = () => {
-                if (settled) return;
-                try {
-                    verovioToolkit = new verovio.toolkit();
-                    settled = true;
-                    clearInterval(pollId);
-                    clearTimeout(timeoutId);
-                    resolve();
-                } catch (e) { /* moduł jeszcze nie gotowy - spróbujemy ponownie */ }
-            };
-
-            verovio.module.onRuntimeInitialized = tryInit;
-            const pollId = setInterval(tryInit, 50);
-            const timeoutId = setTimeout(() => {
-                settled = true;
-                clearInterval(pollId);
-                reject(new Error('Przekroczono limit czasu ładowania Verovio.'));
-            }, 20000);
-
-            tryInit(); // a nuż jest już gotowy w tej właśnie chwili
-        });
-        return verovioReadyPromise;
-    }
-
     function renderMeasure(clef, notes) {
-        const musicXml = buildMeasureMusicXML(clef, notes);
-        const svg = verovioToolkit.renderData(musicXml, {
+        const svg = KszaVerovio.render(buildMeasureMusicXML(clef, notes), {
             pageWidth: 900,
             pageHeight: 260,
             scale: 60,
@@ -139,7 +71,6 @@
         document.getElementById('notation-container').innerHTML = svg;
     }
 
-    /* ---------- Stan ćwiczenia ---------- */
     let currentKey = null;
     let hasAnswered = false;
 
@@ -183,7 +114,7 @@
 
         const clef = pickClef();
         const rootOctave = clef === 'bass' ? BASS_ROOT_OCTAVE : TREBLE_ROOT_OCTAVE;
-        const rootLetter = LETTERS[Math.floor(Math.random() * LETTERS.length)];
+        const rootLetter = MT.LETTERS[Math.floor(Math.random() * MT.LETTERS.length)];
 
         currentKey = pool[Math.floor(Math.random() * pool.length)];
         const type = TRIAD_TYPES[currentKey];
@@ -191,7 +122,7 @@
         const notes = buildTriadNotes(rootNote, type.shape, type.inversion);
 
         try {
-            await ensureVerovioReady();
+            await KszaVerovio.ensureReady();
             renderMeasure(clef, notes);
             setStatus('', null);
         } catch (e) {

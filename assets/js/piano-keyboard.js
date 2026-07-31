@@ -1,9 +1,6 @@
-/* ksza.pl - statyczna klawiatura fortepianu (pomoc do liczenia całych/półtonów)
-   Zakres: razkreślna + kilka dźwięków dwukreślnej (do f2) - wystarczy, żeby
-   pokazać wzór całych/półtonów (nie ma czarnego klawisza między e-f i h-c).
-   Bez numeracji oktaw - powtórzenie liter jest tu celowe (patrz rozmowa).
-   Domyślnie schowana za przyciskiem - pokazuje/chowa się po kliknięciu.
-   Montuje się sama w każdym ".piano-keyboard-mount" na stronie. */
+/* ksza.pl - statyczna klawiatura fortepianu (pomoc do liczenia całych/półtonów).
+   Bez numeracji oktaw - powtórzenie liter jest celowe. Montuje się sama
+   w każdym ".piano-keyboard-mount" na stronie. */
 (function () {
     const WHITE_KEY_WIDTH = 46;
     const WHITE_KEY_HEIGHT = 170;

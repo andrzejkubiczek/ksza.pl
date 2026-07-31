@@ -1,14 +1,10 @@
-/* ksza.pl - interwały: rozpoznawanie zapisu nutowego
-   W odróżnieniu od wersji "ze słuchu" to ćwiczenie jest czysto wzrokowe -
-   nie używa Tone.js ani żadnego dźwięku. Nowa część: prawidłowa pisownia
-   enharmoniczna (np. tercja mała od C to Es, nie Dis - inaczej niż w
-   dźwięku, w zapisie ma to znaczenie) oraz rysowanie przez Verovio. */
+/* ksza.pl - interwały: rozpoznawanie zapisu nutowego.
+   Czysto wzrokowe ćwiczenie (bez dźwięku) - pisownia enharmoniczna zgodna z
+   zapisem (np. tercja mała od C to Es, nie Dis). */
 (function () {
-    const LETTERS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
-    const LETTER_NATURAL_OFFSET = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+    const MT = KszaMusicTheory;
 
-    // steps = liczba krokow literowych (0=pryma,1=sekunda...7=oktawa)
-    // semitones = polstony dla danej odmiany interwalu
+    // steps = liczba kroków literowych (0=pryma,1=sekunda...7=oktawa), semitones = półtony danej odmiany
     const INTERVAL_DEFS = {
         '1':  { steps: 0, semitones: 0,  label: 'Pryma czysta' },
         '2>': { steps: 1, semitones: 1,  label: 'Sekunda mała' },
@@ -26,46 +22,10 @@
     };
     const SYMBOLS = Object.keys(INTERVAL_DEFS);
 
-    /* ---------- Pisownia enharmoniczna ----------
-       "Drabina" diatoniczna: indeks rośnie o 1 na każdy krok literowy,
-       niezależnie od oktawy - przejście przez jej granicę liczy się samo.
-       Zweryfikowane na 10 przypadkach (w tym granicznych) + wyczerpująco
-       na 91 kombinacjach (7 nut naturalnych x 13 interwałów). */
-    function ladderEntry(diatonicIndex) {
-        const letterIdx = ((diatonicIndex % 7) + 7) % 7;
-        const octave = Math.floor(diatonicIndex / 7);
-        const letter = LETTERS[letterIdx];
-        return { letter: letter, octave: octave, naturalSemitone: octave * 12 + LETTER_NATURAL_OFFSET[letter] };
-    }
-    function diatonicIndexOf(letter, octave) { return octave * 7 + LETTERS.indexOf(letter); }
-    function absoluteSemitone(note) { return note.octave * 12 + LETTER_NATURAL_OFFSET[note.letter] + note.alter; }
-
-    function spellIntervalUp(startNote, symbol) {
-        const def = INTERVAL_DEFS[symbol];
-        const startAbs = absoluteSemitone(startNote);
-        const startIdx = diatonicIndexOf(startNote.letter, startNote.octave);
-        const target = ladderEntry(startIdx + def.steps);
-        return { letter: target.letter, alter: (startAbs + def.semitones) - target.naturalSemitone, octave: target.octave };
-    }
-
-    /* ---------- MusicXML: dwa dzwieki jako AKORD (jednoczesnie, nie po sobie) ----------
-       Interwal do rozpoznania to dwa jednoczesnie brzmiace dzwieki, nie melodia -
-       stad <chord/> zamiast dwoch osobnych nut w czasie. */
-    function noteToPitchXml(note) {
-        const alterTag = note.alter !== 0 ? '<alter>' + note.alter + '</alter>' : '';
-        return '<pitch><step>' + note.letter + '</step>' + alterTag + '<octave>' + note.octave + '</octave></pitch>';
-    }
-
-    // <alter> ustala WYSOKOŚĆ dźwięku, ale sam nie gwarantuje narysowania
-    // krzyżyka/bemola - do tego potrzebny jest osobny <accidental>.
-    const ACCIDENTAL_NAMES = { '-2': 'flat-flat', '-1': 'flat', '1': 'sharp', '2': 'double-sharp' };
-    function accidentalTag(note) {
-        return note.alter !== 0 ? '<accidental>' + ACCIDENTAL_NAMES[String(note.alter)] + '</accidental>' : '';
-    }
-
+    // Interwał do rozpoznania to dwa jednoczesne dźwięki - stąd <chord/>, nie melodia.
     function buildNoteXml(note, isChordTone) {
-        return '<note>' + (isChordTone ? '<chord/>' : '') + noteToPitchXml(note) +
-            '<duration>4</duration><type>whole</type>' + accidentalTag(note) + '</note>';
+        return '<note>' + (isChordTone ? '<chord/>' : '') + MT.noteToPitchXml(note) +
+            '<duration>4</duration><type>whole</type>' + MT.accidentalTag(note) + '</note>';
     }
 
     function buildMeasureMusicXML(clef, lowerNote, upperNote) {
@@ -83,48 +43,8 @@
             '</measure></part></score-partwise>';
     }
 
-    /* ---------- Verovio ---------- */
-    let verovioToolkit = null;
-    let verovioReadyPromise = null;
-
-    // onRuntimeInitialized czasem nie odpala się w porę - zabezpieczenie
-    // potrójne: próba od razu, oficjalny callback, odpytywanie co 50ms.
-    function ensureVerovioReady() {
-        if (verovioReadyPromise) return verovioReadyPromise;
-        verovioReadyPromise = new Promise((resolve, reject) => {
-            if (typeof verovio === 'undefined') {
-                reject(new Error('Biblioteka Verovio nie została wczytana (sprawdź połączenie).'));
-                return;
-            }
-
-            let settled = false;
-            const tryInit = () => {
-                if (settled) return;
-                try {
-                    verovioToolkit = new verovio.toolkit();
-                    settled = true;
-                    clearInterval(pollId);
-                    clearTimeout(timeoutId);
-                    resolve();
-                } catch (e) { /* moduł jeszcze nie gotowy - spróbujemy ponownie */ }
-            };
-
-            verovio.module.onRuntimeInitialized = tryInit;
-            const pollId = setInterval(tryInit, 50);
-            const timeoutId = setTimeout(() => {
-                settled = true;
-                clearInterval(pollId);
-                reject(new Error('Przekroczono limit czasu ładowania Verovio.'));
-            }, 20000);
-
-            tryInit(); // a nuż jest już gotowy w tej właśnie chwili
-        });
-        return verovioReadyPromise;
-    }
-
     function renderMeasure(clef, lowerNote, upperNote) {
-        const musicXml = buildMeasureMusicXML(clef, lowerNote, upperNote);
-        const svg = verovioToolkit.renderData(musicXml, {
+        const svg = KszaVerovio.render(buildMeasureMusicXML(clef, lowerNote, upperNote), {
             pageWidth: 900,
             pageHeight: 260,
             scale: 60,
@@ -134,7 +54,6 @@
         document.getElementById('notation-container').innerHTML = svg;
     }
 
-    /* ---------- Stan ćwiczenia ---------- */
     let currentSymbol = null;
     let hasAnswered = false;
 
@@ -165,16 +84,16 @@
 
         const clef = pickClef();
         const rootOctave = clef === 'bass' ? BASS_ROOT_OCTAVE : TREBLE_ROOT_OCTAVE;
-        const rootLetter = LETTERS[Math.floor(Math.random() * LETTERS.length)];
+        const rootLetter = MT.LETTERS[Math.floor(Math.random() * MT.LETTERS.length)];
         const symbol = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
 
         const rootNote = { letter: rootLetter, alter: 0, octave: rootOctave };
-        const upperNote = spellIntervalUp(rootNote, symbol);
+        const upperNote = MT.spellByShape(rootNote, INTERVAL_DEFS[symbol], 1);
 
         currentSymbol = symbol;
 
         try {
-            await ensureVerovioReady();
+            await KszaVerovio.ensureReady();
             renderMeasure(clef, rootNote, upperNote);
             setStatus('', null);
         } catch (e) {

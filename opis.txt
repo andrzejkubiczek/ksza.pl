@@ -1,7 +1,7 @@
 === ksza.pl - dedykowana strona statyczna ===
 
-Kompletna witryna: strona główna, "O projekcie" i pięć ćwiczeń
-słuchowych (interwały, trójdźwięki, gamy, puzzle, dyktanda). Zero
+Kompletna witryna: strona główna, "O projekcie" i sześć ćwiczeń
+słuchowych (interwały, trójdźwięki, gamy, puzzle, dyktanda, rytm). Zero
 backendu, zero bazy danych, zero logowania - tylko pliki.
 
 WAŻNE - KROK WYMAGANY PRZED URUCHOMIENIEM DŹWIĘKU:
@@ -29,12 +29,25 @@ cwiczenia/trojdzwieki.html     - trener trójdźwięków (ze słuchu)
 cwiczenia/trojdzwieki-zapis.html - trener trójdźwięków (zapis nutowy, Verovio)
 cwiczenia/trojdzwieki-buduj.html - trener trójdźwięków (budowanie zapisu, Verovio)
 cwiczenia/gamy.html            - trener odmian gam
+cwiczenia/gamy-stopnie.html    - trener stopni gamy (solmizacja stopni 1-8)
 cwiczenia/dyktanda.html        - dyktanda-puzzle (ze słuchu)
 cwiczenia/dyktanda-zapis.html  - dyktanda-puzzle (zapis nutowy, Verovio)
 cwiczenia/dyktanda-wysokosciowe.html - dyktando wysokościowe (Verovio)
+cwiczenia/rytm.html            - trener rytmu - puzzle (ze słuchu)
+cwiczenia/rytm-zapis.html      - trener rytmu - puzzle (zapis nutowy, Verovio)
 assets/css/site.css            - style witryny (nagłówek, karty, stopka)
 assets/css/widgets.css         - style widżetów ćwiczeń
+
 assets/js/core.js              - rdzeń audio (Tone.js), tempo, nawigacja mobilna
+assets/js/music-theory.js      - wspólna pisownia enharmoniczna + <pitch>/<accidental> w MusicXML
+assets/js/verovio-render.js    - wspólna inicjalizacja i renderowanie Verovio
+assets/js/gesture-layer.js     - wspólna obsługa przeciągnięcia/stuknięcia nad zapisem nutowym
+assets/js/scale-tonics.js      - wspólne toniki gam + budowanie nut od toniki
+assets/js/puzzle-engine.js     - wspólny silnik puzzli z taktami (parser MusicXML, odtwarzanie z pauzą, tasowanie)
+   ^ powyższe pięć plików to WSPÓLNE moduły używane przez kilka ćwiczeń naraz
+     (patrz "ARCHITEKTURA: WSPÓLNE MODUŁY" niżej) - same z siebie nic nie robią,
+     każda strona wczytuje tylko te moduły, których faktycznie potrzebuje.
+
 assets/js/interwaly.js         - logika interwałów (ze słuchu)
 assets/js/interwaly-zapis.js   - logika interwałów (zapis nutowy)
 assets/js/interwaly-buduj.js   - logika interwałów (budowanie zapisu)
@@ -42,26 +55,50 @@ assets/js/trojdzwieki.js       - logika trójdźwięków (ze słuchu)
 assets/js/trojdzwieki-zapis.js - logika trójdźwięków (zapis nutowy)
 assets/js/trojdzwieki-buduj.js - logika trójdźwięków (budowanie zapisu)
 assets/js/gamy.js              - logika gam
-assets/js/dyktanda.js          - logika dyktand (parser MusicXML, pauza)
-assets/js/dyktanda-zapis.js    - logika dyktand (puzzle z zapisem nutowym)
+assets/js/gamy-stopnie.js      - logika stopni gamy
+assets/js/dyktanda.js          - logika dyktand (konfiguracja KszaPuzzleEngine)
+assets/js/dyktanda-zapis.js    - logika dyktand, zapis nutowy (konfiguracja KszaPuzzleEngine)
 assets/js/dyktanda-wysokosciowe.js  - logika dyktanda wysokościowego
+assets/js/rytm.js              - logika rytmu-puzzle (konfiguracja KszaPuzzleEngine)
+assets/js/rytm-zapis.js        - logika rytmu-puzzle, zapis nutowy (konfiguracja KszaPuzzleEngine)
+
 assets/vendor/Tonejs-Instruments.js  - DO WGRANIA - patrz PRZECZYTAJ.txt
 assets/samples/                      - DO WGRANIA - próbki, patrz PRZECZYTAJ.txt
 dyktanda/puzzle/dyktanda.json  - LISTA dyktand-puzzle (manifest - patrz niżej)
 dyktanda/puzzle/*.xml          - pliki MusicXML dyktand-puzzle
 dyktanda/wysokosciowe/dyktanda.json - LISTA dyktand wysokościowych (osobna!)
 dyktanda/wysokosciowe/*.xml    - pliki MusicXML dyktand wysokościowych
+dyktanda/rytm/rytm.json        - LISTA rytmów-puzzle (osobny manifest!)
+dyktanda/rytm/*.musicxml       - pliki MusicXML rytmów-puzzle (stała wysokość dźwięku)
+update-nav.py                  - skrypt: generuje menu główne we WSZYSTKICH plikach HTML z jednej listy (patrz niżej)
 
-WAŻNE: każdy rodzaj dyktanda (puzzle, wysokościowe, w przyszłości też
-uzupełnianie melodii) ma WŁASNĄ, osobną listę i osobny podfolder w
+WAŻNE: każdy rodzaj dyktanda (puzzle, wysokościowe, rytm, w przyszłości
+też uzupełnianie melodii) ma WŁASNĄ, osobną listę i osobny podfolder w
 dyktanda/ - to nie są te same pliki. Dyktanda wysokościowe muszą
 dodatkowo mieć JEDNĄ wartość rytmiczną przez cały utwór (np. same
 ćwierćnuty) - to ćwiczenie sprawdza tylko wysokość dźwięków, nie rytm.
 
-MENU: "Puzzle" (ze słuchu / zapis nutowy) i "Dyktanda" (wysokościowe,
-docelowo też uzupełnianie melodii) to od teraz dwie osobne pozycje w
-menu głównym - w każdej z nich osobna zakładka-przełącznik nad
-ćwiczeniem, gdy jest więcej niż jeden wariant danego rodzaju.
+Rytm (puzzle rytmiczne) ma analogiczną strukturę do dyktand-puzzle, we
+własnym podfolderze dyktanda/rytm/ (manifest dyktanda/rytm/rytm.json +
+pliki dyktanda/rytm/*.musicxml). Odwrotnie niż w dyktandzie
+wysokościowym: tu WSZYSTKIE nuty mają tę samą, stałą wysokość (np. same
+C4), a różnicuje się tylko wartość rytmiczna - to ćwiczenie sprawdza
+tylko rytm, nie wysokość dźwięków. Ćwiczenie Rytm zawsze gra na
+ksylofonie (najlepiej oddaje rytm) - strony rytm.html/rytm-zapis.html
+celowo NIE mają selektora instrumentu.
+
+MENU: "Puzzle" (ze słuchu / zapis nutowy), "Dyktanda" (wysokościowe,
+docelowo też uzupełnianie melodii) i "Rytm" (ze słuchu / zapis nutowy)
+to od teraz trzy osobne pozycje w menu głównym - w każdej z nich osobna
+zakładka-przełącznik nad ćwiczeniem, gdy jest więcej niż jeden wariant
+danego rodzaju.
+
+Samo menu (<nav class="site-nav">) NIE jest już kopiowane ręcznie do
+każdego pliku - jedno źródło prawdy to lista NAV_ITEMS w update-nav.py.
+Żeby dodać/zmienić pozycję menu: edytuj NAV_ITEMS (i FAMILY_MAP, jeśli
+nowa pozycja obejmuje kilka wariantów strony) w update-nav.py, potem
+uruchom `python3 update-nav.py` - wstawi świeże menu do WSZYSTKICH
+plików HTML w repo. Uruchom to ZAWSZE przed wdrożeniem po zmianie menu.
 
 Strony "zapis nutowy" korzystają z biblioteki Verovio (rysowanie nut w
 przeglądarce), wczytywanej bezpośrednio z oficjalnego CDN verovio.org -
@@ -69,20 +106,24 @@ nic tu nie trzeba wgrywać na serwer, wystarczy działające połączenie
 internetowe u odwiedzającego.
 
 
-DODAWANIE NOWEGO DYKTANDA
-Ten sam sposób dla obu rodzajów - różni się tylko folder i manifest:
-dyktanda/puzzle/ + dyktanda/puzzle/dyktanda.json dla puzzli,
-dyktanda/wysokosciowe/ + dyktanda/wysokosciowe/dyktanda.json dla
-dyktanda wysokościowego.
+DODAWANIE NOWEGO DYKTANDA (lub RYTMU)
+Ten sam sposób dla wszystkich trzech rodzajów - różni się tylko folder
+i manifest: dyktanda/puzzle/ + dyktanda/puzzle/dyktanda.json dla
+puzzli, dyktanda/wysokosciowe/ + dyktanda/wysokosciowe/dyktanda.json
+dla dyktanda wysokościowego, dyktanda/rytm/ + dyktanda/rytm/rytm.json
+dla rytmu.
 
-1. Wyeksportuj dyktando z programu nutowego (MuseScore itd.) jako
+1. Wyeksportuj dyktando/rytm z programu nutowego (MuseScore itd.) jako
    NIESKOMPRESOWANY MusicXML (.xml / .musicxml). Skompresowany .mxl
    nie zadziała. Dla dyktanda wysokościowego: cały utwór JEDNĄ wartością
-   rytmiczną (np. same ćwierćnuty).
+   rytmiczną (np. same ćwierćnuty). Dla rytmu: odwrotnie - cały utwór
+   JEDNĄ, stałą wysokością dźwięku (np. same C4), a rytm dowolny.
 2. Wgraj plik do właściwego folderu, np.
-   dyktanda/puzzle/dyktando-01.xml albo
-   dyktanda/wysokosciowe/dyktando-01.xml
-3. Otwórz odpowiedni dyktanda.json i dopisz wpis do listy:
+   dyktanda/puzzle/dyktando-01.xml,
+   dyktanda/wysokosciowe/dyktando-01.xml albo
+   dyktanda/rytm/rytm-01.musicxml
+3. Otwórz odpowiedni manifest (dyktanda.json albo rytm.json) i dopisz
+   wpis do listy:
 
    [
      { "title": "Dyktando 1 - gama C-dur", "file": "dyktando-01.xml" },
@@ -93,7 +134,7 @@ dyktanda wysokościowego.
    - cudzysłowy proste ("), nie drukarskie („")
    - przecinek MIĘDZY wpisami, ale NIE po ostatnim
    - nazwa pliku dokładnie taka jak na serwerze (wielkość liter ma znaczenie)
-4. Odśwież stronę Dyktanda - nowa pozycja pojawi się na liście.
+4. Odśwież stronę Dyktanda (lub Rytm) - nowa pozycja pojawi się na liście.
 
 Jeśli lista nie działa po edycji, najczęstszy powód to literówka w
 JSON. Możesz sprawdzić poprawność pliku na https://jsonlint.com
@@ -107,12 +148,48 @@ na stronie, która "pamięta" cokolwiek między wizytami; reszta jest
 bezstanowa.
 
 
+ARCHITEKTURA: WSPÓLNE MODUŁY
+Strona zostaje statyczna (bez backendu, bez kroku budowania) - ale kilka
+grup ćwiczeń dzieli tę samą logikę, więc jest ona wydzielona do wspólnych
+plików zamiast kopiowana do każdego ćwiczenia osobno:
+
+- music-theory.js  - pisownia enharmoniczna (interwały/trójdźwięki: ze
+  słuchu ma tylko dźwięk, ale zapis nutowy i budowanie zapisu muszą
+  wiedzieć np. że tercja mała od C to Es, nie Dis) + budowanie
+  <pitch>/<accidental> w MusicXML. Używają: interwaly-zapis.js,
+  interwaly-buduj.js, trojdzwieki-zapis.js, trojdzwieki-buduj.js,
+  dyktanda-wysokosciowe.js.
+- verovio-render.js - inicjalizacja biblioteki Verovio (potrójne
+  zabezpieczenie, bo "onRuntimeInitialized" czasem się spóźnia) +
+  wspólne renderData(). Używają wszystkie strony z zapisem nutowym.
+- gesture-layer.js - obsługa przeciągnięcia/stuknięcia nad pięciolinią
+  (przesuwanie nuty i zmiana znaku chromatycznego palcem/myszką).
+  Używają: interwaly-buduj.js, trojdzwieki-buduj.js,
+  dyktanda-wysokosciowe.js.
+- scale-tonics.js - lista tonik dur/moll + budowanie nut od toniki.
+  Używają: gamy.js, gamy-stopnie.js.
+- puzzle-engine.js - cały mechanizm puzzli z taktami: parser MusicXML,
+  odtwarzanie (proste i pełne, z pauzą), tasowanie, sprawdzanie
+  kolejności. Używają: dyktanda.js, dyktanda-zapis.js, rytm.js,
+  rytm-zapis.js - każdy z nich to tylko kilkanaście linii konfiguracji
+  (manifest, teksty komunikatów, czy pokazywać zapis nutowy).
+
+Każdy plik HTML wczytuje w <script> tylko te wspólne moduły, których
+faktycznie potrzebuje jego ćwiczenie - patrz istniejące strony jako wzór
+przy dodawaniu kolejnych.
+
+
 KOLEJNE ĆWICZENIA W PRZYSZŁOŚCI
-1. Skopiuj jedną ze stron w cwiczenia/ jako szablon.
+1. Skopiuj jedną ze stron w cwiczenia/ jako szablon - najlepiej tę z
+   najbliższej rodziny (np. nowe "zbuduj X" - patrz interwaly-buduj.html
+   + interwaly-buduj.js, żeby od razu skorzystać z music-theory.js,
+   verovio-render.js i gesture-layer.js).
 2. Napisz logikę w nowym pliku assets/js/<nazwa>.js - wspólny rdzeń
-   audio (KszaAudio) i tempo (KszaTempo) są gotowe do użycia.
-3. Dodaj link do nowej strony w menu KAŻDEJ strony (menu jest
-   powtórzone w każdym pliku HTML - cena prostoty strony statycznej).
+   audio (KszaAudio) i tempo (KszaTempo) są gotowe do użycia, podobnie
+   jak moduły z sekcji "ARCHITEKTURA: WSPÓLNE MODUŁY" wyżej, jeśli pasują.
+3. Dodaj pozycję do NAV_ITEMS/FAMILY_MAP w update-nav.py i uruchom
+   `python3 update-nav.py` - to wstawi link do nowej strony w menu
+   WSZYSTKICH plików HTML (nie trzeba już edytować ich ręcznie).
 
 
 CO ZOSTAŁO ŚWIADOMIE POMINIĘTE

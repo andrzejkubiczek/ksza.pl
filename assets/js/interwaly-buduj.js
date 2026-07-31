@@ -1,11 +1,10 @@
-/* ksza.pl - interwały: budowanie zapisu nutowego
-   Odwrotność "zapis nutowy": tam uczeń czyta gotowy interwał, tutaj go
-   buduje - strzałkami przesuwa literę drugiego dźwięku i osobno ustawia
-   znak chromatyczny (♭/♮/♯, świadomie tylko 3 stany - sprawdzone, że przy
-   dozwolonych kombinacjach nigdy nie trzeba podwójnego znaku). */
+/* ksza.pl - interwały: budowanie zapisu nutowego.
+   Odwrotność "zapis nutowy": tu uczeń buduje interwał - strzałkami przesuwa
+   literę drugiego dźwięku i osobno ustawia znak chromatyczny (♭/♮/♯, świadomie
+   tylko 3 stany - sprawdzone, że przy dozwolonych kombinacjach nigdy nie
+   trzeba podwójnego znaku). */
 (function () {
-    const LETTERS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
-    const LETTER_NATURAL_OFFSET = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+    const MT = KszaMusicTheory;
 
     const INTERVAL_DEFS = {
         '1':  { steps: 0, semitones: 0,  label: 'Pryma czysta' },
@@ -24,40 +23,11 @@
     };
     const SYMBOLS = Object.keys(INTERVAL_DEFS);
 
-    /* ---------- Pisownia enharmoniczna (identyczne jak w interwaly-zapis.js) ---------- */
-    function ladderEntry(diatonicIndex) {
-        const letterIdx = ((diatonicIndex % 7) + 7) % 7;
-        const octave = Math.floor(diatonicIndex / 7);
-        const letter = LETTERS[letterIdx];
-        return { letter: letter, octave: octave, naturalSemitone: octave * 12 + LETTER_NATURAL_OFFSET[letter] };
-    }
-    function diatonicIndexOf(letter, octave) { return octave * 7 + LETTERS.indexOf(letter); }
-    function absoluteSemitone(note) { return note.octave * 12 + LETTER_NATURAL_OFFSET[note.letter] + note.alter; }
-
-    // direction: 1 = interwał w górę, -1 = interwał w dół.
-    function spellInterval(startNote, symbol, direction) {
-        const def = INTERVAL_DEFS[symbol];
-        const startAbs = absoluteSemitone(startNote);
-        const startIdx = diatonicIndexOf(startNote.letter, startNote.octave);
-        const target = ladderEntry(startIdx + direction * def.steps);
-        return { letter: target.letter, alter: (startAbs + direction * def.semitones) - target.naturalSemitone, octave: target.octave };
-    }
-
-    // Dwie KOLEJNE nuty, nie akord - przy kroku 0 obie nuty nakładałyby się
-    // na siebie i znak chromatyczny wyglądałby, jakby dotyczył złej nuty.
-    function noteToPitchXml(note) {
-        const alterTag = note.alter !== 0 ? '<alter>' + note.alter + '</alter>' : '';
-        return '<pitch><step>' + note.letter + '</step>' + alterTag + '<octave>' + note.octave + '</octave></pitch>';
-    }
-
-    const ACCIDENTAL_NAMES = { '-2': 'flat-flat', '-1': 'flat', '1': 'sharp', '2': 'double-sharp' };
-    function accidentalTag(note) {
-        return note.alter !== 0 ? '<accidental>' + ACCIDENTAL_NAMES[String(note.alter)] + '</accidental>' : '';
-    }
-
+    // Dwie KOLEJNE nuty, nie akord - przy kroku 0 obie nakładałyby się na
+    // siebie i znak chromatyczny wyglądałby, jakby dotyczył złej nuty.
     function buildNoteXml(note) {
-        return '<note>' + noteToPitchXml(note) +
-            '<duration>2</duration><type>half</type>' + accidentalTag(note) + '</note>';
+        return '<note>' + MT.noteToPitchXml(note) +
+            '<duration>2</duration><type>half</type>' + MT.accidentalTag(note) + '</note>';
     }
 
     function buildMeasureMusicXML(clef, lowerNote, upperNote) {
@@ -75,46 +45,8 @@
             '</measure></part></score-partwise>';
     }
 
-    /* ---------- Verovio ---------- */
-    let verovioToolkit = null;
-    let verovioReadyPromise = null;
-
-    function ensureVerovioReady() {
-        if (verovioReadyPromise) return verovioReadyPromise;
-        verovioReadyPromise = new Promise((resolve, reject) => {
-            if (typeof verovio === 'undefined') {
-                reject(new Error('Biblioteka Verovio nie została wczytana (sprawdź połączenie).'));
-                return;
-            }
-
-            let settled = false;
-            const tryInit = () => {
-                if (settled) return;
-                try {
-                    verovioToolkit = new verovio.toolkit();
-                    settled = true;
-                    clearInterval(pollId);
-                    clearTimeout(timeoutId);
-                    resolve();
-                } catch (e) { /* moduł jeszcze nie gotowy - spróbujemy ponownie */ }
-            };
-
-            verovio.module.onRuntimeInitialized = tryInit;
-            const pollId = setInterval(tryInit, 50);
-            const timeoutId = setTimeout(() => {
-                settled = true;
-                clearInterval(pollId);
-                reject(new Error('Przekroczono limit czasu ładowania Verovio.'));
-            }, 20000);
-
-            tryInit();
-        });
-        return verovioReadyPromise;
-    }
-
     function renderMeasure(clef, lowerNote, upperNote) {
-        const musicXml = buildMeasureMusicXML(clef, lowerNote, upperNote);
-        const svg = verovioToolkit.renderData(musicXml, {
+        const svg = KszaVerovio.render(buildMeasureMusicXML(clef, lowerNote, upperNote), {
             pageWidth: 900,
             pageHeight: 260,
             scale: 60,
@@ -124,17 +56,16 @@
         document.getElementById('notation-container').innerHTML = svg;
     }
 
-    /* ---------- Stan ćwiczenia ---------- */
     let currentSymbol = null;
     let direction = 1;     // 1 = w górę, -1 = w dół
     let rootNote = null;
     let clef = 'treble';
-    let builderStep = 0;   // wzgledem rootNote: 0 = ta sama litera .. +-7 = oktawa (kierunek zależny)
+    let builderStep = 0;   // względem rootNote: 0 = ta sama litera .. +-7 = oktawa
     let builderAlter = 0;  // -1 bemol, 0 naturalny, 1 krzyżyk
     let hasAnswered = false;
 
-    const TREBLE_ROOT_OCTAVE = 4; // razkreślna
-    const BASS_ROOT_OCTAVE = 2;   // wielka
+    const TREBLE_ROOT_OCTAVE = 4;
+    const BASS_ROOT_OCTAVE = 2;
 
     function currentLevel() {
         return document.getElementById('level-select').value;
@@ -151,14 +82,9 @@
     }
 
     function candidateNote() {
-        const startIdx = diatonicIndexOf(rootNote.letter, rootNote.octave);
-        const entry = ladderEntry(startIdx + builderStep);
+        const startIdx = MT.diatonicIndexOf(rootNote.letter, rootNote.octave);
+        const entry = MT.ladderEntry(startIdx + builderStep);
         return { letter: entry.letter, alter: builderAlter, octave: entry.octave };
-    }
-
-    function noteLabel(note) {
-        const accidental = note.alter === 1 ? '♯' : note.alter === -1 ? '♭' : '';
-        return note.letter + accidental;
     }
 
     function updateLetterButtons() {
@@ -172,7 +98,7 @@
     function pickRootAlter(letter, symbol, dir) {
         const safeAlters = [-1, 0, 1].filter((alter) => {
             const probe = { letter: letter, alter: alter, octave: TREBLE_ROOT_OCTAVE };
-            const result = spellInterval(probe, symbol, dir);
+            const result = MT.spellByShape(probe, INTERVAL_DEFS[symbol], dir);
             return Math.abs(result.alter) <= 1;
         });
         return safeAlters[Math.floor(Math.random() * safeAlters.length)];
@@ -204,7 +130,7 @@
         clef = pickClef();
         const level = currentLevel();
         const rootOctave = clef === 'bass' ? BASS_ROOT_OCTAVE : TREBLE_ROOT_OCTAVE;
-        const rootLetter = LETTERS[Math.floor(Math.random() * LETTERS.length)];
+        const rootLetter = MT.LETTERS[Math.floor(Math.random() * MT.LETTERS.length)];
         currentSymbol = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
         direction = level === '2' && Math.random() < 0.5 ? -1 : 1;
         const rootAlter = level === '2' ? pickRootAlter(rootLetter, currentSymbol, direction) : 0;
@@ -220,11 +146,11 @@
 
         const directionLabel = direction === 1 ? 'w górę' : 'w dół';
         document.getElementById('task-line').textContent =
-            'Zbuduj ' + directionLabel + ' od dźwięku ' + noteLabel(rootNote) + ': ' +
+            'Zbuduj ' + directionLabel + ' od dźwięku ' + MT.noteLabel(rootNote) + ': ' +
             INTERVAL_DEFS[currentSymbol].label + ' (' + currentSymbol + ').';
 
         try {
-            await ensureVerovioReady();
+            await KszaVerovio.ensureReady();
             redraw();
         } catch (e) {
             console.error('Błąd renderowania nut:', e);
@@ -256,52 +182,11 @@
         setAccidental(builderAlter === 0 ? 1 : builderAlter === 1 ? -1 : 0);
     }
 
-    // Gest jako alternatywa dla przycisków: przesunięcie WZGLĘDNE (co ile
-    // pikseli = jeden krok), bo Verovio przerysowuje nuty od zera i nie znamy
-    // ich dokładnej pozycji na ekranie. Dotknięcie bez przesunięcia = znak.
-    function setupGestureLayer() {
-        const layer = document.getElementById('gesture-layer');
-        const DRAG_STEP_PX = 24;
-        const TAP_THRESHOLD_PX = 4;
-        let dragging = false;
-        let startY = 0;
-        let appliedSteps = 0;
-        let moved = false;
-
-        layer.addEventListener('pointerdown', (ev) => {
-            if (hasAnswered) return;
-            dragging = true;
-            moved = false;
-            startY = ev.clientY;
-            appliedSteps = 0;
-            layer.setPointerCapture(ev.pointerId);
-        });
-        layer.addEventListener('pointermove', (ev) => {
-            if (!dragging) return;
-            const deltaY = ev.clientY - startY;
-            if (Math.abs(deltaY) > TAP_THRESHOLD_PX) moved = true;
-            const targetSteps = Math.round(-deltaY / DRAG_STEP_PX);
-            const diff = targetSteps - appliedSteps;
-            if (diff !== 0) {
-                const dir = diff > 0 ? 1 : -1;
-                for (let i = 0; i < Math.abs(diff); i++) moveLetter(dir);
-                appliedSteps = targetSteps;
-            }
-        });
-        function endGesture() {
-            if (!dragging) return;
-            dragging = false;
-            if (!moved) cycleAccidental();
-        }
-        layer.addEventListener('pointerup', endGesture);
-        layer.addEventListener('pointercancel', endGesture);
-    }
-
     function checkAnswer() {
         if (hasAnswered) return;
         hasAnswered = true;
 
-        const expected = spellInterval(rootNote, currentSymbol, direction);
+        const expected = MT.spellByShape(rootNote, INTERVAL_DEFS[currentSymbol], direction);
         const candidate = candidateNote();
         const isCorrect = candidate.letter === expected.letter &&
             candidate.alter === expected.alter &&
@@ -318,8 +203,8 @@
             feedback.textContent = 'Doskonale! To prawidłowo zbudowany interwał.';
         } else {
             feedback.className = 'feedback-msg feedback-wrong';
-            feedback.textContent = 'Niestety nie. Prawidłowy drugi dźwięk to ' + noteLabel(expected) +
-                ' (' + currentSymbol + ' ' + INTERVAL_DEFS[currentSymbol].label + ' ' + directionLabel + ' od ' + noteLabel(rootNote) + ').';
+            feedback.textContent = 'Niestety nie. Prawidłowy drugi dźwięk to ' + MT.noteLabel(expected) +
+                ' (' + currentSymbol + ' ' + INTERVAL_DEFS[currentSymbol].label + ' ' + directionLabel + ' od ' + MT.noteLabel(rootNote) + ').';
         }
 
         document.getElementById('next-btn').style.display = 'inline-flex';
@@ -327,7 +212,11 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         generateNewQuestion();
-        setupGestureLayer();
+        KszaGestureLayer.setup('gesture-layer', {
+            canEdit: () => !hasAnswered,
+            moveLetter: moveLetter,
+            cycleAccidental: cycleAccidental
+        });
 
         document.getElementById('level-select').addEventListener('change', generateNewQuestion);
         document.getElementById('clef-select').addEventListener('change', generateNewQuestion);

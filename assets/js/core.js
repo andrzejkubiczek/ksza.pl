@@ -1,10 +1,5 @@
-/* ksza.pl - wspólny rdzeń audio (Tone.js)
-   Wymaga w kolejności PRZED tym plikiem: Tone.js (CDN),
-   assets/vendor/Tonejs-Instruments.js, oraz window.KSZA_SAMPLES_BASE
-   ustawione w danej stronie (ścieżka do assets/samples/).
-   Nazwy instrumentów muszą odpowiadać kluczom tonejs-instruments.
-   API zgodne ze starą wersją (soundfont-player), żeby pliki ćwiczeń
-   nie musiały się przepisywać: player.play(nuta, czas, {duration}). */
+/* ksza.pl - wspólny rdzeń audio (Tone.js). Wymaga PRZED tym plikiem: Tone.js,
+   assets/vendor/Tonejs-Instruments.js, window.KSZA_SAMPLES_BASE. */
 window.KszaAudio = (function () {
     const samplerCache = {};
     let currentSampler = null;
@@ -34,9 +29,7 @@ window.KszaAudio = (function () {
         }
     }
 
-    /* Wspólny łańcuch efektów dla wszystkich instrumentów: filtr górnoprzepustowy
-       (tnie dudnienie) -> pogłos (mniej "sucho") -> limiter (bezpiecznik głośności),
-       plus obniżona głośność bazowa - margines bezpieczeństwa dla słuchawek. */
+    // Wspólny łańcuch: highpass (tnie dudnienie) -> pogłos -> limiter, plus obniżona głośność bazowa.
     async function getEffectsChain() {
         if (!effectsChainPromise) {
             effectsChainPromise = (async () => {
@@ -143,9 +136,7 @@ window.KszaAudio = (function () {
     };
 })();
 
-/* Wspólne tempo odtwarzania (suwak 50%-150%), zapamiętywane w localStorage.
-   1.0 = normalna prędkość. Wartość DZIELI bazowe czasy trwania w każdym
-   ćwiczeniu: mniejszy mnożnik = dłużej = wolniej, większy = szybciej. */
+// Wspólne tempo (suwak 50%-150%), zapamiętywane w localStorage. 1.0 = normalna prędkość.
 window.KszaTempo = (function () {
     const STORAGE_KEY = 'ksza-tempo-multiplier';
     const DEFAULT = 1.0;
@@ -169,10 +160,7 @@ window.KszaTempo = (function () {
     };
 })();
 
-/* Wygodny zakres brzmieniowy (wysokość brzmiąca) każdego instrumentu - żeby
-   losowe ćwiczenia (interwały, trójdźwięki, gamy ze słuchu) nie prosiły np.
-   fagotu o dźwięk, którego realnie by tak nie zagrał. Dyktanda pominięte -
-   tam melodia jest wczytana z pliku, nie losowana. */
+// Zakres brzmieniowy każdego instrumentu - żeby losowe ćwiczenia nie prosiły np. fagotu o dźwięk poza jego skalą.
 window.KszaInstrumentRange = (function () {
     const CHROMATIC = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
@@ -207,10 +195,7 @@ window.KszaInstrumentRange = (function () {
         return fromSemitone(toSemitone(name) + octaveShift * 12);
     }
 
-    // Przy zmianie instrumentu w trakcie tego samego przykładu przesuwa
-    // wszystkie dźwięki o tyle samo pełnych oktaw, żeby zmieściły się w
-    // zakresie nowego instrumentu - struktura (interwał/akord/gama) zostaje
-    // ta sama, zmienia się tylko rejestr. Zwraca 0, gdy już się mieszczą.
+    // Przesuwa wszystkie dźwięki o tyle samo oktaw, żeby zmieściły się w zakresie instrumentu; 0, gdy już się mieszczą.
     function fitOctaveShift(noteNames, instrumentKey) {
         const r = range(instrumentKey);
         const semis = noteNames.map(toSemitone);

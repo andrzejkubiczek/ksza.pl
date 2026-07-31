@@ -1,33 +1,21 @@
-/* ksza.pl - dyktando wysokościowe
-   Osobna lista plików niż puzzle (dyktanda/wysokosciowe/dyktanda.json) -
-   te pliki mają świadomie JEDNĄ wartość rytmiczną przez całe dyktando
-   (np. same ćwierćnuty), bo to ćwiczenie sprawdza tylko wysokość, nie rytm.
+/* ksza.pl - dyktando wysokościowe.
+   Osobna lista plików niż puzzle (dyktanda/wysokosciowe/dyktanda.json) - te
+   pliki mają świadomie JEDNĄ wartość rytmiczną przez całe dyktando, bo to
+   ćwiczenie sprawdza tylko wysokość, nie rytm.
 
-   Klucz, tonacja, metrum i pierwszy dźwięk (z wartością) są dane i stałe.
-   Uczeń kursorem "Poprzedni/Następny dźwięk" wybiera, który z pozostałych
-   dźwięków ustawia - te same strzałki góra/dół, przeciąganie i znak
-   chromatyczny co w interwałach/trójdźwiękach (ten sam, już przetestowany
-   mechanizm, tylko więcej dźwięków w rzędzie zamiast 1-2).
+   Klucz, tonacja, metrum i pierwszy dźwięk są dane i stałe. Uczeń kursorem
+   "Poprzedni/Następny dźwięk" wybiera, który z pozostałych dźwięków ustawia -
+   ten sam mechanizm (strzałki, przeciąganie, znak chromatyczny) co w
+   interwałach/trójdźwiękach, tylko więcej dźwięków w rzędzie.
 
-   Nowość względem poprzednich ćwiczeń: prawdziwa tonacja (nie zawsze C-dur)
-   - stąd znak chromatyczny trzeba interpretować WZGLĘDEM tonacji: naturalny
-   dźwięk, którego litera jest podniesiona/obniżona w tonacji, wymaga
-   jawnego kasownika, a dźwięk zgodny z tonacją nie potrzebuje żadnego
-   znaku (patrz accidentalTag/keySignatureAlter - zweryfikowane osobno). */
+   Prawdziwa tonacja (nie zawsze C-dur) - znak chromatyczny trzeba
+   interpretować WZGLĘDEM tonacji: dźwięk zgodny z tonacją nie potrzebuje
+   żadnego znaku, inaczej wymaga jawnego kasownika (patrz keySignatureAlter). */
 (function () {
-    const LETTERS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
-    const LETTER_NATURAL_OFFSET = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+    const MT = KszaMusicTheory;
     const SHARP_ORDER = ['F', 'C', 'G', 'D', 'A', 'E', 'B'];
     const FLAT_ORDER = ['B', 'E', 'A', 'D', 'G', 'C', 'F'];
     const TYPE_DURATION = { whole: 16, half: 8, quarter: 4, eighth: 2, '16th': 1 };
-
-    function ladderEntry(diatonicIndex) {
-        const letterIdx = ((diatonicIndex % 7) + 7) % 7;
-        const octave = Math.floor(diatonicIndex / 7);
-        const letter = LETTERS[letterIdx];
-        return { letter: letter, octave: octave, naturalSemitone: octave * 12 + LETTER_NATURAL_OFFSET[letter] };
-    }
-    function diatonicIndexOf(letter, octave) { return octave * 7 + LETTERS.indexOf(letter); }
 
     // Alteracja, jaką tonacja narzuca danej literze (np. F w G-dur = +1).
     function keySignatureAlter(letter, fifths) {
@@ -36,7 +24,6 @@
         return 0;
     }
 
-    /* ---------- Parser MusicXML ---------- */
     function parseMusicXML(xmlText) {
         const parser = new DOMParser();
         const xml = parser.parseFromString(xmlText, 'application/xml');
@@ -90,24 +77,28 @@
         };
     }
 
-    /* ---------- MusicXML: wiele taktów (oryginalny podział), ta sama wartość rytmiczna ---------- */
-    function noteToPitchXml(note) {
-        const alterTag = note.alter !== 0 ? '<alter>' + note.alter + '</alter>' : '';
-        return '<pitch><step>' + note.letter + '</step>' + alterTag + '<octave>' + note.octave + '</octave></pitch>';
-    }
-
-    const ACCIDENTAL_NAMES = { '-2': 'flat-flat', '-1': 'flat', '0': 'natural', '1': 'sharp', '2': 'double-sharp' };
+    // Klucz-aware: dźwięk zgodny z tonacją nie potrzebuje żadnego znaku.
     function accidentalTag(note, keyFifths) {
         const keyAlter = keySignatureAlter(note.letter, keyFifths);
-        if (note.alter === keyAlter) return ''; // zgadza się z tonacją - nic dorysowywać nie trzeba
-        return '<accidental>' + ACCIDENTAL_NAMES[String(note.alter)] + '</accidental>';
+        if (note.alter === keyAlter) return '';
+        return '<accidental>' + MT.ACCIDENTAL_NAMES[String(note.alter)] + '</accidental>';
     }
 
     function buildNoteXml(note, noteType, keyFifths) {
         const duration = TYPE_DURATION[noteType] || TYPE_DURATION.quarter;
-        return '<note>' + noteToPitchXml(note) +
+        return '<note>' + MT.noteToPitchXml(note) +
             '<duration>' + duration + '</duration><type>' + noteType + '</type>' +
             accidentalTag(note, keyFifths) + '</note>';
+    }
+
+    function regroupFlat(flatNotes, measureSizes) {
+        const groups = [];
+        let cursor = 0;
+        measureSizes.forEach((size) => {
+            groups.push(flatNotes.slice(cursor, cursor + size));
+            cursor += size;
+        });
+        return groups;
     }
 
     function buildScoreMusicXML(dictation, groupedNotes) {
@@ -129,58 +120,12 @@
             '<part id="P1">' + measuresXml + '</part></score-partwise>';
     }
 
-    function regroupFlat(flatNotes, measureSizes) {
-        const groups = [];
-        let cursor = 0;
-        measureSizes.forEach((size) => {
-            groups.push(flatNotes.slice(cursor, cursor + size));
-            cursor += size;
-        });
-        return groups;
-    }
-
-    /* ---------- Verovio ---------- */
-    let verovioToolkit = null;
-    let verovioReadyPromise = null;
-
-    function ensureVerovioReady() {
-        if (verovioReadyPromise) return verovioReadyPromise;
-        verovioReadyPromise = new Promise((resolve, reject) => {
-            if (typeof verovio === 'undefined') {
-                reject(new Error('Biblioteka Verovio nie została wczytana (sprawdź połączenie).'));
-                return;
-            }
-            let settled = false;
-            const tryInit = () => {
-                if (settled) return;
-                try {
-                    verovioToolkit = new verovio.toolkit();
-                    settled = true;
-                    clearInterval(pollId);
-                    clearTimeout(timeoutId);
-                    resolve();
-                } catch (e) { /* moduł jeszcze nie gotowy - spróbujemy ponownie */ }
-            };
-            verovio.module.onRuntimeInitialized = tryInit;
-            const pollId = setInterval(tryInit, 50);
-            const timeoutId = setTimeout(() => {
-                settled = true;
-                clearInterval(pollId);
-                reject(new Error('Przekroczono limit czasu ładowania Verovio.'));
-            }, 20000);
-            tryInit();
-        });
-        return verovioReadyPromise;
-    }
-
     // Verovio (MusicXML) nie koloruje pojedynczych nut przez atrybut "color" na
-    // <note> - sprawdzone w źródłach importera. Kolorujemy więc PO renderze:
-    // Verovio nadaje każdej wyrenderowanej nucie klasę "note" (kolejność w SVG
-    // odpowiada kolejności w naszym XML-u), więc wystarczy dobrać element po
-    // indeksie i dorzucić klasę CSS - oficjalnie zalecany sposób podświetlania
-    // nut w Verovio (patrz dokumentacja "CSS and SVG").
+    // <note> (sprawdzone w źródłach importera) - kolorujemy więc PO renderze:
+    // każda wyrenderowana nuta ma klasę "note" w kolejności zgodnej z naszym
+    // XML-em, więc wystarczy dobrać element po indeksie i dorzucić klasę CSS.
     function renderScore(dictation, flatNotes, feedbackColors) {
-        const svg = verovioToolkit.renderData(buildScoreMusicXML(dictation, regroupFlat(flatNotes, dictation.measureSizes)), {
+        const svg = KszaVerovio.render(buildScoreMusicXML(dictation, regroupFlat(flatNotes, dictation.measureSizes)), {
             pageWidth: 1400,
             pageHeight: 200,
             scale: 60,
@@ -198,18 +143,16 @@
         }
     }
 
-    /* ---------- Stan ćwiczenia ---------- */
     const dictationLibrary = {};
     const dictationSources = {};
 
     let activeDictation = null;
-    let editableState = {};      // { flatIndex: {step, alter} }, wzgledem pierwszego dzwieku
+    let editableState = {};      // { flatIndex: {step, alter} }, względem pierwszego dźwięku
     let editableIndices = [];    // [1, 2, ..., N-1]
     let cursorPos = 0;
-    // Kolory po ostatnim "Sprawdź" ({flatIndex: 'correct'|'wrong'}) - null, gdy
-    // jeszcze nie sprawdzono albo uczeń coś zmienił po sprawdzeniu (nieaktualne).
-    // Sprawdzanie NIE blokuje edycji - dziecko poprawia czerwone dźwięki i
-    // sprawdza ponownie, zamiast dostawać od razu gotową odpowiedź.
+    // Kolory po ostatnim "Sprawdź" - koloruje tylko WŁASNE dźwięki ucznia
+    // (zielony/czerwony), nie odsłania poprawnej odpowiedzi. Sprawdzanie nie
+    // blokuje edycji: dziecko poprawia czerwone i sprawdza ponownie.
     let feedbackColors = null;
 
     const MIN_STEP = -14;
@@ -232,18 +175,13 @@
     function candidateNoteAt(flatIndex) {
         const state = editableState[flatIndex];
         const firstNote = activeDictation.notes[0];
-        const firstIdx = diatonicIndexOf(firstNote.letter, firstNote.octave);
-        const entry = ladderEntry(firstIdx + state.step);
+        const firstIdx = MT.diatonicIndexOf(firstNote.letter, firstNote.octave);
+        const entry = MT.ladderEntry(firstIdx + state.step);
         return { letter: entry.letter, alter: state.alter, octave: entry.octave };
     }
 
     function currentNotesFlat() {
         return activeDictation.notes.map((n, i) => (i === 0 ? n : candidateNoteAt(i)));
-    }
-
-    function noteLabel(note) {
-        const accidental = note.alter === 1 ? '♯' : note.alter === -1 ? '♭' : '';
-        return note.letter + accidental;
     }
 
     function noteToToneName(note) {
@@ -310,45 +248,6 @@
         setAccidental(current === 0 ? 1 : current === 1 ? -1 : 0);
     }
 
-    /* ---------- Gest: przeciągnięcie/stuknięcie - patrz interwaly-buduj.js ---------- */
-    function setupGestureLayer() {
-        const layer = document.getElementById('gesture-layer');
-        const DRAG_STEP_PX = 24;
-        const TAP_THRESHOLD_PX = 4;
-        let dragging = false;
-        let startY = 0;
-        let appliedSteps = 0;
-        let moved = false;
-
-        layer.addEventListener('pointerdown', (ev) => {
-            dragging = true;
-            moved = false;
-            startY = ev.clientY;
-            appliedSteps = 0;
-            layer.setPointerCapture(ev.pointerId);
-        });
-        layer.addEventListener('pointermove', (ev) => {
-            if (!dragging) return;
-            const deltaY = ev.clientY - startY;
-            if (Math.abs(deltaY) > TAP_THRESHOLD_PX) moved = true;
-            const targetSteps = Math.round(-deltaY / DRAG_STEP_PX);
-            const diff = targetSteps - appliedSteps;
-            if (diff !== 0) {
-                const dir = diff > 0 ? 1 : -1;
-                for (let i = 0; i < Math.abs(diff); i++) moveLetter(dir);
-                appliedSteps = targetSteps;
-            }
-        });
-        function endGesture() {
-            if (!dragging) return;
-            dragging = false;
-            if (!moved) cycleAccidental();
-        }
-        layer.addEventListener('pointerup', endGesture);
-        layer.addEventListener('pointercancel', endGesture);
-    }
-
-    /* ---------- Odtwarzanie (proste, bez pauzy - kolejność zawsze prawidłowa) ---------- */
     const BASE_NOTE_DURATION = 0.75;
     let scheduledTimeouts = [];
     let isPlaying = false;
@@ -385,10 +284,6 @@
         scheduledTimeouts.push(endId);
     }
 
-    /* ---------- Sprawdzanie ---------- */
-    // Nie blokuje niczego i nie pokazuje poprawnej odpowiedzi - koloruje tylko
-    // WŁASNE dźwięki ucznia (zielony/czerwony), żeby dało się poprawić błędne
-    // i sprawdzić jeszcze raz, zamiast od razu poznać rozwiązanie.
     function checkAnswer() {
         const colors = {};
         let allCorrect = true;
@@ -416,7 +311,6 @@
         }
     }
 
-    /* ---------- Wczytywanie dyktand ---------- */
     async function loadManifest() {
         try {
             const res = await fetch('../dyktanda/wysokosciowe/dyktanda.json', { cache: 'no-store' });
@@ -461,7 +355,7 @@
         if (!dictation && dictationSources[id]) {
             setStatus('Wczytywanie dyktanda...', null);
             try {
-                await ensureVerovioReady();
+                await KszaVerovio.ensureReady();
                 const res = await fetch(dictationSources[id].url);
                 if (!res.ok) throw new Error('Nie udało się pobrać pliku (kod ' + res.status + ').');
                 const text = await res.text();
@@ -497,7 +391,7 @@
         syncControlsToCursor();
 
         try {
-            await ensureVerovioReady();
+            await KszaVerovio.ensureReady();
             redraw();
         } catch (e) {
             console.error('Błąd renderowania nut:', e);
@@ -505,9 +399,11 @@
         }
     }
 
-    /* ---------- Inicjalizacja ---------- */
     document.addEventListener('DOMContentLoaded', async () => {
-        setupGestureLayer();
+        KszaGestureLayer.setup('gesture-layer', {
+            moveLetter: moveLetter,
+            cycleAccidental: cycleAccidental
+        });
         await loadManifest();
         populateDictationSelect();
 
