@@ -462,14 +462,14 @@
     /* ---------- Wczytywanie dyktand ---------- */
     async function loadManifest() {
         try {
-            const res = await fetch('../dyktanda/dyktanda.json', { cache: 'no-store' });
+            const res = await fetch('../dyktanda/puzzle/dyktanda.json', { cache: 'no-store' });
             if (!res.ok) return; // brak manifestu = pusta lista, bez błędu
             const items = await res.json();
             if (!Array.isArray(items)) return;
             items.forEach((item, i) => {
                 if (item && item.file) {
                     dictationSources['m-' + i] = {
-                        url: '../dyktanda/' + item.file,
+                        url: '../dyktanda/puzzle/' + item.file,
                         title: item.title || item.file
                     };
                 }
@@ -495,7 +495,7 @@
             opt.value = '';
             opt.textContent = 'Brak dostępnych dyktand';
             select.appendChild(opt);
-            setStatus('Nie dodano jeszcze żadnego dyktanda - patrz dyktanda/dyktanda.json.', null);
+            setStatus('Nie dodano jeszcze żadnego dyktanda - patrz dyktanda/puzzle/dyktanda.json.', null);
         }
     }
 

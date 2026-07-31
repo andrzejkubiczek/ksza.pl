@@ -5,9 +5,9 @@ bez logowania, bez bazy danych, bez backendu. Wszystko działa od razu w
 przeglądarce, na komputerze, tablecie i telefonie.
 
 Pełny opis projektu (dla ucznia/nauczyciela) jest na stronie ["O
-projekcie"](o-projekcie.html). Instrukcja wdrożenia przez FTP i
-utrzymania (dodawanie dyktand, wgrywanie próbek dźwiękowych, struktura
-plików) jest w [opis.txt](opis.txt).
+projekcie"](o-projekcie.html). Instrukcja wdrożenia i utrzymania
+(dodawanie dyktand, wgrywanie próbek dźwiękowych, struktura plików)
+jest w [opis.txt](opis.txt).
 
 ## Ćwiczenia
 
@@ -18,9 +18,17 @@ plików) jest w [opis.txt](opis.txt).
   zapis nutowy i budowanie zapisu; postać zasadnicza oraz przewroty.
 - **Gamy** - durowa i cztery odmiany molowej (eolska, harmoniczna,
   dorycka, melodyczna).
-- **Dyktanda** - układanie fragmentów melodii we właściwej kolejności;
-  ze słuchu albo czytając zapis nutowy (każdy takt jako osobny,
-  samodzielny fragment - z własnym kluczem, żeby nie zdradzać kolejności).
+- **Puzzle** - układanie fragmentów melodii we właściwej kolejności, ze
+  słuchu albo czytając zapis nutowy.
+- **Dyktanda** - dyktando wysokościowe (klucz, tonacja i pierwszy
+  dźwięk są dane, uczeń uzupełnia wysokości kolejnych dźwięków - rytm
+  jest wszędzie taki sam), docelowo też uzupełnianie całej melodii.
+  Sprawdzenie koloruje własne dźwięki ucznia (zielony/czerwony) zamiast
+  pokazywać poprawną odpowiedź - można poprawić i sprawdzić ponownie.
+
+Puzzle i Dyktanda to dwie osobne, choć pokrewne rodziny ćwiczeń (osobne
+pozycje w menu, osobne listy plików w `dyktanda/puzzle/` i
+`dyktanda/wysokosciowe/`).
 
 Ćwiczenia "zbuduj" (interwały/trójdźwięki) obsługuje się zarówno
 przyciskami, jak i dotykiem/myszką: przeciągnięcie nuty zmienia jej
@@ -43,7 +51,8 @@ cwiczenia/*.html                  po jednej stronie na wariant ćwiczenia
 assets/css/                       style (site.css, widgets.css)
 assets/js/                        logika ćwiczeń + core.js (audio, tempo)
 assets/samples/, assets/vendor/   próbki dźwiękowe i biblioteka instrumentów
-dyktanda/                         manifest i pliki MusicXML dyktand
+dyktanda/puzzle/                  manifest i pliki dyktand-puzzle
+dyktanda/wysokosciowe/            osobny manifest i pliki dyktanda wysokościowego
 ```
 
 Szczegółowy opis każdego pliku, sposób dodawania nowego dyktanda i

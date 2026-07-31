@@ -234,6 +234,21 @@
 }
 .notation-container svg { max-width: 100%; height: auto; }
 
+/* Kolorowanie pojedynczych nut po "Sprawdź" (dyktando wysokościowe) - klasa
+   dodawana po renderze na element <g class="note"> wyrenderowany przez
+   Verovio (patrz dyktanda-wysokosciowe.js). Gwiazdka łapie też łepek/kreskę/
+   znak chromatyczny w środku tej grupy, niezależnie od dokładnej struktury SVG. */
+.notation-container g.note.note-feedback-correct,
+.notation-container g.note.note-feedback-correct * {
+    fill: var(--green) !important;
+    stroke: var(--green) !important;
+}
+.notation-container g.note.note-feedback-wrong,
+.notation-container g.note.note-feedback-wrong * {
+    fill: var(--coral) !important;
+    stroke: var(--coral) !important;
+}
+
 .notation-wrap { position: relative; }
 .gesture-layer {
     position: absolute; inset: 0; touch-action: none; cursor: grab;

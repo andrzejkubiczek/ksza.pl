@@ -1,20 +1,20 @@
 === ksza.pl - dedykowana strona statyczna ===
 
-Kompletna witryna: strona główna, "O projekcie" i cztery ćwiczenia
-słuchowe (interwały, trójdźwięki, gamy, dyktanda). Zero backendu,
-zero bazy danych, zero logowania - tylko pliki.
+Kompletna witryna: strona główna, "O projekcie" i pięć ćwiczeń
+słuchowych (interwały, trójdźwięki, gamy, puzzle, dyktanda). Zero
+backendu, zero bazy danych, zero logowania - tylko pliki.
 
 WAŻNE - KROK WYMAGANY PRZED URUCHOMIENIEM DŹWIĘKU:
 Strona używa Tone.js z próbkami dźwiękowymi, których nie mogłem sam
 pobrać (brak internetu w środowisku, w którym pisałem kod) - musisz
-je wgrać przez FTP. Pełna instrukcja: assets/samples/PRZECZYTAJ.txt -
+je wgrać na serwer. Pełna instrukcja: assets/samples/PRZECZYTAJ.txt -
 przeczytaj to PRZED wdrożeniem, inaczej ćwiczenia wczytają się
 poprawnie, ale dźwięk nie zagra.
 
 
 WDROŻENIE (jednorazowe)
-1. Wgraj przez FTP CAŁĄ zawartość folderu ksza-site do katalogu
-   głównego domeny (zwykle public_html/ albo www/).
+1. Wgraj CAŁĄ zawartość folderu ksza-site do katalogu głównego
+   domeny (zwykle public_html/ albo www/).
 2. To wszystko. Strona działa od razu - nie ma nic do instalowania
    ani konfigurowania.
 
@@ -31,6 +31,7 @@ cwiczenia/trojdzwieki-buduj.html - trener trójdźwięków (budowanie zapisu, Ve
 cwiczenia/gamy.html            - trener odmian gam
 cwiczenia/dyktanda.html        - dyktanda-puzzle (ze słuchu)
 cwiczenia/dyktanda-zapis.html  - dyktanda-puzzle (zapis nutowy, Verovio)
+cwiczenia/dyktanda-wysokosciowe.html - dyktando wysokościowe (Verovio)
 assets/css/site.css            - style witryny (nagłówek, karty, stopka)
 assets/css/widgets.css         - style widżetów ćwiczeń
 assets/js/core.js              - rdzeń audio (Tone.js), tempo, nawigacja mobilna
@@ -43,23 +44,45 @@ assets/js/trojdzwieki-buduj.js - logika trójdźwięków (budowanie zapisu)
 assets/js/gamy.js              - logika gam
 assets/js/dyktanda.js          - logika dyktand (parser MusicXML, pauza)
 assets/js/dyktanda-zapis.js    - logika dyktand (puzzle z zapisem nutowym)
+assets/js/dyktanda-wysokosciowe.js  - logika dyktanda wysokościowego
 assets/vendor/Tonejs-Instruments.js  - DO WGRANIA - patrz PRZECZYTAJ.txt
 assets/samples/                      - DO WGRANIA - próbki, patrz PRZECZYTAJ.txt
-dyktanda/dyktanda.json         - LISTA dyktand (manifest - patrz niżej)
-dyktanda/*.xml                 - pliki MusicXML dyktand (wgrywasz przez FTP)
+dyktanda/puzzle/dyktanda.json  - LISTA dyktand-puzzle (manifest - patrz niżej)
+dyktanda/puzzle/*.xml          - pliki MusicXML dyktand-puzzle
+dyktanda/wysokosciowe/dyktanda.json - LISTA dyktand wysokościowych (osobna!)
+dyktanda/wysokosciowe/*.xml    - pliki MusicXML dyktand wysokościowych
+
+WAŻNE: każdy rodzaj dyktanda (puzzle, wysokościowe, w przyszłości też
+uzupełnianie melodii) ma WŁASNĄ, osobną listę i osobny podfolder w
+dyktanda/ - to nie są te same pliki. Dyktanda wysokościowe muszą
+dodatkowo mieć JEDNĄ wartość rytmiczną przez cały utwór (np. same
+ćwierćnuty) - to ćwiczenie sprawdza tylko wysokość dźwięków, nie rytm.
+
+MENU: "Puzzle" (ze słuchu / zapis nutowy) i "Dyktanda" (wysokościowe,
+docelowo też uzupełnianie melodii) to od teraz dwie osobne pozycje w
+menu głównym - w każdej z nich osobna zakładka-przełącznik nad
+ćwiczeniem, gdy jest więcej niż jeden wariant danego rodzaju.
 
 Strony "zapis nutowy" korzystają z biblioteki Verovio (rysowanie nut w
 przeglądarce), wczytywanej bezpośrednio z oficjalnego CDN verovio.org -
-nic tu nie trzeba wgrywać przez FTP, wystarczy działające połączenie
+nic tu nie trzeba wgrywać na serwer, wystarczy działające połączenie
 internetowe u odwiedzającego.
 
 
-DODAWANIE NOWEGO DYKTANDA (przez FTP)
+DODAWANIE NOWEGO DYKTANDA
+Ten sam sposób dla obu rodzajów - różni się tylko folder i manifest:
+dyktanda/puzzle/ + dyktanda/puzzle/dyktanda.json dla puzzli,
+dyktanda/wysokosciowe/ + dyktanda/wysokosciowe/dyktanda.json dla
+dyktanda wysokościowego.
+
 1. Wyeksportuj dyktando z programu nutowego (MuseScore itd.) jako
    NIESKOMPRESOWANY MusicXML (.xml / .musicxml). Skompresowany .mxl
-   nie zadziała.
-2. Wgraj plik przez FTP do folderu dyktanda/, np. dyktanda/dyktando-01.xml
-3. Otwórz dyktanda/dyktanda.json i dopisz wpis do listy:
+   nie zadziała. Dla dyktanda wysokościowego: cały utwór JEDNĄ wartością
+   rytmiczną (np. same ćwierćnuty).
+2. Wgraj plik do właściwego folderu, np.
+   dyktanda/puzzle/dyktando-01.xml albo
+   dyktanda/wysokosciowe/dyktando-01.xml
+3. Otwórz odpowiedni dyktanda.json i dopisz wpis do listy:
 
    [
      { "title": "Dyktando 1 - gama C-dur", "file": "dyktando-01.xml" },
@@ -93,5 +116,5 @@ KOLEJNE ĆWICZENIA W PRZYSZŁOŚCI
 
 
 CO ZOSTAŁO ŚWIADOMIE POMINIĘTE
-- Panel administracyjny - dyktanda dodaje się przez FTP.
+- Panel administracyjny - dyktanda dodaje się ręcznie, wgrywając pliki.
 - Statystyki/konta uczniów - wymagałyby backendu.

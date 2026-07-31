@@ -214,12 +214,14 @@ a:focus-visible, button:focus-visible, select:focus-visible {
 .exercise-card.accent-plum { border-left-color: var(--plum); }
 .exercise-card.accent-teal { border-left-color: var(--teal); }
 .exercise-card.accent-indigo { border-left-color: var(--indigo); }
+.exercise-card.accent-coral { border-left-color: var(--coral); }
 
 .exercise-card .icon { width: 28px; height: 28px; margin: 0 auto 10px; flex-shrink: 0; }
 .exercise-card.accent-gold .icon { color: var(--gold); }
 .exercise-card.accent-plum .icon { color: var(--plum); }
 .exercise-card.accent-teal .icon { color: var(--teal); }
 .exercise-card.accent-indigo .icon { color: var(--indigo); }
+.exercise-card.accent-coral .icon { color: var(--coral); }
 .exercise-card .icon svg { width: 100%; height: 100%; display: block; }
 
 .exercise-card h3 {
