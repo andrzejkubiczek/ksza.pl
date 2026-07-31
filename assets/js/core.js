@@ -136,7 +136,6 @@ window.KszaAudio = (function () {
     }
 
     return {
-        now: function () { return Tone.now(); },
         loadInstrument: loadInstrument,
         ensureReady: ensureReady,
         stopAll: stopAll,
@@ -167,6 +166,77 @@ window.KszaTempo = (function () {
             current = value;
             try { localStorage.setItem(STORAGE_KEY, String(value)); } catch (e) { /* ignorujemy */ }
         }
+    };
+})();
+
+/* Wygodny zakres brzmieniowy (wysokość brzmiąca) każdego instrumentu - żeby
+   losowe ćwiczenia (interwały, trójdźwięki, gamy ze słuchu) nie prosiły np.
+   fagotu o dźwięk, którego realnie by tak nie zagrał. Dyktanda pominięte -
+   tam melodia jest wczytana z pliku, nie losowana. */
+window.KszaInstrumentRange = (function () {
+    const CHROMATIC = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+    const RANGES = {
+        piano:     { min: 'C3',  max: 'F6'  },
+        flute:     { min: 'C4',  max: 'C7'  },
+        clarinet:  { min: 'D3',  max: 'F6'  },
+        violin:    { min: 'G3',  max: 'F6'  },
+        xylophone: { min: 'C5',  max: 'F6'  },
+        trumpet:   { min: 'F#3', max: 'D6'  },
+        bassoon:   { min: 'G2',  max: 'D#5' }
+    };
+
+    function toSemitone(name) {
+        const m = /^([A-G]#?)(-?\d+)$/.exec(name);
+        return parseInt(m[2], 10) * 12 + CHROMATIC.indexOf(m[1]);
+    }
+
+    function fromSemitone(abs) {
+        const pc = ((abs % 12) + 12) % 12;
+        const octave = Math.floor(abs / 12);
+        return CHROMATIC[pc] + octave;
+    }
+
+    // {min, max} jako absolutne półtony; nieznany instrument -> zakres fortepianu.
+    function range(instrumentKey) {
+        const r = RANGES[instrumentKey] || RANGES.piano;
+        return { min: toSemitone(r.min), max: toSemitone(r.max) };
+    }
+
+    function transposeNoteName(name, octaveShift) {
+        return fromSemitone(toSemitone(name) + octaveShift * 12);
+    }
+
+    // Przy zmianie instrumentu w trakcie tego samego przykładu przesuwa
+    // wszystkie dźwięki o tyle samo pełnych oktaw, żeby zmieściły się w
+    // zakresie nowego instrumentu - struktura (interwał/akord/gama) zostaje
+    // ta sama, zmienia się tylko rejestr. Zwraca 0, gdy już się mieszczą.
+    function fitOctaveShift(noteNames, instrumentKey) {
+        const r = range(instrumentKey);
+        const semis = noteNames.map(toSemitone);
+        const lo = Math.min.apply(null, semis);
+        const hi = Math.max.apply(null, semis);
+        let best = 0;
+        let bestOverflow = Infinity;
+        for (let shift = -8; shift <= 8; shift++) {
+            const newLo = lo + shift * 12;
+            const newHi = hi + shift * 12;
+            const overflow = Math.max(0, r.min - newLo) + Math.max(0, newHi - r.max);
+            if (overflow < bestOverflow) {
+                bestOverflow = overflow;
+                best = shift;
+            }
+            if (overflow === 0) break;
+        }
+        return best;
+    }
+
+    return {
+        toSemitone: toSemitone,
+        fromSemitone: fromSemitone,
+        range: range,
+        transposeNoteName: transposeNoteName,
+        fitOctaveShift: fitOctaveShift
     };
 })();
 

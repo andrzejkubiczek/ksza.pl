@@ -87,11 +87,8 @@
     let verovioToolkit = null;
     let verovioReadyPromise = null;
 
-    // Znany, udokumentowany przez sam zespół Verovio problem: onRuntimeInitialized
-    // czasem nie odpala się w porę, jeśli moduł zdąży się zainicjalizować, zanim
-    // nasz kod zdąży się pod niego podpiąć (najbardziej widoczne przy szybkim
-    // odświeżaniu strony na serwerach lokalnych). Zabezpieczamy się potrójnie:
-    // próba od razu, oficjalny callback, i na wszelki wypadek odpytywanie co 50ms.
+    // onRuntimeInitialized czasem nie odpala się w porę - zabezpieczenie
+    // potrójne: próba od razu, oficjalny callback, odpytywanie co 50ms.
     function ensureVerovioReady() {
         if (verovioReadyPromise) return verovioReadyPromise;
         verovioReadyPromise = new Promise((resolve, reject) => {

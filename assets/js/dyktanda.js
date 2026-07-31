@@ -99,10 +99,8 @@
     const FRAGMENT_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     let sortableInstance = null;
 
-    /* Silnik odtwarzania całości z pauzą. Tone.Sampler nie zwraca uchwytu do
-       pojedynczej, jeszcze nie zagranej nuty (inaczej niż soundfont-player),
-       więc planowanie/anulowanie robimy przez setTimeout/clearTimeout -
-       gwarantowany mechanizm przeglądarki, nie zależny od Tone.js. */
+    // Silnik odtwarzania z pauzą - planowanie/anulowanie przez setTimeout,
+    // bo Tone.Sampler nie zwraca uchwytu do pojedynczej, niezagranej nuty.
     let fullPlaybackTimeline = [];
     let fullPlaybackTotalDuration = 0;
     let playbackState = 'stopped';
@@ -196,9 +194,8 @@
         if (playbackWatcher) { clearTimeout(playbackWatcher); playbackWatcher = null; }
     }
 
-    // Zatrzymuje WSZYSTKO zaplanowane - fragment/"mój układ" ORAZ pełne
-    // dyktando z pauzą - i to, co akurat brzmi. Wywoływana na początku
-    // każdej akcji odtwarzania, żeby żadne dwie ścieżki się nie nałożyły.
+    // Zatrzymuje wszystko zaplanowane (fragment i pełne dyktando) - wywoływana
+    // na początku każdej akcji odtwarzania, żeby ścieżki się nie nałożyły.
     function stopAllPlayback() {
         scheduledSimpleTimeouts.forEach((id) => clearTimeout(id));
         scheduledSimpleTimeouts = [];
@@ -209,9 +206,7 @@
         updatePlaybackButtons();
     }
 
-    // Planuje pozostałą część utworu od offsetSeconds. Każda nuta to
-    // osobny setTimeout - jeśli trzeba przerwać, clearTimeout na
-    // wszystkich gwarantuje, że żadna z nich nie zabrzmi.
+    // Planuje pozostałą część utworu od offsetSeconds, nuta po nucie.
     function scheduleFullFrom(offsetSeconds) {
         stopScheduledTimeouts();
         scheduleStartWallClock = performance.now();

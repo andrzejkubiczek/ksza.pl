@@ -73,7 +73,6 @@
 /* ---------- Status / komunikaty ---------- */
 .status-line { min-height: 20px; font-size: 0.82rem; margin: 6px 0 4px; color: var(--muted); }
 .status-line.status-error { color: var(--coral); font-weight: 600; }
-.status-line.status-ok { color: var(--green); }
 
 /* ---------- Przyciski odtwarzania ---------- */
 .player-controls { margin: 20px 0 24px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }

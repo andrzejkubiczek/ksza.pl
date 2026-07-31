@@ -1,19 +1,8 @@
 /* ksza.pl - interwały: budowanie zapisu nutowego
-   Odwrotność ćwiczenia "zapis nutowy": tam uczeń CZYTA gotowy interwał,
-   tutaj go BUDUJE. Dźwięk startowy jest losowany i stały, uczeń strzałkami
-   przesuwa literę drugiego dźwięku (drabina diatoniczna C-D-E-F-G-A-B) i
-   osobno ustawia znak chromatyczny (bemol/naturalny/krzyżyk). Po każdej
-   zmianie przerysowujemy nuty przez Verovio - ten sam mechanizm budowania
-   MusicXML co w interwaly-zapis.js (zweryfikowany), tylko sterowany
-   panelem zamiast przycisków z gotową nazwą interwału.
-
-   Panel znaku chromatycznego ma świadomie tylko 3 stany (-1..1): przy
-   naturalnym dźwięku startowym żaden z 13 interwałów nie wymaga
-   podwójnego bemola/krzyżyka (sprawdzone dla wszystkich 7 liter x 13
-   interwałów x 2 kierunki). Poziom 2 dopuszcza chromatyczny dźwięk
-   startowy, ale TYLKO w kombinacjach z danym interwałem/kierunkiem,
-   które nadal mieszczą się w tym zakresie (patrz pickRootAlter) - żeby
-   panel nie musiał rosnąć do 5 znaków. */
+   Odwrotność "zapis nutowy": tam uczeń czyta gotowy interwał, tutaj go
+   buduje - strzałkami przesuwa literę drugiego dźwięku i osobno ustawia
+   znak chromatyczny (♭/♮/♯, świadomie tylko 3 stany - sprawdzone, że przy
+   dozwolonych kombinacjach nigdy nie trzeba podwójnego znaku). */
 (function () {
     const LETTERS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
     const LETTER_NATURAL_OFFSET = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
@@ -54,14 +43,8 @@
         return { letter: target.letter, alter: (startAbs + direction * def.semitones) - target.naturalSemitone, octave: target.octave };
     }
 
-    /* ---------- MusicXML: dwie KOLEJNE nuty (nie akord) ----------
-       W ćwiczeniu "rozpoznawanie" dwa dzwieki sa akordem (<chord/>), bo
-       interwal tam jest gotowy i ma brzmiec jako calosc. Tutaj uczen
-       dopiero USTAWIA gorny dzwiek - gdy krok = 0 (pryma), akord
-       nalozylby obie nuty na siebie w tym samym miejscu, przez co znak
-       chromatyczny gornej nuty wygladalby jak znak dolnej (zob. uwaga
-       uzytkownika). Dwie kolejne nuty w takcie rozwiazuja to od razu:
-       zawsze osobne miejsca na pieciolinii, niezaleznie od wysokosci. */
+    // Dwie KOLEJNE nuty, nie akord - przy kroku 0 obie nuty nakładałyby się
+    // na siebie i znak chromatyczny wyglądałby, jakby dotyczył złej nuty.
     function noteToPitchXml(note) {
         const alterTag = note.alter !== 0 ? '<alter>' + note.alter + '</alter>' : '';
         return '<pitch><step>' + note.letter + '</step>' + alterTag + '<octave>' + note.octave + '</octave></pitch>';
@@ -184,10 +167,8 @@
         document.getElementById('letter-up').disabled = hasAnswered || builderStep === bounds.max;
     }
 
-    // Poziom 2: dźwięk startowy może być chromatyczny, ale tylko jeśli dla
-    // danego interwału/kierunku wynikowy drugi dźwięk nadal mieści się w
-    // zakresie -1..1 (żeby panel nie musiał mieć podwójnych znaków). 0
-    // (naturalny) jest zawsze bezpieczny, więc lista nigdy nie jest pusta.
+    // Poziom 2: dźwięk startowy może być chromatyczny, ale tylko gdy wynikowy
+    // drugi dźwięk zmieści się w -1..1 (naturalny jest zawsze bezpieczny).
     function pickRootAlter(letter, symbol, dir) {
         const safeAlters = [-1, 0, 1].filter((alter) => {
             const probe = { letter: letter, alter: alter, octave: TREBLE_ROOT_OCTAVE };
@@ -275,12 +256,9 @@
         setAccidental(builderAlter === 0 ? 1 : builderAlter === 1 ? -1 : 0);
     }
 
-    /* ---------- Gest: przeciągnięcie/stuknięcie jako alternatywa dla przycisków ----------
-       Verovio rysuje nuty od zera przy każdej zmianie, więc nie znamy dokładnej
-       pozycji piksela danej nuty na ekranie - zamiast mapować palec na pozycję,
-       liczymy WZGLĘDNE przesunięcie (co ile pikseli = jeden krok) i wywołujemy
-       dokładnie te same, już przetestowane funkcje co przyciski (moveLetter,
-       cycleAccidental). Krótkie dotknięcie bez przesunięcia = zmiana znaku. */
+    // Gest jako alternatywa dla przycisków: przesunięcie WZGLĘDNE (co ile
+    // pikseli = jeden krok), bo Verovio przerysowuje nuty od zera i nie znamy
+    // ich dokładnej pozycji na ekranie. Dotknięcie bez przesunięcia = znak.
     function setupGestureLayer() {
         const layer = document.getElementById('gesture-layer');
         const DRAG_STEP_PX = 24;

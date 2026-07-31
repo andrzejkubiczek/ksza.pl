@@ -13,10 +13,9 @@
         { name: 'c-moll', pc: 0 }
     ];
 
-    // "up" = przebieg w górę (8 dźwięków), "down": null = dokładne odwrócenie up.
-    // "dorycka" tutaj NIE jest klasycznym trybem doryckim (tam podwyższone
-    // byłoby tylko VI) - to VI i VII podwyższone symetrycznie w obu kierunkach.
-    // Różni się od melodycznej tylko zejściem: melodyczna wraca do eolskiej.
+    // "up" = przebieg w górę, "down": null = odwrócenie up. "dorycka" tu to
+    // VI i VII podwyższone symetrycznie w obu kierunkach (nie klasyczny tryb
+    // dorycki) - różni się od melodycznej tylko zejściem.
     const SCALE_TYPES = [
         { key: 'durowa',      label: 'Durowa',             tonics: MAJOR_TONICS, up: [0,2,4,5,7,9,11,12], down: null },
         { key: 'eolska',      label: 'Molowa eolska',      tonics: MINOR_TONICS, up: [0,2,3,5,7,8,10,12], down: null },
@@ -25,9 +24,7 @@
         { key: 'melodyczna',  label: 'Molowa melodyczna',  tonics: MINOR_TONICS, up: [0,2,3,5,7,9,11,12], down: [12,10,8,7,5,3,2,0] }
     ];
 
-    // Tonika losowana z {3, 4} (mała/razkreślna) - cała gama mieści się
-    // zawsze w C3-H5 (mała, razkreślna, dwukreślna).
-    const TONIC_OCTAVE_OPTIONS = [3, 4];
+    const TONIC_OCTAVE_OPTIONS = [3, 4]; // awaryjne, patrz pickTonicOctave
     const BASE_NOTE_DURATION = 0.425;        // 0.34 * 1.25 - wolniej o 25% (I stopień, młodsze dzieci)
     const BASE_TURNAROUND_DURATION = 0.6875; // 0.55 * 1.25
     const BASE_TURNAROUND_GAP = 0.225;       // 0.18 * 1.25
@@ -50,9 +47,38 @@
         return CHROMATIC[pc] + octave;
     }
 
-    // 'up-down': 8 dźwięków w górę + 8 w dół (nuta w punkcie zwrotnym powtórzona -
-    //            raz kończy wznoszenie, raz zaczyna zejście - łącznie 16 dźwięków).
-    // 'down-up': analogicznie, 8 w dół + 8 w górę.
+    function currentInstrument() {
+        return document.getElementById('instrument-select').value;
+    }
+
+    // Oktawa toniki tak, by cała gama zmieściła się w zakresie instrumentu;
+    // gdy żadna nie pasuje w całości (np. wąski zakres ksylofonu), bierzemy
+    // tę z najmniejszym przekroczeniem zakresu.
+    function pickTonicOctave(tonicPc, maxOffset) {
+        const range = KszaInstrumentRange.range(currentInstrument());
+        const candidates = [];
+        for (let oct = 0; oct <= 8; oct++) {
+            const abs = oct * 12 + tonicPc;
+            if (abs >= range.min && abs + maxOffset <= range.max) candidates.push(oct);
+        }
+        if (candidates.length) {
+            return candidates[Math.floor(Math.random() * candidates.length)];
+        }
+
+        let best = TONIC_OCTAVE_OPTIONS[0];
+        let bestOverflow = Infinity;
+        for (let oct = 0; oct <= 8; oct++) {
+            const abs = oct * 12 + tonicPc;
+            const overflow = Math.max(0, range.min - abs) + Math.max(0, (abs + maxOffset) - range.max);
+            if (overflow < bestOverflow) {
+                bestOverflow = overflow;
+                best = oct;
+            }
+        }
+        return best;
+    }
+
+    // Nuta w punkcie zwrotnym powtórzona - kończy jeden kierunek i zaczyna drugi.
     function buildScaleNoteNames(scaleType, tonic, direction, tonicOctave) {
         const upNotes = scaleType.up.map((o) => noteAt(tonic.pc, o, tonicOctave));
         const downOffsets = scaleType.down || [...scaleType.up].reverse();
@@ -109,7 +135,8 @@
         const tonics = currentScaleType.tonics;
         currentTonic = tonics[Math.floor(Math.random() * tonics.length)];
         currentDirection = DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)];
-        currentTonicOctave = TONIC_OCTAVE_OPTIONS[Math.floor(Math.random() * TONIC_OCTAVE_OPTIONS.length)];
+        const maxOffset = Math.max(...currentScaleType.up);
+        currentTonicOctave = pickTonicOctave(currentTonic.pc, maxOffset);
         currentNoteNames = buildScaleNoteNames(currentScaleType, currentTonic, currentDirection, currentTonicOctave);
     }
 
@@ -188,6 +215,10 @@
         document.getElementById('instrument-select').addEventListener('change', (e) => {
             KszaAudio.stopAll();
             stopScheduledScale();
+            const shift = KszaInstrumentRange.fitOctaveShift(currentNoteNames, e.target.value);
+            if (shift !== 0) {
+                currentNoteNames = currentNoteNames.map((n) => KszaInstrumentRange.transposeNoteName(n, shift));
+            }
             KszaAudio.loadInstrument(e.target.value, onAudioState);
         });
         document.querySelectorAll('.scale-choice').forEach((btn) => {

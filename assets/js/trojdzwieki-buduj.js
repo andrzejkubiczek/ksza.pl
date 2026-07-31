@@ -1,24 +1,10 @@
 /* ksza.pl - trójdźwięki: budowanie zapisu nutowego
-   Odwrotność ćwiczenia "zapis nutowy": tam uczeń CZYTA gotowy trójdźwięk,
-   tutaj go BUDUJE. Dźwięk w basie jest losowany i stały (dokładnie to,
-   co "zapis nutowy" wylicza jako notes[0] po uwzględnieniu przewrotu) -
-   uczeń ustawia pozostałe dwa dźwięki.
-
-   Dwa dźwięki do ustawienia to więcej niż w interwałach (tam był jeden),
-   więc zamiast jednego panelu jest KURSOR: strzałki "Poprzednia/Następna
-   nuta" przełączają, który z dwóch dźwięków aktualnie edytujemy - te same
-   strzałki góra/dół i przełącznik ♭/♮/♯ działają zawsze na aktualnie
-   wybrany. Stan (krok + znak) każdego dźwięku jest pamiętany osobno, więc
-   przełączanie tam i z powrotem nic nie gubi. Ten sam mechanizm ma się
-   dać rozszerzyć w przyszłości na dyktanda z uzupełnianiem całej melodii
-   (więcej niż 2 edytowalne dźwięki - zmienia się tylko długość listy
-   przystanków kursora, nie sam mechanizm).
-
-   Znak chromatyczny ma świadomie tylko 3 stany (-1..1). Przy naturalnym
-   dźwięku w basie jedyna kombinacja wymagająca podwójnego krzyżyka to
-   dźwięk H (B) + trójdźwięk zwiększony (kwinta = Fisis) - wykluczona z
-   losowania (patrz pickRootLetter). Sprawdzone dla wszystkich 7 liter x
-   4 rodzajów x obu składników (tercja, kwinta). */
+   Odwrotność "zapis nutowy": tam uczeń czyta gotowy trójdźwięk, tutaj go
+   buduje. Bas jest dany, uczeń ustawia pozostałe dwa dźwięki - kursor
+   "Poprzednia/Następna nuta" wybiera KTÓRY, te same strzałki i przełącznik
+   ♭/♮/♯ działają na aktualnie wybranym (stan każdego pamiętany osobno).
+   Docelowo ten sam mechanizm ma obsłużyć dłuższe listy - np. uzupełnianie
+   całej melodii w przyszłych dyktandach. */
 (function () {
     const LETTERS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
     const LETTER_NATURAL_OFFSET = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
@@ -30,9 +16,7 @@
         zwiekszony:  { third: { steps: 2, semitones: 4 }, fifth: { steps: 4, semitones: 8 } }
     };
 
-    // symbol: te same znaki co na przyciskach odpowiedzi w ćwiczeniu
-    // "rozpoznawanie" (trojdzwieki.html / trojdzwieki-zapis.html) - dopisywane
-    // do polecenia, żeby dzieciom łatwiej się kojarzyły i zapamiętywały.
+    // symbol: te same znaki co na przyciskach w ćwiczeniu "rozpoznawanie".
     const TRIAD_TYPES = {
         'durowy_z':    { shape: 'durowy',      inversion: 0, level: 1, label: 'Durowy',                 symbol: '+' },
         'molowy_z':    { shape: 'molowy',      inversion: 0, level: 1, label: 'Molowy',                 symbol: 'o' },
@@ -61,9 +45,8 @@
         return { letter: target.letter, alter: (startAbs + def.semitones) - target.naturalSemitone, octave: target.octave };
     }
 
-    // Buduje trójdźwięk w postaci zasadniczej (pryma, tercja, kwinta), a dla
-    // przewrotu "obraca" go: składnik z dołu wędruje na górę, +1 oktawa.
-    // notes[0] po obrocie to zawsze faktyczny dźwięk w basie.
+    // Postać zasadnicza, a dla przewrotu "obrót": składnik z dołu na górę, +1
+    // oktawa. notes[0] po obrocie to zawsze faktyczny dźwięk w basie.
     function buildTriadNotes(rootNote, shapeName, inversion) {
         const shape = TRIAD_SHAPES[shapeName];
         const third = spellUp(rootNote, shape.third);
@@ -160,10 +143,8 @@
     let expectedNotes = null;     // [bas, srodkowy, gorny] - poprawna odpowiedź
     let hasAnswered = false;
 
-    // Edytowalne pozycje: indeks 1 (środkowy) i 2 (górny) w tablicy notes.
-    // editableState[i] = { step, alter }. Kursor porusza się po EDITABLE_INDICES -
-    // ten sam mechanizm posłuży w przyszłości do uzupełniania całej melodii
-    // (wtedy EDITABLE_INDICES miałoby więcej niż 2 pozycje).
+    // Edytowalne pozycje w notes: 1 (środkowy), 2 (górny). Kursor porusza się
+    // po EDITABLE_INDICES - dłuższa lista obsłużyłaby więcej dźwięków.
     const EDITABLE_INDICES = [1, 2];
     let editableState = {};
     let cursorPos = 0;
@@ -185,9 +166,7 @@
         el.className = 'status-line' + (type ? ' status-' + type : '');
     }
 
-    // Jedyna kombinacja przy naturalnym dźwięku wymagająca podwójnego krzyżyka:
-    // H (B) jako pryma trójdźwięku zwiększonego (kwinta = Fisis). Wykluczamy ją,
-    // żeby panel znaku chromatycznego mógł zostać 3-stanowy.
+    // H + zwiększony wymagałby podwójnego krzyżyka (kwinta = Fisis) - wykluczone.
     function pickRootLetter(shapeName) {
         const pool = shapeName === 'zwiekszony' ? LETTERS.filter((l) => l !== 'B') : LETTERS;
         return pool[Math.floor(Math.random() * pool.length)];
@@ -314,12 +293,8 @@
         setAccidental(current === 0 ? 1 : current === 1 ? -1 : 0);
     }
 
-    /* ---------- Gest: przeciągnięcie/stuknięcie jako alternatywa dla przycisków ----------
-       Działa zawsze na dźwięku aktualnie wybranym kursorem "Poprzednia/Następna
-       nuta" - wybór KTÓREGO dźwięku edytujemy zostaje przy przyciskach (patrz
-       rozmowa o kursorze), gest dokłada tylko sposób ustawienia jego wysokości.
-       Względne przesunięcie zamiast mapowania na piksel nuty - patrz uzasadnienie
-       w interwaly-buduj.js. */
+    // Gest działa na dźwięku aktualnie wybranym kursorem; wybór KTÓRY zostaje
+    // przy przyciskach. Względne przesunięcie - patrz uzasadnienie w interwaly-buduj.js.
     function setupGestureLayer() {
         const layer = document.getElementById('gesture-layer');
         const DRAG_STEP_PX = 24;

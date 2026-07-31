@@ -20,12 +20,33 @@
     const BASE_HARMONIC_DURATION = 1.75;      // czas trwania obu dźwięków granych razem (tryb harmoniczny/mieszany)
     const BASE_MIXED_GAP = 1.0;               // cisza między częścią melodyczną a harmoniczną w trybie mieszanym
 
+    const ARRAY_BASE_SEMITONE = KszaInstrumentRange.toSemitone(notesArray[0]); // C3
+
     let currentInterval = null;
     let firstNoteName = '';
     let secondNoteName = '';
     let hasAnswered = false;
     let isPlayingInterval = false;
     let scheduledIntervalTimeouts = [];
+
+    function currentInstrument() {
+        return document.getElementById('instrument-select').value;
+    }
+
+    // Indeks startowy tak, by cały interwał zmieścił się w zakresie instrumentu.
+    // notesArray ma twardy sufit (B5) - gdy się nie da zmieścić w całości
+    // (np. ksylofon + oktawa), bierzemy pozycję najbliższą temu zakresowi.
+    function pickStartIndex(semitones) {
+        const range = KszaInstrumentRange.range(currentInstrument());
+        const arrayMaxIdx = notesArray.length - 1 - semitones;
+        let minIdx = Math.max(0, range.min - ARRAY_BASE_SEMITONE);
+        let maxIdx = Math.min(arrayMaxIdx, range.max - ARRAY_BASE_SEMITONE - semitones);
+        if (maxIdx < minIdx) {
+            minIdx = Math.max(0, Math.min(minIdx, arrayMaxIdx));
+            maxIdx = minIdx;
+        }
+        return minIdx + Math.floor(Math.random() * (maxIdx - minIdx + 1));
+    }
 
     function setStatus(message, type) {
         const el = document.getElementById('status-line');
@@ -58,9 +79,7 @@
         document.querySelectorAll('.interval-choice').forEach((b) => b.removeAttribute('disabled'));
 
         currentInterval = intervals[Math.floor(Math.random() * intervals.length)];
-
-        const maxStartIndex = notesArray.length - 1 - currentInterval.semitones;
-        const startIndex = Math.floor(Math.random() * maxStartIndex);
+        const startIndex = pickStartIndex(currentInterval.semitones);
 
         const lowerNote = notesArray[startIndex];
         const higherNote = notesArray[startIndex + currentInterval.semitones];
@@ -160,6 +179,11 @@
         document.getElementById('instrument-select').addEventListener('change', (e) => {
             KszaAudio.stopAll();
             stopScheduledInterval();
+            const shift = KszaInstrumentRange.fitOctaveShift([firstNoteName, secondNoteName], e.target.value);
+            if (shift !== 0) {
+                firstNoteName = KszaInstrumentRange.transposeNoteName(firstNoteName, shift);
+                secondNoteName = KszaInstrumentRange.transposeNoteName(secondNoteName, shift);
+            }
             KszaAudio.loadInstrument(e.target.value, onAudioState);
         });
         document.querySelectorAll('.interval-choice').forEach((btn) => {

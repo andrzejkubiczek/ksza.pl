@@ -1,8 +1,8 @@
 === ksza.pl - dedykowana strona statyczna ===
 
-Kompletna witryna zastępująca WordPressa: strona główna, "O projekcie"
-i cztery ćwiczenia słuchowe (interwały, trójdźwięki, gamy, dyktanda).
-Zero backendu, zero bazy danych, zero logowania - tylko pliki.
+Kompletna witryna: strona główna, "O projekcie" i cztery ćwiczenia
+słuchowe (interwały, trójdźwięki, gamy, dyktanda). Zero backendu,
+zero bazy danych, zero logowania - tylko pliki.
 
 WAŻNE - KROK WYMAGANY PRZED URUCHOMIENIEM DŹWIĘKU:
 Strona używa Tone.js z próbkami dźwiękowymi, których nie mogłem sam
@@ -17,12 +17,6 @@ WDROŻENIE (jednorazowe)
    głównego domeny (zwykle public_html/ albo www/).
 2. To wszystko. Strona działa od razu - nie ma nic do instalowania
    ani konfigurowania.
-
-Uwaga przy przejściu z WordPressa: zanim usuniesz WordPressa, upewnij
-się, że nowe pliki nie kolidują ze starymi (np. stary index.php vs nowy
-index.html). Najbezpieczniej: najpierw wgraj nową stronę do podkatalogu
-testowego, sprawdź czy wszystko działa, a dopiero potem przenieś pliki
-na docelowe miejsce.
 
 
 STRUKTURA PLIKÓW

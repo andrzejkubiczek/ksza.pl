@@ -1,7 +1,7 @@
 /* ksza.pl - trener trójdźwięków */
 (function () {
     const CHROMATIC = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-    const BASS_OCTAVE_OPTIONS = [3, 4]; // mała/razkreślna - trójdźwięk zawsze zmieści się w C3-H5
+    const BASS_OCTAVE_OPTIONS = [3, 4]; // mała/razkreślna - awaryjny zestaw, gdy zakres instrumentu jest za wąski
 
     // Offsety liczone od NAJNIŻSZEGO granego dźwięku (basu danej postaci), nie od
     // "prymy" akordu - nie trzeba śledzić harmonicznego prymu, liczy się struktura.
@@ -33,6 +33,24 @@
         const pc = ((total % 12) + 12) % 12;
         const octave = bassOctave + Math.floor(total / 12);
         return CHROMATIC[pc] + octave;
+    }
+
+    function currentInstrument() {
+        return document.getElementById('instrument-select').value;
+    }
+
+    // Bas (jako absolutny półton) tak, by cały akord zmieścił się w zakresie
+    // instrumentu; gdyby się nie dało - awaryjnie generyczny zestaw oktaw.
+    function pickBassAbsolute(maxOffset) {
+        const range = KszaInstrumentRange.range(currentInstrument());
+        let lo = range.min;
+        let hi = range.max - maxOffset;
+        if (hi < lo) {
+            const oct = BASS_OCTAVE_OPTIONS[Math.floor(Math.random() * BASS_OCTAVE_OPTIONS.length)];
+            lo = oct * 12;
+            hi = lo + 11;
+        }
+        return lo + Math.floor(Math.random() * (hi - lo + 1));
     }
 
     function setStatus(message, type) {
@@ -86,8 +104,10 @@
 
         currentTriadType = pool[Math.floor(Math.random() * pool.length)];
 
-        const bassPc = Math.floor(Math.random() * 12);
-        const bassOctave = BASS_OCTAVE_OPTIONS[Math.floor(Math.random() * BASS_OCTAVE_OPTIONS.length)];
+        const maxOffset = Math.max(...currentTriadType.offsets);
+        const bassAbsolute = pickBassAbsolute(maxOffset);
+        const bassPc = ((bassAbsolute % 12) + 12) % 12;
+        const bassOctave = Math.floor(bassAbsolute / 12);
         currentNotes = currentTriadType.offsets.map((o) => noteAt(bassPc, o, bassOctave));
     }
 
@@ -187,6 +207,10 @@
         document.getElementById('instrument-select').addEventListener('change', (e) => {
             KszaAudio.stopAll();
             stopScheduled();
+            const shift = KszaInstrumentRange.fitOctaveShift(currentNotes, e.target.value);
+            if (shift !== 0) {
+                currentNotes = currentNotes.map((n) => KszaInstrumentRange.transposeNoteName(n, shift));
+            }
             KszaAudio.loadInstrument(e.target.value, onAudioState);
         });
         document.getElementById('level-select').addEventListener('change', generateNewTriad);
