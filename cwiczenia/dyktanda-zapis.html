@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Dyktanda - ksza.pl</title>
-    <meta name="description" content="Dyktanda muzyczne w formie puzzli: wysłuchaj melodii i ułóż jej fragmenty we właściwej kolejności.">
+    <title>Dyktanda - zapis nutowy - ksza.pl</title>
+    <meta name="description" content="Dyktanda muzyczne w formie puzzli: wysłuchaj dyktanda, przeczytaj zapis nutowy fragmentów i ułóż je we właściwej kolejności.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -34,15 +34,13 @@
     <div class="container exercise-page">
         <div class="widget">
             <nav class="subnav" aria-label="Odmiany ćwiczenia">
-                <a href="dyktanda.html" aria-current="page">Ze słuchu</a>
-                <a href="dyktanda-zapis.html">Zapis nutowy</a>
+                <a href="dyktanda.html">Ze słuchu</a>
+                <a href="dyktanda-zapis.html" aria-current="page">Zapis nutowy</a>
             </nav>
             <div class="widget-header">
-                <h1>Dyktando muzyczne - puzzle</h1>
-                <p>Wysłuchaj dyktanda, a następnie ułóż potasowane fragmenty (takty) we właściwej kolejności.</p>
+                <h1>Dyktando muzyczne - puzzle (zapis nutowy)</h1>
+                <p>Wysłuchaj dyktanda, przeczytaj zapis nutowy fragmentów, a następnie ułóż potasowane takty we właściwej kolejności.</p>
             </div>
-
-            <ul class="staff" aria-hidden="true"><li></li><li></li><li></li><li></li><li></li></ul>
 
             <div class="controls-row">
                 <div class="field">
@@ -106,6 +104,7 @@
     <div class="container">
         &copy; <span id="footer-year">2026</span> ksza.pl (aK) &middot; <a href="../o-projekcie.html">O projekcie</a>
         <br><small>Próbki instrumentów: biblioteka <a href="https://github.com/nbrosowsky/tonejs-instruments" target="_blank" rel="noopener">tonejs-instruments</a> (źródło nagrań: VSCO2, licencja CC-BY 3.0)</small>
+        <br><small>Zapis nutowy: silnik <a href="https://www.verovio.org/" target="_blank" rel="noopener">Verovio</a> (RISM Digital Center, licencja LGPL)</small>
     </div>
 </footer>
 
@@ -113,8 +112,9 @@
 <script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.min.js"></script>
 <script src="../assets/vendor/Tonejs-Instruments.js"></script>
 <script>window.KSZA_SAMPLES_BASE = '../assets/samples/';</script>
+<script src="https://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.7/Sortable.min.js"></script>
 <script src="../assets/js/core.js"></script>
-<script src="../assets/js/dyktanda.js"></script>
+<script src="../assets/js/dyktanda-zapis.js"></script>
 </body>
 </html>

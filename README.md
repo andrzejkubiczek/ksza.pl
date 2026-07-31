@@ -18,8 +18,9 @@ plików) jest w [opis.txt](opis.txt).
   zapis nutowy i budowanie zapisu; postać zasadnicza oraz przewroty.
 - **Gamy** - durowa i cztery odmiany molowej (eolska, harmoniczna,
   dorycka, melodyczna).
-- **Dyktanda** - układanie fragmentów melodii we właściwej kolejności
-  ze słuchu.
+- **Dyktanda** - układanie fragmentów melodii we właściwej kolejności;
+  ze słuchu albo czytając zapis nutowy (każdy takt jako osobny,
+  samodzielny fragment - z własnym kluczem, żeby nie zdradzać kolejności).
 
 Ćwiczenia "zbuduj" (interwały/trójdźwięki) obsługuje się zarówno
 przyciskami, jak i dotykiem/myszką: przeciągnięcie nuty zmienia jej

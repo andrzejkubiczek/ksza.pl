@@ -66,7 +66,7 @@
             : '<clef><sign>G</sign><line>2</line></clef>';
         return '<?xml version="1.0" encoding="UTF-8"?>' +
             '<score-partwise version="4.0">' +
-            '<part-list><score-part id="P1"><part-name>Interwał</part-name></score-part></part-list>' +
+            '<part-list><score-part id="P1"><part-name print-object="no">Interwał</part-name></score-part></part-list>' +
             '<part id="P1"><measure number="1">' +
             '<attributes><divisions>1</divisions><key><fifths>0</fifths></key>' +
             '<time><beats>4</beats><beat-type>4</beat-type></time>' + clefTag + '</attributes>' +

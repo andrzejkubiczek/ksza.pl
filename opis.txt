@@ -29,7 +29,8 @@ cwiczenia/trojdzwieki.html     - trener trójdźwięków (ze słuchu)
 cwiczenia/trojdzwieki-zapis.html - trener trójdźwięków (zapis nutowy, Verovio)
 cwiczenia/trojdzwieki-buduj.html - trener trójdźwięków (budowanie zapisu, Verovio)
 cwiczenia/gamy.html            - trener odmian gam
-cwiczenia/dyktanda.html        - dyktanda-puzzle
+cwiczenia/dyktanda.html        - dyktanda-puzzle (ze słuchu)
+cwiczenia/dyktanda-zapis.html  - dyktanda-puzzle (zapis nutowy, Verovio)
 assets/css/site.css            - style witryny (nagłówek, karty, stopka)
 assets/css/widgets.css         - style widżetów ćwiczeń
 assets/js/core.js              - rdzeń audio (Tone.js), tempo, nawigacja mobilna
@@ -41,6 +42,7 @@ assets/js/trojdzwieki-zapis.js - logika trójdźwięków (zapis nutowy)
 assets/js/trojdzwieki-buduj.js - logika trójdźwięków (budowanie zapisu)
 assets/js/gamy.js              - logika gam
 assets/js/dyktanda.js          - logika dyktand (parser MusicXML, pauza)
+assets/js/dyktanda-zapis.js    - logika dyktand (puzzle z zapisem nutowym)
 assets/vendor/Tonejs-Instruments.js  - DO WGRANIA - patrz PRZECZYTAJ.txt
 assets/samples/                      - DO WGRANIA - próbki, patrz PRZECZYTAJ.txt
 dyktanda/dyktanda.json         - LISTA dyktand (manifest - patrz niżej)

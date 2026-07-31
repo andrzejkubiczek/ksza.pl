@@ -1,17 +1,18 @@
-/* ksza.pl - dyktanda muzyczne (puzzle)
-   Lista dyktand pochodzi z pliku ../dyktanda/dyktanda.json (manifest),
-   który edytujesz razem z wgrywaniem plików .xml przez FTP.
-   Format manifestu:
-   [
-     { "title": "Dyktando 1 - gama C-dur", "file": "dyktando-01.xml" },
-     { "title": "Dyktando 2 - tercje",     "file": "dyktando-02.xml" }
-   ]
-*/
+/* ksza.pl - dyktanda: puzzle w wersji zapisu nutowego
+   Ta sama lista dyktand (dyktanda.json) i te same pliki MusicXML co w
+   wersji "ze słuchu" - silnik odtwarzania jest identyczny (dziecko musi
+   móc posłuchać dyktanda w obu wersjach), dodatkowo każdy takt jest też
+   rysowany przez Verovio na karcie puzzli.
+
+   Każdy takt to osobny, samodzielny dokument MusicXML z tym samym kluczem/
+   metrum/tonacją co cały utwór (z pierwszego taktu) - żeby żaden fragment
+   nie zdradzał, który jest naprawdę pierwszy w kolejności. Nuty w każdym
+   takcie to dosłowna kopia oryginalnego XML-a (przez XMLSerializer), więc
+   wiązania, kropki i inne szczegóły zapisu zostają takie, jak w źródle. */
 (function () {
-    // Wolniej o 25% niż tempo zapisane w pliku MusicXML - I stopień, młodsze dzieci.
     const TEMPO_SLOWDOWN = 1.25;
 
-    /* ---------- Parser MusicXML (jednogłosowe dyktanda) ---------- */
+    /* ---------- Parser MusicXML: audio (events) + notacja (surowy XML) razem ---------- */
     function parseMusicXML(xmlText) {
         const parser = new DOMParser();
         const xml = parser.parseFromString(xmlText, 'application/xml');
@@ -25,13 +26,32 @@
             throw new Error('Nie znaleziono elementu <part> - to nie wygląda na plik MusicXML.');
         }
 
+        const measureEls = Array.from(part.querySelectorAll('measure'));
+        const firstAttrs = measureEls.length ? measureEls[0].querySelector('attributes') : null;
+
+        function attrText(selector, fallback) {
+            const el = firstAttrs ? firstAttrs.querySelector(selector) : null;
+            return el ? el.textContent : fallback;
+        }
+
+        const notationHeaderXml =
+            '<attributes><divisions>' + attrText('divisions', '1') + '</divisions>' +
+            '<key><fifths>' + attrText('key fifths', '0') + '</fifths></key>' +
+            '<time><beats>' + attrText('time beats', '4') + '</beats>' +
+            '<beat-type>' + attrText('time beat-type', '4') + '</beat-type></time>' +
+            '<clef><sign>' + attrText('clef sign', 'G') + '</sign>' +
+            '<line>' + attrText('clef line', '2') + '</line></clef>' +
+            '</attributes>';
+
         let divisions = 1;
         let tempoBPM = 96;
+        const serializer = new XMLSerializer();
         const fragments = [];
         let pendingTie = null;
 
-        part.querySelectorAll('measure').forEach((measure) => {
+        measureEls.forEach((measure) => {
             const events = [];
+            const noteEls = [];
 
             Array.from(measure.children).forEach((el) => {
                 const tag = el.tagName;
@@ -46,8 +66,8 @@
                         if (t) tempoBPM = t;
                     }
                 } else if (tag === 'note') {
-                    if (el.querySelector('chord')) return;
-                    if (el.querySelector('grace')) return;
+                    noteEls.push(el);
+                    if (el.querySelector('chord') || el.querySelector('grace')) return;
 
                     const durationEl = el.querySelector('duration');
                     if (!durationEl) return;
@@ -79,7 +99,10 @@
                 }
             });
 
-            if (events.length > 0) fragments.push(events);
+            if (events.length > 0) {
+                const notationXml = notationHeaderXml + noteEls.map((n) => serializer.serializeToString(n)).join('');
+                fragments.push({ events: events, notationXml: notationXml });
+            }
         });
 
         if (fragments.length < 2) {
@@ -87,6 +110,68 @@
         }
 
         return { fragments: fragments, tempoBPM: tempoBPM };
+    }
+
+    function buildFragmentMusicXML(innerXml) {
+        // print-object="no" - nazwa "Dyktando" jest w danych, ale nieukazywana (Verovio nie rysuje incipitu).
+        return '<?xml version="1.0" encoding="UTF-8"?>' +
+            '<score-partwise version="4.0">' +
+            '<part-list><score-part id="P1"><part-name print-object="no">Dyktando</part-name></score-part></part-list>' +
+            '<part id="P1"><measure number="1">' + innerXml + '</measure></part></score-partwise>';
+    }
+
+    /* ---------- Verovio ---------- */
+    let verovioToolkit = null;
+    let verovioReadyPromise = null;
+
+    function ensureVerovioReady() {
+        if (verovioReadyPromise) return verovioReadyPromise;
+        verovioReadyPromise = new Promise((resolve, reject) => {
+            if (typeof verovio === 'undefined') {
+                reject(new Error('Biblioteka Verovio nie została wczytana (sprawdź połączenie).'));
+                return;
+            }
+
+            let settled = false;
+            const tryInit = () => {
+                if (settled) return;
+                try {
+                    verovioToolkit = new verovio.toolkit();
+                    settled = true;
+                    clearInterval(pollId);
+                    clearTimeout(timeoutId);
+                    resolve();
+                } catch (e) { /* moduł jeszcze nie gotowy - spróbujemy ponownie */ }
+            };
+
+            verovio.module.onRuntimeInitialized = tryInit;
+            const pollId = setInterval(tryInit, 50);
+            const timeoutId = setTimeout(() => {
+                settled = true;
+                clearInterval(pollId);
+                reject(new Error('Przekroczono limit czasu ładowania Verovio.'));
+            }, 20000);
+
+            tryInit();
+        });
+        return verovioReadyPromise;
+    }
+
+    function renderFragmentSvg(notationXml) {
+        // Domyślne marginesy strony Verovio (50px z każdej strony) NIE skalują się
+        // z "scale" - przy małym fragmencie potrafią pochłonąć większość wysokości.
+        // Zmniejszone tutaj, żeby w tej samej ramce CSS zostało miejsce na nuty.
+        return verovioToolkit.renderData(buildFragmentMusicXML(notationXml), {
+            pageWidth: 380,
+            pageHeight: 110,
+            scale: 90,
+            pageMarginTop: 15,
+            pageMarginBottom: 15,
+            pageMarginLeft: 15,
+            pageMarginRight: 15,
+            adjustPageHeight: true,
+            breaks: 'none'
+        });
     }
 
     /* ---------- Stan ---------- */
@@ -98,17 +183,15 @@
     let fragmentNumberMap = {};
     let sortableInstance = null;
 
-    // Silnik odtwarzania z pauzą - planowanie/anulowanie przez setTimeout,
-    // bo Tone.Sampler nie zwraca uchwytu do pojedynczej, niezagranej nuty.
     let fullPlaybackTimeline = [];
     let fullPlaybackTotalDuration = 0;
     let playbackState = 'stopped';
-    let scheduleStartWallClock = 0; // performance.now() (ms) w momencie ostatniego zaplanowania
-    let scheduleStartOffset = 0;    // pozycja w "sekundach linii czasu", od której zaczęto planować
-    let scheduleSpeed = 1;          // mnożnik tempa z suwaka, jaki obowiązywał przy planowaniu
+    let scheduleStartWallClock = 0;
+    let scheduleStartOffset = 0;
+    let scheduleSpeed = 1;
     let pausedOffset = 0;
     let scheduledTimeouts = [];
-    let scheduledSimpleTimeouts = []; // fragment / "mój układ" - osobne śledzenie, żeby dało się je niezawodnie anulować
+    let scheduledSimpleTimeouts = [];
     let playbackWatcher = null;
 
     /* ---------- UI ---------- */
@@ -157,25 +240,25 @@
         if (!activeDictation) return;
         const ok = await KszaAudio.ensureReady(document.getElementById('instrument-select'), onAudioState);
         if (!ok) return;
-        playEvents(activeDictation.fragments[originalIndex], activeDictation.tempoBPM);
+        playEvents(activeDictation.fragments[originalIndex].events, activeDictation.tempoBPM);
     }
 
     async function playCurrentArrangement() {
         if (!activeDictation) return;
         const ok = await KszaAudio.ensureReady(document.getElementById('instrument-select'), onAudioState);
         if (!ok) return;
-        const ordered = [].concat(...displayOrder.map((i) => activeDictation.fragments[i]));
+        const ordered = [].concat(...displayOrder.map((i) => activeDictation.fragments[i].events));
         playEvents(ordered, activeDictation.tempoBPM);
     }
 
-    /* ---------- Silnik pełnego odtwarzania z pauzą ---------- */
+    /* ---------- Silnik pełnego odtwarzania z pauzą (jak w dyktanda.js) ---------- */
     function buildFullPlaybackTimeline() {
         fullPlaybackTimeline = [];
         fullPlaybackTotalDuration = 0;
         if (!activeDictation) return;
 
         const quarterSeconds = (60 / activeDictation.tempoBPM) * TEMPO_SLOWDOWN;
-        const allEvents = [].concat(...activeDictation.fragments);
+        const allEvents = [].concat(...activeDictation.fragments.map((f) => f.events));
         let cursor = 0;
         allEvents.forEach((e) => {
             const durSeconds = e.beats * quarterSeconds;
@@ -193,8 +276,6 @@
         if (playbackWatcher) { clearTimeout(playbackWatcher); playbackWatcher = null; }
     }
 
-    // Zatrzymuje wszystko zaplanowane (fragment i pełne dyktando) - wywoływana
-    // na początku każdej akcji odtwarzania, żeby ścieżki się nie nałożyły.
     function stopAllPlayback() {
         scheduledSimpleTimeouts.forEach((id) => clearTimeout(id));
         scheduledSimpleTimeouts = [];
@@ -205,7 +286,6 @@
         updatePlaybackButtons();
     }
 
-    // Planuje pozostałą część utworu od offsetSeconds, nuta po nucie.
     function scheduleFullFrom(offsetSeconds) {
         stopScheduledTimeouts();
         scheduleStartWallClock = performance.now();
@@ -247,7 +327,7 @@
         const wallClockElapsed = (performance.now() - scheduleStartWallClock) / 1000;
         pausedOffset = Math.min(scheduleStartOffset + wallClockElapsed * scheduleSpeed, fullPlaybackTotalDuration);
         stopScheduledTimeouts();
-        KszaAudio.stopAll(); // natychmiast tnie nutę, która akurat brzmi
+        KszaAudio.stopAll();
         playbackState = 'paused';
         updatePlaybackButtons();
     }
@@ -307,7 +387,7 @@
 
         displayOrder.forEach((originalIndex) => {
             const li = document.createElement('li');
-            li.className = 'fragment-card';
+            li.className = 'fragment-card notation-fragment-card';
             li.dataset.originalIndex = String(originalIndex);
 
             const number = fragmentNumberMap[originalIndex] || '?';
@@ -317,12 +397,18 @@
                 '<span class="fragment-badge">' + number + '</span>' +
                 '<button type="button" class="fragment-play-btn" aria-label="Odtwórz fragment ' + number + '">' +
                 '<span class="play-icon" aria-hidden="true"></span></button>' +
-                '<span class="fragment-label">Fragment ' + number + '</span>' +
+                '<div class="fragment-notation" aria-label="Zapis nutowy fragmentu ' + number + '"></div>' +
                 '<span class="result-icon" aria-hidden="true"></span>';
 
             li.querySelector('.fragment-play-btn').addEventListener('click', () => {
                 playFragmentByOriginalIndex(originalIndex);
             });
+
+            try {
+                li.querySelector('.fragment-notation').innerHTML = renderFragmentSvg(activeDictation.fragments[originalIndex].notationXml);
+            } catch (e) {
+                console.error('Błąd renderowania fragmentu:', e);
+            }
 
             list.appendChild(li);
         });
@@ -355,11 +441,11 @@
             li.classList.remove('is-correct', 'is-wrong');
             if (originalIndex === position) {
                 li.classList.add('is-correct');
-                icon.textContent = '\u2713';
+                icon.textContent = '✓';
                 correctCount++;
             } else {
                 li.classList.add('is-wrong');
-                icon.textContent = '\u2715';
+                icon.textContent = '✕';
             }
         });
 
@@ -421,6 +507,7 @@
         if (!dictation && dictationSources[id]) {
             setStatus('Wczytywanie dyktanda...', null);
             try {
+                await ensureVerovioReady();
                 const res = await fetch(dictationSources[id].url);
                 if (!res.ok) throw new Error('Nie udało się pobrać pliku (kod ' + res.status + ').');
                 const text = await res.text();
