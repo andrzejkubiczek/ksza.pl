@@ -7,7 +7,7 @@
 window.KszaPuzzleEngine = (function () {
     const TEMPO_SLOWDOWN = 1.25; // I stopień, młodsze dzieci - wolniej niż tempo w pliku
 
-    function parseMusicXML(xmlText, notation, minFragmentsMessage) {
+    function parseMusicXML(xmlText, notation, minFragmentsMessage, rhythmStaff) {
         const parser = new DOMParser();
         const xml = parser.parseFromString(xmlText, 'application/xml');
 
@@ -31,14 +31,30 @@ window.KszaPuzzleEngine = (function () {
                 const el = firstAttrs ? firstAttrs.querySelector(selector) : null;
                 return el ? el.textContent : fallback;
             };
-            notationHeaderXml =
-                '<attributes><divisions>' + attrText('divisions', '1') + '</divisions>' +
-                '<key><fifths>' + attrText('key fifths', '0') + '</fifths></key>' +
-                '<time><beats>' + attrText('time beats', '4') + '</beats>' +
-                '<beat-type>' + attrText('time beat-type', '4') + '</beat-type></time>' +
-                '<clef><sign>' + attrText('clef sign', 'G') + '</sign>' +
-                '<line>' + attrText('clef line', '2') + '</line></clef>' +
-                '</attributes>';
+            if (rhythmStaff) {
+                // Rytm: standardowy zapis rytmiczny - bez klucza wysokościowego i
+                // tonacji, samo metrum, pięciolinia jednolinijkowa. Klucz perkusyjny
+                // w Verovio NIE ignoruje wysokość nuty przy pozycjonowaniu (sprawdzone
+                // w źródle - PitchInterface::CalcLoc liczy tak samo jak dla klucza
+                // wiolinowego) - noteXml dla tego trybu dostaje więc wymuszoną wysokość
+                // E4, która przy tym kluczu i 1 linii wypada dokładnie na tej linii.
+                notationHeaderXml =
+                    '<attributes><divisions>' + attrText('divisions', '1') + '</divisions>' +
+                    '<time><beats>' + attrText('time beats', '4') + '</beats>' +
+                    '<beat-type>' + attrText('time beat-type', '4') + '</beat-type></time>' +
+                    '<clef><sign>percussion</sign></clef>' +
+                    '<staff-details><staff-lines>1</staff-lines></staff-details>' +
+                    '</attributes>';
+            } else {
+                notationHeaderXml =
+                    '<attributes><divisions>' + attrText('divisions', '1') + '</divisions>' +
+                    '<key><fifths>' + attrText('key fifths', '0') + '</fifths></key>' +
+                    '<time><beats>' + attrText('time beats', '4') + '</beats>' +
+                    '<beat-type>' + attrText('time beat-type', '4') + '</beat-type></time>' +
+                    '<clef><sign>' + attrText('clef sign', 'G') + '</sign>' +
+                    '<line>' + attrText('clef line', '2') + '</line></clef>' +
+                    '</attributes>';
+            }
         }
 
         let divisions = 1;
@@ -99,7 +115,23 @@ window.KszaPuzzleEngine = (function () {
 
             if (events.length > 0) {
                 if (notation) {
-                    const notationXml = notationHeaderXml + noteEls.map((n) => serializer.serializeToString(n)).join('');
+                    const noteXmls = noteEls.map((n) => {
+                        if (!rhythmStaff) return serializer.serializeToString(n);
+                        // Wysokość dźwięku w danych zostaje (audio gra ją bez zmian) -
+                        // do WYŚWIETLENIA klonujemy nutę i wymuszamy E4 (patrz wyżej).
+                        const clone = n.cloneNode(true);
+                        const pitchEl = clone.querySelector('pitch');
+                        if (pitchEl) {
+                            const stepEl = pitchEl.querySelector('step');
+                            const octaveEl = pitchEl.querySelector('octave');
+                            const alterEl = pitchEl.querySelector('alter');
+                            if (stepEl) stepEl.textContent = 'E';
+                            if (octaveEl) octaveEl.textContent = '4';
+                            if (alterEl) alterEl.parentNode.removeChild(alterEl);
+                        }
+                        return serializer.serializeToString(clone);
+                    });
+                    const notationXml = notationHeaderXml + noteXmls.join('');
                     fragments.push({ events: events, notationXml: notationXml });
                 } else {
                     fragments.push(events);
@@ -112,9 +144,11 @@ window.KszaPuzzleEngine = (function () {
         return { fragments: fragments, tempoBPM: tempoBPM };
     }
 
-    // config: { notation, partNameLabel, manifestUrl, fileBaseUrl, labels: {...}, fixedInstrument }
+    // config: { notation, partNameLabel, manifestUrl, fileBaseUrl, labels: {...}, fixedInstrument, rhythmStaff }
     // fixedInstrument: gdy podane, strona nie ma #instrument-select (jeden stały
     // instrument, np. rytm - ksylofon) - reszta silnika działa bez zmian.
+    // rhythmStaff: rytm zapisany na pięciolinii jednolinijkowej z kluczem
+    // perkusyjnym, bez tonacji - patrz parseMusicXML.
     function init(config) {
         const notation = !!config.notation;
         const labels = config.labels;
@@ -495,7 +529,7 @@ window.KszaPuzzleEngine = (function () {
                     const res = await fetch(sources[id].url);
                     if (!res.ok) throw new Error('Nie udało się pobrać pliku (kod ' + res.status + ').');
                     const text = await res.text();
-                    item = parseMusicXML(text, notation, labels.minFragments);
+                    item = parseMusicXML(text, notation, labels.minFragments, config.rhythmStaff);
                     library[id] = item;
                 } catch (e) {
                     console.error(labels.loadErrorConsole, e);

@@ -19,6 +19,7 @@ window.KszaVerovio = (function () {
                 if (settled) return;
                 try {
                     toolkit = new verovio.toolkit();
+                    toolkit.setOptions({ font: 'Leland' }); // domyślna czcionka Verovio to Leipzig
                     settled = true;
                     clearInterval(pollId);
                     clearTimeout(timeoutId);

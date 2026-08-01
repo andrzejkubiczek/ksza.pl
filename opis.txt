@@ -88,6 +88,19 @@ tylko rytm, nie wysokość dźwięków. Ćwiczenie Rytm zawsze gra na
 ksylofonie (najlepiej oddaje rytm) - strony rytm.html/rytm-zapis.html
 celowo NIE mają selektora instrumentu.
 
+Zapis nutowy rytmu (rytm-zapis.html) rysuje standardowy zapis
+rytmiczny: bez klucza wysokościowego i tonacji, samo metrum, pięciolinia
+jednolinijkowa z kluczem perkusyjnym - tak jak zapisuje się ćwiczenia
+czysto rytmiczne w szkole. Audio gra zawsze prawdziwą wysokość z pliku
+(np. C4) - zmienia się TYLKO to, co widać na pięciolinii (osobna kopia
+nuty do wyświetlenia dostaje wymuszoną wysokość E4, bo w Verovio klucz
+perkusyjny nie ignoruje wysokości przy pozycjonowaniu nuty - E4 przy tym
+kluczu i 1 linii wypada dokładnie na tej linii; sprawdzone w źródle
+Verovio, nie tylko założone). Ta logika jest w assets/js/puzzle-engine.js
+(parseMusicXML, flaga rhythmStaff) i dotyczy WYŁĄCZNIE rytmu - dyktanda
+(dyktanda-zapis.js) rysują zapis normalnie, z prawdziwym kluczem i
+tonacją.
+
 MENU: "Puzzle" (ze słuchu / zapis nutowy), "Dyktanda" (wysokościowe,
 docelowo też uzupełnianie melodii) i "Rytm" (ze słuchu / zapis nutowy)
 to od teraz trzy osobne pozycje w menu głównym - w każdej z nich osobna
@@ -102,9 +115,16 @@ uruchom `python3 update-nav.py` - wstawi świeże menu do WSZYSTKICH
 plików HTML w repo. Uruchom to ZAWSZE przed wdrożeniem po zmianie menu.
 
 Strony "zapis nutowy" korzystają z biblioteki Verovio (rysowanie nut w
-przeglądarce), wczytywanej bezpośrednio z oficjalnego CDN verovio.org -
-nic tu nie trzeba wgrywać na serwer, wystarczy działające połączenie
-internetowe u odwiedzającego.
+przeglądarce), wczytywanej z jsDelivr (https://cdn.jsdelivr.net/npm/
+verovio@6.2.0/dist/verovio-toolkit-wasm.js - ta sama biblioteka co pod
+oficjalnym CDN verovio.org, tylko z konkretną wersją przypiętą na stałe,
+tak jak Tone.js i Sortable.js) - nic tu nie trzeba wgrywać na serwer,
+wystarczy działające połączenie internetowe u odwiedzającego.
+
+Czcionka nutowa: Leland (ustawiana raz w assets/js/verovio-render.js,
+toolkit.setOptions({ font: 'Leland' }) zaraz po utworzeniu toolkitu) -
+domyślna czcionka Verovio to Leipzig, Leland jest jednak już wbudowana
+w ten sam plik .js, więc nie trzeba nic dodatkowo wgrywać.
 
 
 DODAWANIE NOWEGO DYKTANDA (lub RYTMU)
@@ -190,9 +210,11 @@ plików zamiast kopiowana do każdego ćwiczenia osobno:
   Używają: gamy.js, gamy-stopnie.js.
 - puzzle-engine.js - cały mechanizm puzzli z taktami: parser MusicXML,
   odtwarzanie (proste i pełne, z pauzą), tasowanie, sprawdzanie
-  kolejności. Używają: dyktanda.js, dyktanda-zapis.js, rytm.js,
-  rytm-zapis.js - każdy z nich to tylko kilkanaście linii konfiguracji
-  (manifest, teksty komunikatów, czy pokazywać zapis nutowy).
+  kolejności; dla rytmu (flaga rhythmStaff) dodatkowo rysuje zapis bez
+  klucza wysokościowego/tonacji, na pięciolinii jednolinijkowej (patrz
+  wyżej). Używają: dyktanda.js, dyktanda-zapis.js, rytm.js, rytm-zapis.js
+  - każdy z nich to tylko kilkanaście linii konfiguracji (manifest,
+  teksty komunikatów, czy pokazywać zapis nutowy).
 - klasa-filter.js - filtr "Klasa" nad listą tytułów (patrz "POLE klasy"
   wyżej): stała kolejność klas + dopasowywanie po polu "klasy" z
   manifestu. Używają: dyktanda.js, dyktanda-zapis.js, rytm.js,

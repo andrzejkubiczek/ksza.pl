@@ -48,8 +48,8 @@ wysokość, stuknięcie zmienia znak chromatyczny.
 - [Tone.js](https://tonejs.github.io/) + próbki
   [tonejs-instruments](https://github.com/nbrosowsky/tonejs-instruments)
   do odtwarzania dźwięku.
-- [Verovio](https://www.verovio.org/) (z CDN) do rysowania zapisu
-  nutowego z MusicXML.
+- [Verovio](https://www.verovio.org/) (z jsDelivr, wersja przypięta na
+  stałe) do rysowania zapisu nutowego z MusicXML, czcionka Bravura.
 
 ## Struktura
 
