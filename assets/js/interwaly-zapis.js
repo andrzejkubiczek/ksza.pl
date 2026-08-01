@@ -12,7 +12,7 @@
         '3>': { steps: 2, semitones: 3,  label: 'Tercja mała' },
         '3':  { steps: 2, semitones: 4,  label: 'Tercja wielka' },
         '4':  { steps: 3, semitones: 5,  label: 'Kwarta czysta' },
-        '4<': { steps: 3, semitones: 6,  label: 'Kwarta zwiększona' },
+        '4<': { steps: 3, semitones: 6,  label: 'Tryton' },
         '5':  { steps: 4, semitones: 7,  label: 'Kwinta czysta' },
         '6>': { steps: 5, semitones: 8,  label: 'Seksta mała' },
         '6':  { steps: 5, semitones: 9,  label: 'Seksta wielka' },

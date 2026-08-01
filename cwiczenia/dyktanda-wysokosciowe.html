@@ -37,10 +37,16 @@
         <div class="widget">
             <div class="widget-header">
                 <h1>Dyktando</h1>
-                <p>Klucz, tonacja i pierwszy dźwięk są już podane. Posłuchaj melodii i dorysuj resztę nut - liczy się tylko to, jak wysoko je postawisz.</p>
+                <p>Posłuchaj melodii i dorysuj resztę nut - liczy się tylko to, jak wysoko je postawisz.<br><small>Pierwszy dźwięk jest już poprawny.</small></p>
             </div>
 
             <div class="controls-row">
+                <div class="field">
+                    <label for="klasa-select">Klasa</label>
+                    <div class="select-wrap">
+                        <select id="klasa-select"></select>
+                    </div>
+                </div>
                 <div class="field">
                     <label for="dictation-select">Dyktando</label>
                     <div class="select-wrap">
@@ -121,6 +127,7 @@
 <script>window.KSZA_SAMPLES_BASE = '../assets/samples/';</script>
 <script src="https://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js"></script>
 <script src="../assets/js/core.js"></script>
+<script src="../assets/js/klasa-filter.js"></script>
 <script src="../assets/js/music-theory.js"></script>
 <script src="../assets/js/verovio-render.js"></script>
 <script src="../assets/js/gesture-layer.js"></script>

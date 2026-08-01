@@ -33,7 +33,10 @@ jest w [opis.txt](opis.txt).
 
 Puzzle, Dyktanda i Rytm to trzy osobne, choć pokrewne rodziny ćwiczeń
 (osobne pozycje w menu, osobne listy plików w `dyktanda/puzzle/`,
-`dyktanda/wysokosciowe/` i `dyktanda/rytm/`).
+`dyktanda/wysokosciowe/` i `dyktanda/rytm/`). Każdy utwór w tych trzech
+listach można przypisać do jednej lub dwóch klas (np. `I/4`, `IV/6`) -
+selektor "Klasa" nad listą tytułów filtruje wtedy, co się pokazuje;
+utwory bez przypisanej klasy są ogólne i widoczne zawsze.
 
 Ćwiczenia "zbuduj" (interwały/trójdźwięki) obsługuje się zarówno
 przyciskami, jak i dotykiem/myszką: przeciągnięcie nuty zmienia jej
@@ -60,6 +63,7 @@ assets/js/verovio-render.js       wspólna inicjalizacja/render Verovio
 assets/js/gesture-layer.js        wspólna obsługa przeciągnięcia/stuknięcia
 assets/js/scale-tonics.js         wspólne toniki gam + budowanie nut od toniki
 assets/js/puzzle-engine.js        wspólny silnik puzzli z taktami (dyktanda/rytm)
+assets/js/klasa-filter.js         wspólny filtr "Klasa" nad listą dyktand/rytmów
 assets/js/<nazwa>.js              logika pojedynczego ćwiczenia (korzysta z modułów wyżej)
 assets/samples/, assets/vendor/   próbki dźwiękowe i biblioteka instrumentów
 dyktanda/puzzle/                  manifest i pliki dyktand-puzzle

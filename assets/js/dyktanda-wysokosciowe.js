@@ -321,7 +321,8 @@
                 if (item && item.file) {
                     dictationSources['m-' + i] = {
                         url: '../dyktanda/wysokosciowe/' + item.file,
-                        title: item.title || item.file
+                        title: item.title || item.file,
+                        klasy: item.klasy || []
                     };
                 }
             });
@@ -330,15 +331,23 @@
         }
     }
 
+    function currentKlasa() {
+        const el = document.getElementById('klasa-select');
+        return el ? el.value : '';
+    }
+
     function populateDictationSelect() {
         const select = document.getElementById('dictation-select');
         select.innerHTML = '';
-        Object.keys(dictationSources).forEach((id) => {
-            const opt = document.createElement('option');
-            opt.value = id;
-            opt.textContent = dictationSources[id].title;
-            select.appendChild(opt);
-        });
+        const klasa = currentKlasa();
+        Object.keys(dictationSources)
+            .filter((id) => KszaKlasaFilter.matches(dictationSources[id].klasy, klasa))
+            .forEach((id) => {
+                const opt = document.createElement('option');
+                opt.value = id;
+                opt.textContent = dictationSources[id].title;
+                select.appendChild(opt);
+            });
         if (select.options.length === 0) {
             const opt = document.createElement('option');
             opt.value = '';
@@ -404,6 +413,8 @@
             moveLetter: moveLetter,
             cycleAccidental: cycleAccidental
         });
+        KszaKlasaFilter.populateSelect(document.getElementById('klasa-select'));
+
         await loadManifest();
         populateDictationSelect();
 
@@ -411,6 +422,15 @@
         loadDictationById(select.value);
 
         select.addEventListener('change', (e) => loadDictationById(e.target.value));
+
+        const klasaSelect = document.getElementById('klasa-select');
+        if (klasaSelect) {
+            klasaSelect.addEventListener('change', () => {
+                populateDictationSelect();
+                loadDictationById(select.value);
+            });
+        }
+
         document.getElementById('instrument-select').addEventListener('change', (e) => {
             stopPlayback();
             KszaAudio.loadInstrument(e.target.value, onAudioState);

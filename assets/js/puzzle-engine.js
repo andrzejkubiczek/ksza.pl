@@ -447,7 +447,7 @@ window.KszaPuzzleEngine = (function () {
                 if (!Array.isArray(items)) return;
                 items.forEach((item, i) => {
                     if (item && item.file) {
-                        sources['m-' + i] = { url: config.fileBaseUrl + item.file, title: item.title || item.file };
+                        sources['m-' + i] = { url: config.fileBaseUrl + item.file, title: item.title || item.file, klasy: item.klasy || [] };
                     }
                 });
             } catch (e) {
@@ -455,16 +455,24 @@ window.KszaPuzzleEngine = (function () {
             }
         }
 
+        function currentKlasa() {
+            const el = document.getElementById('klasa-select');
+            return el ? el.value : '';
+        }
+
         function populateSelect() {
             const select = document.getElementById('dictation-select');
             select.innerHTML = '';
 
-            Object.keys(sources).forEach((id) => {
-                const opt = document.createElement('option');
-                opt.value = id;
-                opt.textContent = sources[id].title;
-                select.appendChild(opt);
-            });
+            const klasa = currentKlasa();
+            Object.keys(sources)
+                .filter((id) => KszaKlasaFilter.matches(sources[id].klasy, klasa))
+                .forEach((id) => {
+                    const opt = document.createElement('option');
+                    opt.value = id;
+                    opt.textContent = sources[id].title;
+                    select.appendChild(opt);
+                });
 
             if (select.options.length === 0) {
                 const opt = document.createElement('option');
@@ -506,6 +514,8 @@ window.KszaPuzzleEngine = (function () {
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
+            KszaKlasaFilter.populateSelect(document.getElementById('klasa-select'));
+
             await loadManifest();
             populateSelect();
 
@@ -513,6 +523,14 @@ window.KszaPuzzleEngine = (function () {
             loadById(select.value);
 
             select.addEventListener('change', (e) => loadById(e.target.value));
+
+            const klasaSelect = document.getElementById('klasa-select');
+            if (klasaSelect) {
+                klasaSelect.addEventListener('change', () => {
+                    populateSelect();
+                    loadById(select.value);
+                });
+            }
 
             const instrumentSelect = document.getElementById('instrument-select');
             if (instrumentSelect) {

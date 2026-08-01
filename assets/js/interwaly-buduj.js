@@ -197,14 +197,12 @@
         updateLetterButtons();
 
         const feedback = document.getElementById('feedback');
-        const directionLabel = direction === 1 ? 'w górę' : 'w dół';
         if (isCorrect) {
             feedback.className = 'feedback-msg feedback-correct';
             feedback.textContent = 'Doskonale! To prawidłowo zbudowany interwał.';
         } else {
             feedback.className = 'feedback-msg feedback-wrong';
-            feedback.textContent = 'Niestety nie. Prawidłowy drugi dźwięk to ' + MT.noteLabel(expected) +
-                ' (' + currentSymbol + ' ' + INTERVAL_DEFS[currentSymbol].label + ' ' + directionLabel + ' od ' + MT.noteLabel(rootNote) + ').';
+            feedback.textContent = 'Niestety nie. Prawidłowy drugi dźwięk to ' + MT.noteLabel(expected) + '.';
         }
 
         document.getElementById('next-btn').style.display = 'inline-flex';

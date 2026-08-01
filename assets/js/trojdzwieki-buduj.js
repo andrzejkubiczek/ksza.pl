@@ -242,7 +242,7 @@
         } else {
             feedback.className = 'feedback-msg feedback-wrong';
             feedback.textContent = 'Niestety nie. Prawidłowo: środkowy dźwięk to ' + MT.noteLabel(expectedNotes[1]) +
-                ', górny to ' + MT.noteLabel(expectedNotes[2]) + ' (' + TRIAD_TYPES[currentKey].symbol + ' ' + TRIAD_TYPES[currentKey].label + ').';
+                ', górny to ' + MT.noteLabel(expectedNotes[2]) + '.';
         }
 
         document.getElementById('next-btn').style.display = 'inline-flex';

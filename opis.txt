@@ -44,7 +44,8 @@ assets/js/verovio-render.js    - wspólna inicjalizacja i renderowanie Verovio
 assets/js/gesture-layer.js     - wspólna obsługa przeciągnięcia/stuknięcia nad zapisem nutowym
 assets/js/scale-tonics.js      - wspólne toniki gam + budowanie nut od toniki
 assets/js/puzzle-engine.js     - wspólny silnik puzzli z taktami (parser MusicXML, odtwarzanie z pauzą, tasowanie)
-   ^ powyższe pięć plików to WSPÓLNE moduły używane przez kilka ćwiczeń naraz
+assets/js/klasa-filter.js      - wspólny filtr "Klasa" dla list dyktand/rytmów (stała kolejność klas)
+   ^ powyższe sześć plików to WSPÓLNE moduły używane przez kilka ćwiczeń naraz
      (patrz "ARCHITEKTURA: WSPÓLNE MODUŁY" niżej) - same z siebie nic nie robią,
      każda strona wczytuje tylko te moduły, których faktycznie potrzebuje.
 
@@ -126,8 +127,8 @@ dla rytmu.
    wpis do listy:
 
    [
-     { "title": "Dyktando 1 - gama C-dur", "file": "dyktando-01.xml" },
-     { "title": "Dyktando 2 - tercje",     "file": "dyktando-02.xml" }
+     { "title": "Dyktando 1 - gama C-dur", "file": "dyktando-01.xml", "klasy": ["I/4"] },
+     { "title": "Dyktando 2 - tercje",     "file": "dyktando-02.xml", "klasy": [] }
    ]
 
    WAŻNE - format JSON jest wrażliwy na szczegóły:
@@ -138,6 +139,25 @@ dla rytmu.
 
 Jeśli lista nie działa po edycji, najczęstszy powód to literówka w
 JSON. Możesz sprawdzić poprawność pliku na https://jsonlint.com
+
+POLE "klasy" (filtr Klasa)
+Każdy wpis w manifeście może mieć pole "klasy" - tablicę z jedną lub
+dwiema wartościami z ustalonego, stałego zestawu:
+   "IV/6", "V/6", "VI/6", "I/4", "II/4", "III/4", "IV/4"
+(oznaczenie: klasa/cykl, np. "I/4" = I klasa cyklu 4-letniego). Kolejność
+w tej liście to NIE numeracja klas, tylko postęp trudności - końcówka
+cyklu 6-letniego (IV/6-VI/6) odpowiada mniej więcej początkowi cyklu
+4-letniego (I/4), więc obie ścieżki nauki stykają się właśnie tu. Ta
+kolejność jest ustalona na stałe w assets/js/klasa-filter.js.
+
+Utwór można przypisać do JEDNEJ klasy, DWÓCH naraz (np. ["IV/6", "I/4"]
+- odpowiedni dla obu), albo zostawić "klasy": [] (lub pominąć pole
+całkiem) - wtedy jest to ćwiczenie OGÓLNE i pojawia się na liście
+niezależnie od wybranej klasy w filtrze "Klasa" nad selektorem tytułu.
+
+Selektor "Klasa" jest generowany automatycznie (assets/js/klasa-filter.js)
+- nie trzeba go ręcznie edytować w HTML, wystarczy poprawnie wypełnić
+pole "klasy" w manifeście.
 
 
 TEMPO ODTWARZANIA
@@ -173,6 +193,10 @@ plików zamiast kopiowana do każdego ćwiczenia osobno:
   kolejności. Używają: dyktanda.js, dyktanda-zapis.js, rytm.js,
   rytm-zapis.js - każdy z nich to tylko kilkanaście linii konfiguracji
   (manifest, teksty komunikatów, czy pokazywać zapis nutowy).
+- klasa-filter.js - filtr "Klasa" nad listą tytułów (patrz "POLE klasy"
+  wyżej): stała kolejność klas + dopasowywanie po polu "klasy" z
+  manifestu. Używają: dyktanda.js, dyktanda-zapis.js, rytm.js,
+  rytm-zapis.js, dyktanda-wysokosciowe.js.
 
 Każdy plik HTML wczytuje w <script> tylko te wspólne moduły, których
 faktycznie potrzebuje jego ćwiczenie - patrz istniejące strony jako wzór
