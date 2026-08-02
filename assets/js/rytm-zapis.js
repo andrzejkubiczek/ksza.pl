@@ -1,10 +1,6 @@
-/* ksza.pl - rytmy (puzzle), zapis nutowy.
-   Ta sama lista i pliki co wersja "ze słuchu" - dodatkowo każdy takt jest
-   rysowany przez Verovio (patrz assets/js/verovio-render.js), jako
-   standardowy zapis rytmiczny: bez klucza wysokościowego i tonacji, samo
-   metrum, pięciolinia jednolinijkowa z kluczem perkusyjnym.
-   Zawsze ksylofon - najlepiej oddaje rytm, bez wyboru instrumentu.
-   Silnik: assets/js/puzzle-engine.js. */
+/* ksza.pl - rytmy (puzzle), zapis nutowy. Ta sama lista i pliki co wersja
+   "ze słuchu", dodatkowo każdy takt jest rysowany (bez klucza/tonacji, patrz
+   rhythmStaff w puzzle-engine.js). Zawsze ksylofon, bez wyboru instrumentu. */
 (function () {
     KszaPuzzleEngine.init({
         notation: true,

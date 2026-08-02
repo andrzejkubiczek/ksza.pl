@@ -136,27 +136,17 @@ window.KszaAudio = (function () {
     };
 })();
 
-// Wspólne tempo (suwak 50%-150%), zapamiętywane w localStorage. 1.0 = normalna prędkość.
+// Wspólne tempo (suwak 50%-150%). 1.0 = normalna prędkość. Resetuje się do
+// 100% przy każdym wejściu na stronę - ćwiczenia zbyt się różnią, żeby
+// jedno zapamiętane tempo miało sens między nimi.
 window.KszaTempo = (function () {
-    const STORAGE_KEY = 'ksza-tempo-multiplier';
     const DEFAULT = 1.0;
     let current = DEFAULT;
-
-    try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored !== null) {
-            const parsed = parseFloat(stored);
-            if (!isNaN(parsed) && parsed >= 0.5 && parsed <= 1.5) current = parsed;
-        }
-    } catch (e) { /* localStorage niedostępny - zostajemy przy domyślnej wartości */ }
 
     return {
         DEFAULT: DEFAULT,
         get: function () { return current; },
-        set: function (value) {
-            current = value;
-            try { localStorage.setItem(STORAGE_KEY, String(value)); } catch (e) { /* ignorujemy */ }
-        }
+        set: function (value) { current = value; }
     };
 })();
 

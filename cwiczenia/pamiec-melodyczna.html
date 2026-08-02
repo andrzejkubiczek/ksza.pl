@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Dyktanda - wysokości - ksza.pl</title>
-    <meta name="description" content="Dyktando wysokościowe: wysłuchaj melodii i uzupełnij wysokości kolejnych dźwięków na pięciolinii.">
+    <title>Pamięć melodyczna - ksza.pl</title>
+    <meta name="description" content="Ćwiczenie: posłuchaj krótkiej melodii i powtórz ją, klikając klawisze fortepianu.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -36,25 +36,25 @@
     <div class="container exercise-page">
         <div class="widget">
             <nav class="subnav" aria-label="Odmiany ćwiczenia">
-                <a href="dyktanda-wysokosciowe.html" aria-current="page">Dyktando</a>
-                <a href="pamiec-melodyczna.html">Pamięć melodyczna</a>
+                <a href="dyktanda-wysokosciowe.html">Dyktando</a>
+                <a href="pamiec-melodyczna.html" aria-current="page">Pamięć melodyczna</a>
             </nav>
             <div class="widget-header">
-                <h1>Dyktando</h1>
-                <p>Posłuchaj melodii i dorysuj resztę nut - liczy się tylko to, jak wysoko je postawisz.<br><small>Pierwszy dźwięk jest już poprawny.</small></p>
+                <h1>Pamięć melodyczna</h1>
+                <p>Posłuchaj melodii i powtórz ją, klikając klawisze fortepianu.<br><small>Na początku usłyszysz dźwięk odniesienia (a).</small></p>
             </div>
 
             <div class="controls-row">
                 <div class="field">
-                    <label for="klasa-select">Klasa</label>
+                    <label for="level-select">Poziom</label>
                     <div class="select-wrap">
-                        <select id="klasa-select"></select>
-                    </div>
-                </div>
-                <div class="field">
-                    <label for="dictation-select">Dyktando</label>
-                    <div class="select-wrap">
-                        <select id="dictation-select"></select>
+                        <select id="level-select">
+                            <option value="1">Poziom 1</option>
+                            <option value="2">Poziom 2</option>
+                            <option value="3">Poziom 3</option>
+                            <option value="4">Poziom 4</option>
+                            <option value="5">Poziom 5</option>
+                        </select>
                     </div>
                 </div>
                 <div class="field">
@@ -82,37 +82,26 @@
             <div class="player-controls">
                 <button id="play-btn" class="btn-primary">
                     <span class="play-icon" aria-hidden="true"></span>
-                    <span>Odtwórz dyktando</span>
+                    <span>Odtwórz melodię</span>
                 </button>
             </div>
 
-            <div class="notation-wrap">
-                <div id="notation-container" class="notation-container" aria-live="polite"></div>
-                <div id="gesture-layer" class="gesture-layer" aria-hidden="true"></div>
-            </div>
-            <p class="gesture-hint">Można też przeciągnąć wybrany dźwięk górę/dół i stuknąć, by zmienić znak.</p>
+            <div id="answer-trail" class="answer-trail"></div>
 
-            <div class="note-builder">
-                <div class="note-cursor" role="group" aria-label="Wybór edytowanego dźwięku">
-                    <button type="button" id="note-prev" class="letter-btn" aria-label="Poprzedni dźwięk">◀</button>
-                    <span id="note-cursor-label" class="note-cursor-label">Dźwięk 2 z 8</span>
-                    <button type="button" id="note-next" class="letter-btn" aria-label="Następny dźwięk">▶</button>
-                </div>
-                <div class="note-builder-controls">
-                    <div class="note-builder-letter">
-                        <button type="button" id="letter-down" class="letter-btn" aria-label="Dźwięk niżej">▼</button>
-                        <button type="button" id="letter-up" class="letter-btn" aria-label="Dźwięk wyżej">▲</button>
-                    </div>
-                    <div class="accidental-group" role="group" aria-label="Znak chromatyczny">
-                        <button type="button" class="accidental-btn" data-alter="-1">♭</button>
-                        <button type="button" class="accidental-btn is-active" data-alter="0">♮</button>
-                        <button type="button" class="accidental-btn" data-alter="1">♯</button>
-                    </div>
-                </div>
-                <button type="button" id="check-btn" class="btn-primary">Sprawdź</button>
+            <div class="echo-keyboard-wrap">
+                <div id="echo-keyboard-mount" aria-label="Klawiatura - klikaj dźwięki w usłyszanej kolejności"></div>
+            </div>
+
+            <div class="player-controls">
+                <button id="reset-btn" class="btn-ghost">Wyczyść odpowiedź</button>
+                <button id="check-btn" class="btn-primary" disabled>Sprawdź</button>
             </div>
 
             <div id="feedback" class="feedback-msg"></div>
+
+            <div class="puzzle-controls">
+                <button id="next-btn" class="btn-dark" style="display:none;">Następna melodia →</button>
+            </div>
         </div>
     </div>
 </main>
@@ -121,7 +110,6 @@
     <div class="container">
         &copy; <span id="footer-year">2026</span> ksza.pl (aK) &middot; <a href="../o-projekcie.html">O projekcie</a>
         <br><small>Próbki instrumentów: biblioteka <a href="https://github.com/nbrosowsky/tonejs-instruments" target="_blank" rel="noopener">tonejs-instruments</a> (źródło nagrań: VSCO2, licencja CC-BY 3.0)</small>
-        <br><small>Zapis nutowy: silnik <a href="https://www.verovio.org/" target="_blank" rel="noopener">Verovio</a> (RISM Digital Center, licencja LGPL)</small>
     </div>
 </footer>
 
@@ -129,12 +117,7 @@
 <script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.min.js"></script>
 <script src="../assets/vendor/Tonejs-Instruments.js"></script>
 <script>window.KSZA_SAMPLES_BASE = '../assets/samples/';</script>
-<script src="https://cdn.jsdelivr.net/npm/verovio@6.2.0/dist/verovio-toolkit-wasm.js"></script>
 <script src="../assets/js/core.js"></script>
-<script src="../assets/js/klasa-filter.js"></script>
-<script src="../assets/js/music-theory.js"></script>
-<script src="../assets/js/verovio-render.js"></script>
-<script src="../assets/js/gesture-layer.js"></script>
-<script src="../assets/js/dyktanda-wysokosciowe.js"></script>
+<script src="../assets/js/pamiec-melodyczna.js"></script>
 </body>
 </html>

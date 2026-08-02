@@ -32,12 +32,9 @@ window.KszaPuzzleEngine = (function () {
                 return el ? el.textContent : fallback;
             };
             if (rhythmStaff) {
-                // Rytm: standardowy zapis rytmiczny - bez klucza wysokościowego i
-                // tonacji, samo metrum, pięciolinia jednolinijkowa. Klucz perkusyjny
-                // w Verovio NIE ignoruje wysokość nuty przy pozycjonowaniu (sprawdzone
-                // w źródle - PitchInterface::CalcLoc liczy tak samo jak dla klucza
-                // wiolinowego) - noteXml dla tego trybu dostaje więc wymuszoną wysokość
-                // E4, która przy tym kluczu i 1 linii wypada dokładnie na tej linii.
+                // Rytm: bez klucza/tonacji, samo metrum, 1 linia + klucz perkusyjny.
+                // Verovio NIE ignoruje wysokość nuty przy tym kluczu - stąd wymuszone
+                // E4 przy serializacji niżej (dokładnie na tej jednej linii).
                 notationHeaderXml =
                     '<attributes><divisions>' + attrText('divisions', '1') + '</divisions>' +
                     '<time><beats>' + attrText('time beats', '4') + '</beats>' +

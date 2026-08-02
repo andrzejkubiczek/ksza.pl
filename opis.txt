@@ -20,7 +20,7 @@ STRUKTURA
 index.html, o-projekcie.html   - strony ogólne
 cwiczenia/*.html               - po jednej stronie na wariant ćwiczenia
 assets/css/                    - style
-assets/js/core.js              - audio (Tone.js), tempo, menu mobilne
+assets/js/core.js              - audio (Tone.js), tempo (zawsze 100% na starcie), menu mobilne
 assets/js/*.js (reszta)        - logika ćwiczeń + parę wspólnych modułów
                                   (music-theory, verovio-render, gesture-layer,
                                   scale-tonics, puzzle-engine, klasa-filter) -
@@ -37,6 +37,13 @@ tylko wysokość dźwięków). Rytm: odwrotnie - cały utwór jedną, stałą
 wysokością (liczy się tylko rytm), zawsze na ksylofonie. Zapis nutowy
 rytmu rysuje samo metrum, bez klucza i tonacji (szczegóły techniczne w
 komentarzu przy KszaPuzzleEngine w puzzle-engine.js).
+
+Pamięć melodyczna (cwiczenia/pamiec-melodyczna.html): druga zakładka
+w rodzinie Dyktanda. Gra się krótka losowa melodia, uczeń powtarza ją
+klikając klawisze na klawiaturze (zawsze C4-C5, dowolny instrument z
+selektora), po dźwięku odniesienia a1 (440 Hz) granym przed każdym
+odtworzeniem. Poziom decyduje o puli dźwięków i długości melodii -
+stała LEVELS w assets/js/pamiec-melodyczna.js.
 
 
 DODAWANIE NOWEGO DYKTANDA / RYTMU

@@ -40,16 +40,40 @@ window.KszaMusicTheory = (function () {
         return note.alter !== 0 ? '<accidental>' + ACCIDENTAL_NAMES[String(note.alter)] + '</accidental>' : '';
     }
 
+    // Tercja i kwinta jako {steps, semitones} liczone od prymy.
+    const TRIAD_SHAPES = {
+        durowy:      { third: { steps: 2, semitones: 4 }, fifth: { steps: 4, semitones: 7 } },
+        molowy:      { third: { steps: 2, semitones: 3 }, fifth: { steps: 4, semitones: 7 } },
+        zmniejszony: { third: { steps: 2, semitones: 3 }, fifth: { steps: 4, semitones: 6 } },
+        zwiekszony:  { third: { steps: 2, semitones: 4 }, fifth: { steps: 4, semitones: 8 } }
+    };
+
+    // Postać zasadnicza (pryma, tercja, kwinta), a dla przewrotu "obraca" ją:
+    // składnik z dołu wędruje na górę, +1 oktawa.
+    function buildTriadNotes(rootNote, shapeName, inversion) {
+        const shape = TRIAD_SHAPES[shapeName];
+        const third = spellByShape(rootNote, shape.third, 1);
+        const fifth = spellByShape(rootNote, shape.fifth, 1);
+        const notes = [rootNote, third, fifth];
+        for (let i = 0; i < inversion; i++) {
+            const wrapped = notes.shift();
+            notes.push({ letter: wrapped.letter, alter: wrapped.alter, octave: wrapped.octave + 1 });
+        }
+        return notes;
+    }
+
     return {
         LETTERS: LETTERS,
         LETTER_NATURAL_OFFSET: LETTER_NATURAL_OFFSET,
         ACCIDENTAL_NAMES: ACCIDENTAL_NAMES,
+        TRIAD_SHAPES: TRIAD_SHAPES,
         ladderEntry: ladderEntry,
         diatonicIndexOf: diatonicIndexOf,
         absoluteSemitone: absoluteSemitone,
         spellByShape: spellByShape,
         noteLabel: noteLabel,
         noteToPitchXml: noteToPitchXml,
-        accidentalTag: accidentalTag
+        accidentalTag: accidentalTag,
+        buildTriadNotes: buildTriadNotes
     };
 })();

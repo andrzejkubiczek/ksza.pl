@@ -45,6 +45,7 @@ FAMILY_MAP = {
     "dyktanda-wysokosciowe.html": "Dyktanda",
     "rytm.html": "Rytm",
     "rytm-zapis.html": "Rytm",
+    "pamiec-melodyczna.html": "Dyktanda",
 }
 
 NAV_BLOCK_RE = re.compile(

@@ -260,7 +260,13 @@
 .piano-keyboard-wrap { margin: 0 0 22px; }
 .piano-keyboard-mount { text-align: center; }
 .piano-keyboard-panel {
+    /* overflow-y jawnie wyłączony: samo overflow-x:auto (bez ustawionego
+       overflow-y) każe przeglądarce liczyć oba kierunki jako "auto" (taka
+       jest reguła CSS dla tej pary), więc kontener - mimo że nie powinien -
+       potrafił dostać własny, PIONOWY pasek przewijania, którego wysokość
+       akurat odpowiada wysokości klawiatury. Stąd "przesuwanie się w lewo". */
     overflow-x: auto;
+    overflow-y: hidden;
     margin-top: 14px;
     padding: 12px 8px 8px;
     background: var(--key);
@@ -282,6 +288,36 @@
 }
 .piano-white-key .piano-key-label { font-size: 0.8rem; color: var(--muted); }
 .piano-black-key .piano-key-label { font-size: 0.56rem; line-height: 1.2; color: #fdfbf6; }
+
+/* ---------- Pamięć melodyczna: klawiatura interaktywna ---------- */
+.echo-keyboard-wrap { margin: 0 0 22px; overflow-x: auto; overflow-y: hidden; }
+.echo-keyboard { position: relative; margin: 0 auto; }
+.echo-white-key {
+    position: absolute; top: 0; height: 170px; box-sizing: border-box;
+    background: #fff; border: 1px solid var(--border); border-radius: 0 0 4px 4px;
+    cursor: pointer; padding: 0; transition: background 0.1s, transform 0.05s;
+}
+.echo-white-key:hover:not(:disabled) { background: var(--key-hover); }
+.echo-white-key:active:not(:disabled) { transform: translateY(2px); }
+.echo-black-key {
+    position: absolute; top: 0; height: 108px; z-index: 2; box-sizing: border-box;
+    background: var(--ink); border: none; border-radius: 0 0 3px 3px;
+    cursor: pointer; padding: 0; transition: background 0.1s, transform 0.05s;
+}
+.echo-black-key:hover:not(:disabled) { background: #3a3d4a; }
+.echo-black-key:active:not(:disabled) { transform: translateY(2px); }
+.echo-white-key:disabled, .echo-black-key:disabled { cursor: not-allowed; opacity: 0.55; }
+
+/* ---------- Pamięć melodyczna: ślad odpowiedzi ---------- */
+.answer-trail { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 0 0 18px; }
+.answer-slot {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border);
+    background: var(--key); transition: background 0.15s, border-color 0.15s;
+}
+.answer-slot.is-filled { border-color: var(--gold-soft); background: var(--gold-soft); }
+.answer-slot.is-correct { border-color: var(--green); background: var(--green-soft); }
+.answer-slot.is-wrong { border-color: var(--coral); background: rgba(192,57,43,0.08); }
 
 @media (max-width: 480px) {
     .widget { padding: 28px 18px 26px; }

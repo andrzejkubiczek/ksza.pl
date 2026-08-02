@@ -5,13 +5,6 @@
 (function () {
     const MT = KszaMusicTheory;
 
-    const TRIAD_SHAPES = {
-        durowy:      { third: { steps: 2, semitones: 4 }, fifth: { steps: 4, semitones: 7 } },
-        molowy:      { third: { steps: 2, semitones: 3 }, fifth: { steps: 4, semitones: 7 } },
-        zmniejszony: { third: { steps: 2, semitones: 3 }, fifth: { steps: 4, semitones: 6 } },
-        zwiekszony:  { third: { steps: 2, semitones: 4 }, fifth: { steps: 4, semitones: 8 } }
-    };
-
     // symbol: te same znaki co na przyciskach w ćwiczeniu "rozpoznawanie".
     const TRIAD_TYPES = {
         'durowy_z':    { shape: 'durowy',      inversion: 0, level: 1, label: 'Durowy',                 symbol: '+' },
@@ -23,18 +16,6 @@
         'molowy_3':    { shape: 'molowy',      inversion: 1, level: 2, label: 'Molowy - I przewrót',     symbol: 'o₃' },
         'molowy_5':    { shape: 'molowy',      inversion: 2, level: 2, label: 'Molowy - II przewrót',    symbol: 'o₅' }
     };
-
-    function buildTriadNotes(rootNote, shapeName, inversion) {
-        const shape = TRIAD_SHAPES[shapeName];
-        const third = MT.spellByShape(rootNote, shape.third, 1);
-        const fifth = MT.spellByShape(rootNote, shape.fifth, 1);
-        const notes = [rootNote, third, fifth];
-        for (let i = 0; i < inversion; i++) {
-            const wrapped = notes.shift();
-            notes.push({ letter: wrapped.letter, alter: wrapped.alter, octave: wrapped.octave + 1 });
-        }
-        return notes;
-    }
 
     // Trzy KOLEJNE nuty (nie akord), żeby było czytelniej.
     function buildNoteXml(note) {
@@ -168,7 +149,7 @@
         const rootLetter = pickRootLetter(type.shape);
         const rootNote = { letter: rootLetter, alter: 0, octave: rootOctave };
 
-        expectedNotes = buildTriadNotes(rootNote, type.shape, type.inversion);
+        expectedNotes = MT.buildTriadNotes(rootNote, type.shape, type.inversion);
         bassNote = expectedNotes[0];
 
         editableState = { 1: { step: 0, alter: 0 }, 2: { step: 0, alter: 0 } };

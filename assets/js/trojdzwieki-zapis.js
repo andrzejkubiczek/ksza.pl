@@ -5,14 +5,6 @@
 (function () {
     const MT = KszaMusicTheory;
 
-    // Kształt każdego trójdźwięku: tercja i kwinta jako {steps, semitones} liczone od prymy.
-    const TRIAD_SHAPES = {
-        durowy:      { third: { steps: 2, semitones: 4 }, fifth: { steps: 4, semitones: 7 } },
-        molowy:      { third: { steps: 2, semitones: 3 }, fifth: { steps: 4, semitones: 7 } },
-        zmniejszony: { third: { steps: 2, semitones: 3 }, fifth: { steps: 4, semitones: 6 } },
-        zwiekszony:  { third: { steps: 2, semitones: 4 }, fifth: { steps: 4, semitones: 8 } }
-    };
-
     // Klucze odpowiedzi - te same co w wersji "ze słuchu". inversion: 0=zasadnicza,
     // 1=I przewrót (tercja w basie), 2=II przewrót (kwinta w basie).
     const TRIAD_TYPES = {
@@ -25,20 +17,6 @@
         'molowy_3':    { shape: 'molowy',      inversion: 1, level: 2, label: 'Molowy - I przewrót' },
         'molowy_5':    { shape: 'molowy',      inversion: 2, level: 2, label: 'Molowy - II przewrót' }
     };
-
-    // Buduje trójdźwięk w postaci zasadniczej (pryma, tercja, kwinta), a dla
-    // przewrotu "obraca" go: składnik z dołu wędruje na górę, +1 oktawa.
-    function buildTriadNotes(rootNote, shapeName, inversion) {
-        const shape = TRIAD_SHAPES[shapeName];
-        const third = MT.spellByShape(rootNote, shape.third, 1);
-        const fifth = MT.spellByShape(rootNote, shape.fifth, 1);
-        const notes = [rootNote, third, fifth];
-        for (let i = 0; i < inversion; i++) {
-            const wrapped = notes.shift();
-            notes.push({ letter: wrapped.letter, alter: wrapped.alter, octave: wrapped.octave + 1 });
-        }
-        return notes;
-    }
 
     // Trzy dźwięki jako AKORD.
     function buildNoteXml(note, isChordTone) {
@@ -119,7 +97,7 @@
         currentKey = pool[Math.floor(Math.random() * pool.length)];
         const type = TRIAD_TYPES[currentKey];
         const rootNote = { letter: rootLetter, alter: 0, octave: rootOctave };
-        const notes = buildTriadNotes(rootNote, type.shape, type.inversion);
+        const notes = MT.buildTriadNotes(rootNote, type.shape, type.inversion);
 
         try {
             await KszaVerovio.ensureReady();

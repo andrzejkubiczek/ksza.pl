@@ -27,7 +27,12 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
-html { -webkit-text-size-adjust: 100%; }
+/* Pasek przewijania ZAWSZE widoczny (nie tylko "zarezerwowany") - jedyny
+   w pełni niezawodny sposób, żeby strona nigdy nie "skakała" w bok, gdy
+   jej wysokość zmienia się po kliknięciu (np. pojawia się/znika komunikat
+   czy przycisk) i pasek to lub owo pojawia/znika. scrollbar-gutter samo
+   w sobie nie wystarczyło - to twardszy, sprawdzony od lat sposób. */
+html { -webkit-text-size-adjust: 100%; overflow-y: scroll; }
 
 body {
     margin: 0;

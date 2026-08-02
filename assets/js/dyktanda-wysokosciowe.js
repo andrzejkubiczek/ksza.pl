@@ -1,16 +1,7 @@
-/* ksza.pl - dyktando wysokościowe.
-   Osobna lista plików niż puzzle (dyktanda/wysokosciowe/dyktanda.json) - te
-   pliki mają świadomie JEDNĄ wartość rytmiczną przez całe dyktando, bo to
-   ćwiczenie sprawdza tylko wysokość, nie rytm.
-
-   Klucz, tonacja, metrum i pierwszy dźwięk są dane i stałe. Uczeń kursorem
-   "Poprzedni/Następny dźwięk" wybiera, który z pozostałych dźwięków ustawia -
-   ten sam mechanizm (strzałki, przeciąganie, znak chromatyczny) co w
-   interwałach/trójdźwiękach, tylko więcej dźwięków w rzędzie.
-
-   Prawdziwa tonacja (nie zawsze C-dur) - znak chromatyczny trzeba
-   interpretować WZGLĘDEM tonacji: dźwięk zgodny z tonacją nie potrzebuje
-   żadnego znaku, inaczej wymaga jawnego kasownika (patrz keySignatureAlter). */
+/* ksza.pl - dyktando wysokościowe. Klucz, tonacja i pierwszy dźwięk są
+   stałe; kursor "Poprzedni/Następny dźwięk" wybiera, który z pozostałych
+   uczeń ustawia (ten sam mechanizm co w interwałach/trójdźwiękach). Znak
+   chromatyczny liczy się WZGLĘDEM tonacji - patrz keySignatureAlter. */
 (function () {
     const MT = KszaMusicTheory;
     const SHARP_ORDER = ['F', 'C', 'G', 'D', 'A', 'E', 'B'];

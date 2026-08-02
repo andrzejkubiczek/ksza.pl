@@ -16,8 +16,10 @@ Instrukcja wdrożenia i utrzymania jest w [opis.txt](opis.txt).
   stopnie gamy (I-VIII).
 - **Puzzle** - układanie fragmentów melodii we właściwej kolejności, ze
   słuchu albo z zapisu nutowego.
-- **Dyktanda** - dyktando wysokościowe: klucz, tonacja i pierwszy
-  dźwięk są dane, reszta wysokości do uzupełnienia ze słuchu.
+- **Dyktanda** - dyktando wysokościowe (klucz, tonacja i pierwszy
+  dźwięk są dane, reszta wysokości do uzupełnienia ze słuchu) oraz
+  pamięć melodyczna (usłysz krótką melodię i powtórz ją, klikając
+  klawisze fortepianu; 4 poziomy trudności).
 - **Rytm** - to samo co Puzzle, ale odwrotnie: wysokość dźwięku jest
   stała (zawsze ksylofon), liczy się tylko rytm.
 
