@@ -21,16 +21,20 @@ window.KszaPuzzleEngine = (function () {
 
         const measureEls = Array.from(part.querySelectorAll('measure'));
 
+        // Metrum czytane zawsze (nie tylko przy notation:true) - potrzebne też
+        // do odliczenia taktu metronomem przed pełnym odsłuchem.
+        const firstAttrs = measureEls.length ? measureEls[0].querySelector('attributes') : null;
+        const attrText = (selector, fallback) => {
+            const el = firstAttrs ? firstAttrs.querySelector(selector) : null;
+            return el ? el.textContent : fallback;
+        };
+        const meterBeats = parseInt(attrText('time beats', '4'), 10) || 4;
+
         // Nagłówek każdego taktu-fragmentu (notation:true): ten sam klucz/metrum/
         // tonacja co cały utwór, żeby żaden fragment nie zdradzał, który jest
         // naprawdę pierwszy w kolejności.
         let notationHeaderXml = '';
         if (notation) {
-            const firstAttrs = measureEls.length ? measureEls[0].querySelector('attributes') : null;
-            const attrText = (selector, fallback) => {
-                const el = firstAttrs ? firstAttrs.querySelector(selector) : null;
-                return el ? el.textContent : fallback;
-            };
             if (rhythmStaff) {
                 // Rytm: bez klucza/tonacji, samo metrum, 1 linia + klucz perkusyjny.
                 // Verovio NIE ignoruje wysokość nuty przy tym kluczu - stąd wymuszone
@@ -138,7 +142,7 @@ window.KszaPuzzleEngine = (function () {
 
         if (fragments.length < 2) throw new Error(minFragmentsMessage);
 
-        return { fragments: fragments, tempoBPM: tempoBPM };
+        return { fragments: fragments, tempoBPM: tempoBPM, meterBeats: meterBeats };
     }
 
     // config: { notation, partNameLabel, manifestUrl, fileBaseUrl, labels: {...}, fixedInstrument, rhythmStaff }
@@ -199,6 +203,8 @@ window.KszaPuzzleEngine = (function () {
         let scheduledTimeouts = [];
         let scheduledSimpleTimeouts = []; // fragment / "mój układ" - osobne śledzenie
         let playbackWatcher = null;
+        let countInTimeouts = [];      // odliczenie taktu - tylko przed pełnym odsłuchem od początku
+        let pendingStartTimeout = null;
 
         function fragmentEvents(fragment) { return notation ? fragment.events : fragment; }
 
@@ -286,11 +292,27 @@ window.KszaPuzzleEngine = (function () {
         function stopAllPlayback() {
             scheduledSimpleTimeouts.forEach((id) => clearTimeout(id));
             scheduledSimpleTimeouts = [];
+            countInTimeouts.forEach((id) => clearTimeout(id));
+            countInTimeouts = [];
+            if (pendingStartTimeout) { clearTimeout(pendingStartTimeout); pendingStartTimeout = null; }
             stopScheduledTimeouts();
             KszaAudio.stopAll();
             playbackState = 'stopped';
             pausedOffset = 0;
             updatePlaybackButtons();
+        }
+
+        // Odliczenie jednego taktu metronomem (akcent na "raz") w tym samym
+        // tempie co utwór - tylko przed odsłuchem CAŁOŚCI od początku, nie przy
+        // pojedynczym fragmencie ani przy wznowieniu po pauzie. Zwraca czas
+        // trwania odliczenia w sekundach, o który przesuwa się start melodii.
+        function scheduleCountIn(meterBeats, tempoBPM) {
+            const quarterSeconds = (60 / tempoBPM) * TEMPO_SLOWDOWN / KszaTempo.get();
+            for (let i = 0; i < meterBeats; i++) {
+                const id = setTimeout(() => KszaAudio.playClick(i === 0), i * quarterSeconds * 1000);
+                countInTimeouts.push(id);
+            }
+            return meterBeats * quarterSeconds;
         }
 
         // Planuje pozostałą część utworu od offsetSeconds, nuta po nucie.
@@ -327,11 +349,28 @@ window.KszaPuzzleEngine = (function () {
             const ok = await KszaAudio.ensureReady(instrumentSelectEl(), onAudioState);
             if (!ok) return;
             stopAllPlayback();
-            scheduleFullFrom(0);
+            playbackState = 'playing';
+            updatePlaybackButtons();
+            const countInSeconds = scheduleCountIn(active.meterBeats, active.tempoBPM);
+            pendingStartTimeout = setTimeout(() => {
+                pendingStartTimeout = null;
+                scheduleFullFrom(0);
+            }, countInSeconds * 1000);
         }
 
         function pausePlayback() {
             if (playbackState !== 'playing') return;
+            if (pendingStartTimeout) {
+                // Wciąż trwa odliczenie taktu - melodia jeszcze się nie zaczęła.
+                clearTimeout(pendingStartTimeout);
+                pendingStartTimeout = null;
+                countInTimeouts.forEach((id) => clearTimeout(id));
+                countInTimeouts = [];
+                pausedOffset = 0;
+                playbackState = 'paused';
+                updatePlaybackButtons();
+                return;
+            }
             const wallClockElapsed = (performance.now() - scheduleStartWallClock) / 1000;
             pausedOffset = Math.min(scheduleStartOffset + wallClockElapsed * scheduleSpeed, fullPlaybackTotalDuration);
             stopScheduledTimeouts();

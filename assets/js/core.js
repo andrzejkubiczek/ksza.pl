@@ -128,10 +128,28 @@ window.KszaAudio = (function () {
         }
     }
 
+    // Klik metronomu (odliczenie taktu przed pełnym odsłuchem) - osobny
+    // syntezator, niezależny od wybranego instrumentu.
+    let clickSynth = null;
+    function getClickSynth() {
+        if (!clickSynth) {
+            clickSynth = new Tone.Synth({
+                oscillator: { type: 'triangle' },
+                envelope: { attack: 0.001, decay: 0.05, sustain: 0, release: 0.05 }
+            }).toDestination();
+            clickSynth.volume.value = -4;
+        }
+        return clickSynth;
+    }
+    function playClick(accent) {
+        getClickSynth().triggerAttackRelease(accent ? 'C6' : 'G5', 0.05, Tone.now());
+    }
+
     return {
         loadInstrument: loadInstrument,
         ensureReady: ensureReady,
         stopAll: stopAll,
+        playClick: playClick,
         get player() { return currentSampler ? makePlayerWrapper(currentSampler) : null; }
     };
 })();

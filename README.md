@@ -15,13 +15,15 @@ Instrukcja wdrożenia i utrzymania jest w [opis.txt](opis.txt).
 - **Gamy** - durowa i cztery odmiany molowej, plus osobne ćwiczenie na
   stopnie gamy (I-VIII).
 - **Puzzle** - układanie fragmentów melodii we właściwej kolejności, ze
-  słuchu albo z zapisu nutowego.
+  słuchu albo z zapisu nutowego. Pełny odsłuch zaczyna się od odliczenia
+  jednego taktu metronomem, w tempie utworu.
 - **Dyktanda** - dyktando wysokościowe (klucz, tonacja i pierwszy
   dźwięk są dane, reszta wysokości do uzupełnienia ze słuchu) oraz
   pamięć melodyczna (usłysz krótką melodię i powtórz ją, klikając
   klawisze fortepianu; 5 poziomów trudności).
-- **Rytm** - to samo co Puzzle, ale odwrotnie: wysokość dźwięku jest
-  stała (zawsze ksylofon), liczy się tylko rytm.
+- **Rytm** - to samo co Puzzle (razem z odliczeniem metronomem), ale
+  odwrotnie: wysokość dźwięku jest stała (zawsze ksylofon), liczy się
+  tylko rytm.
 
 Puzzle, Dyktanda i Rytm mają osobne listy plików i można każdy utwór
 przypisać do jednej lub dwóch klas (np. `I/4`, `IV/6`) - selektor

@@ -38,6 +38,11 @@ wysokością (liczy się tylko rytm), zawsze na ksylofonie. Zapis nutowy
 rytmu rysuje samo metrum, bez klucza i tonacji (szczegóły techniczne w
 komentarzu przy KszaPuzzleEngine w puzzle-engine.js).
 
+Przed pełnym odsłuchem (Puzzle, Rytm) słychać odliczenie jednego taktu
+metronomem, w tempie utworu - żeby wiadomo było, jakie jest tempo,
+zanim zabrzmi pierwszy dźwięk. Tylko przy odsłuchu całości od początku,
+nie przy pojedynczym fragmencie ani przy wznowieniu po pauzie.
+
 Pamięć melodyczna (cwiczenia/pamiec-melodyczna.html): druga zakładka
 w rodzinie Dyktanda. Gra się krótka losowa melodia, uczeń powtarza ją
 klikając klawisze na klawiaturze (zawsze C4-C5, dowolny instrument z
