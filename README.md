@@ -19,7 +19,7 @@ Instrukcja wdrożenia i utrzymania jest w [opis.txt](opis.txt).
 - **Dyktanda** - dyktando wysokościowe (klucz, tonacja i pierwszy
   dźwięk są dane, reszta wysokości do uzupełnienia ze słuchu) oraz
   pamięć melodyczna (usłysz krótką melodię i powtórz ją, klikając
-  klawisze fortepianu; 4 poziomy trudności).
+  klawisze fortepianu; 5 poziomów trudności).
 - **Rytm** - to samo co Puzzle, ale odwrotnie: wysokość dźwięku jest
   stała (zawsze ksylofon), liczy się tylko rytm.
 
@@ -44,7 +44,7 @@ cwiczenia/*.html               po jednej stronie na wariant ćwiczenia
 assets/css/                    style
 assets/js/core.js              audio, tempo, menu mobilne
 assets/js/*.js                 logika ćwiczeń + kilka wspólnych modułów
-dyktanda/puzzle/                manifest i pliki dyktand-puzzle
+dyktanda/puzzle/                manifest (puzzle.json) i pliki dyktand-puzzle
 dyktanda/wysokosciowe/          manifest i pliki dyktanda wysokościowego
 dyktanda/rytm/                  manifest i pliki rytmów-puzzle
 update-nav.py                  generuje menu we wszystkich stronach naraz

@@ -19,10 +19,10 @@
 
     const LEVELS = {
         '1': { pool: WHITE_NOTES, length: 3 },
-        '2': { pool: WHITE_NOTES, length: 5 },
-        '3': { pool: CHROMATIC_NOTES, length: 5 },
-        '4': { pool: CHROMATIC_NOTES, length: 6 },
-        '5': { pool: CHROMATIC_NOTES, length: 8 }
+        '2': { pool: WHITE_NOTES, length: 4 },
+        '3': { pool: CHROMATIC_NOTES, length: 4 },
+        '4': { pool: CHROMATIC_NOTES, length: 5 },
+        '5': { pool: CHROMATIC_NOTES, length: 6 }
     };
 
     const REFERENCE_NOTE = 'A4'; // a1 = 440 Hz, dźwięk odniesienia przed KAŻDYM odtworzeniem

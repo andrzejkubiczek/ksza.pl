@@ -1,6 +1,6 @@
 /* ksza.pl - wspólny silnik puzzli z taktami: parsowanie MusicXML, odtwarzanie
    (proste i pełne, z pauzą), tasowanie i sprawdzanie kolejności. Używany przez
-   dyktanda.js, dyktanda-zapis.js, rytm.js, rytm-zapis.js - różni je tylko
+   puzzle.js, puzzle-zapis.js, rytm.js, rytm-zapis.js - różni je tylko
    manifest, teksty komunikatów i to, czy każdy takt jest też rysowany
    (notation: true) przez Verovio (KszaVerovio).
    Konfiguracja - patrz init() niżej. */

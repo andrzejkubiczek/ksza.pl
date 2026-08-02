@@ -27,9 +27,9 @@ assets/js/*.js (reszta)        - logika ćwiczeń + parę wspólnych modułów
                                   każda strona wczytuje tylko to, czego
                                   faktycznie potrzebuje
 assets/vendor/, assets/samples/ - DO WGRANIA, patrz PRZECZYTAJ.txt
-dyktanda/puzzle/                - dyktanda-puzzle: manifest + pliki MusicXML
-dyktanda/wysokosciowe/          - dyktanda wysokościowe: manifest + pliki
-dyktanda/rytm/                  - rytmy-puzzle: manifest + pliki
+dyktanda/puzzle/                - dyktanda-puzzle: manifest (puzzle.json) + MusicXML
+dyktanda/wysokosciowe/          - dyktanda wysokościowe: manifest (dyktanda.json) + pliki
+dyktanda/rytm/                  - rytmy-puzzle: manifest (rytm.json) + pliki
 update-nav.py                  - generuje menu we wszystkich stronach naraz
 
 Dyktanda wysokościowe: cały utwór jedną wartością rytmiczną (liczy się
@@ -52,7 +52,7 @@ DODAWANIE NOWEGO DYKTANDA / RYTMU
    (.xml/.musicxml, nie .mxl).
 2. Wgraj plik do właściwego folderu (dyktanda/puzzle/, dyktanda/
    wysokosciowe/ albo dyktanda/rytm/).
-3. Dopisz wpis do manifestu (dyktanda.json albo rytm.json):
+3. Dopisz wpis do manifestu (puzzle.json, dyktanda.json albo rytm.json):
 
    [
      { "title": "Dyktando 1 - gama C-dur", "file": "dyktando-01.xml", "klasy": ["I/4"] },
