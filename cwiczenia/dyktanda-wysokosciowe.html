@@ -16,7 +16,7 @@
 <header class="site-header">
     <div class="container site-header-inner">
         <a class="brand" href="../index.html">ksza.pl<small>kształcenie słuchu</small></a>
-        <button class="nav-toggle" aria-controls="site-menu" aria-expanded="false">Menu</button>
+        <button class="nav-toggle" type="button" aria-controls="site-menu" aria-expanded="false" aria-label="Otwórz menu nawigacji">Menu</button>
         <nav class="site-nav" id="site-menu" aria-label="Menu główne">
             <ul>
                 <li><a href="../index.html">Start</a></li>
@@ -125,12 +125,12 @@
     </div>
 </footer>
 
-<script>document.getElementById('footer-year').textContent = new Date().getFullYear();</script>
-<script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.min.js"></script>
-<script src="../assets/vendor/Tonejs-Instruments.js"></script>
-<script>window.KSZA_SAMPLES_BASE = '../assets/samples/';</script>
+<script defer>document.getElementById('footer-year').textContent = new Date().getFullYear();</script>
+<script defer src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.min.js"></script>
+<script defer src="../assets/vendor/Tonejs-Instruments.js"></script>
+<script defer>window.KSZA_SAMPLES_BASE = '../assets/samples/';</script>
 <script src="https://cdn.jsdelivr.net/npm/verovio@6.2.0/dist/verovio-toolkit-wasm.js"></script>
-<script src="../assets/js/core.js"></script>
+<script defer src="../assets/js/core.js"></script>
 <script src="../assets/js/klasa-filter.js"></script>
 <script src="../assets/js/music-theory.js"></script>
 <script src="../assets/js/verovio-render.js"></script>
