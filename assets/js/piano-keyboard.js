@@ -1,12 +1,12 @@
 /* ksza.pl - statyczna klawiatura fortepianu (pomoc do liczenia całych/półtonów).
    Bez numeracji oktaw - powtórzenie liter jest celowe. Montuje się sama
    w każdym ".piano-keyboard-mount" na stronie. */
-(function () {
+(() => {
     const WHITE_KEY_WIDTH = 46;
     const WHITE_KEY_HEIGHT = 170;
     const BLACK_KEY_WIDTH = 28;
 
-    // razkreślna (c-h) + dwukreślna do f
+    // Razkreślna (c-h) + dwukreślna do f
     const WHITE_LETTERS = ['c', 'd', 'e', 'f', 'g', 'a', 'h', 'c', 'd', 'e', 'f'];
 
     // Krzyżyk i bemol na każdym czarnym klawiszu. Obniżone h w tej konwencji
@@ -27,25 +27,21 @@
         let blackHtml = '';
 
         WHITE_LETTERS.forEach((letter, i) => {
-            whiteHtml += '<div class="piano-white-key" style="left:' + (i * WHITE_KEY_WIDTH) + 'px;width:' + WHITE_KEY_WIDTH + 'px;">' +
-                '<span class="piano-key-label">' + letter + '</span></div>';
+            const left = i * WHITE_KEY_WIDTH;
+            whiteHtml += `<div class="piano-white-key" style="left:${left}px;width:${WHITE_KEY_WIDTH}px;"><span class="piano-key-label">${letter}</span></div>`;
         });
 
         BLACK_KEYS_AFTER.forEach((bk) => {
             const centerX = (bk.afterIndex + 1) * WHITE_KEY_WIDTH;
             const left = centerX - BLACK_KEY_WIDTH / 2;
-            blackHtml += '<div class="piano-black-key" style="left:' + left + 'px;width:' + BLACK_KEY_WIDTH + 'px;">' +
-                '<span class="piano-key-label">' + bk.sharp + '</span>' +
-                '<span class="piano-key-label">' + bk.flat + '</span></div>';
+            blackHtml += `<div class="piano-black-key" style="left:${left}px;width:${BLACK_KEY_WIDTH}px;"><span class="piano-key-label">${bk.sharp}</span><span class="piano-key-label">${bk.flat}</span></div>`;
         });
 
-        return '<div class="piano-keyboard" style="width:' + totalWidth + 'px;height:' + WHITE_KEY_HEIGHT + 'px;">' +
-            whiteHtml + blackHtml + '</div>';
+        return `<div class="piano-keyboard" style="width:${totalWidth}px;height:${WHITE_KEY_HEIGHT}px;">${whiteHtml}${blackHtml}</div>`;
     }
 
     function buildWidgetHtml() {
-        return '<button type="button" class="btn-ghost piano-keyboard-toggle" aria-expanded="false">Pokaż klawiaturę</button>' +
-            '<div class="piano-keyboard-panel" hidden>' + buildKeyboardHtml() + '</div>';
+        return `<button type="button" class="btn-ghost piano-keyboard-toggle" aria-expanded="false">Pokaż klawiaturę</button><div class="piano-keyboard-panel" hidden>${buildKeyboardHtml()}</div>`;
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -63,5 +59,5 @@
         });
     });
 
-    window.KszaPianoKeyboard = { buildKeyboardHtml: buildKeyboardHtml };
+    window.KszaPianoKeyboard = { buildKeyboardHtml };
 })();

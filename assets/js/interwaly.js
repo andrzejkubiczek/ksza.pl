@@ -1,5 +1,5 @@
 /* ksza.pl - trener interwałów */
-(function () {
+(() => {
     const notesArray = [
         'C3', 'C#3', 'D3', 'D#3', 'E3', 'F3', 'F#3', 'G3', 'G#3', 'A3', 'A#3', 'B3',
         'C4', 'C#4', 'D4', 'D#4', 'E4', 'F4', 'F#4', 'G4', 'G#4', 'A4', 'A#4', 'B4',
@@ -29,13 +29,8 @@
     let isPlayingInterval = false;
     let scheduledIntervalTimeouts = [];
 
-    function currentInstrument() {
-        return document.getElementById('instrument-select').value;
-    }
+    const currentInstrument = () => document.getElementById('instrument-select').value;
 
-    // Indeks startowy tak, by cały interwał zmieścił się w zakresie instrumentu.
-    // notesArray ma twardy sufit (B5) - gdy się nie da zmieścić w całości
-    // (np. ksylofon + oktawa), bierzemy pozycję najbliższą temu zakresowi.
     function pickStartIndex(semitones) {
         const range = KszaInstrumentRange.range(currentInstrument());
         const arrayMaxIdx = notesArray.length - 1 - semitones;
@@ -50,12 +45,15 @@
 
     function setStatus(message, type) {
         const el = document.getElementById('status-line');
-        el.textContent = message || '';
-        el.className = 'status-line' + (type ? ' status-' + type : '');
+        if (el) {
+            el.textContent = message || '';
+            el.className = `status-line${type ? ` status-${type}` : ''}`;
+        }
     }
 
     function onAudioState(state, message) {
-        document.getElementById('play-btn').disabled = state === 'loading';
+        const playBtn = document.getElementById('play-btn');
+        if (playBtn) playBtn.disabled = state === 'loading';
         if (state === 'error') setStatus(message, 'error');
         else if (state === 'loading') setStatus(message, null);
         else setStatus('', null);
@@ -65,14 +63,18 @@
         scheduledIntervalTimeouts.forEach((id) => clearTimeout(id));
         scheduledIntervalTimeouts = [];
         isPlayingInterval = false;
-        document.getElementById('play-btn').disabled = false;
+        const playBtn = document.getElementById('play-btn');
+        if (playBtn) playBtn.disabled = false;
     }
 
     function generateNewInterval() {
         stopScheduledInterval();
         hasAnswered = false;
-        document.getElementById('feedback').textContent = '';
-        document.getElementById('feedback').className = 'feedback-msg';
+        const feedback = document.getElementById('feedback');
+        if (feedback) {
+            feedback.textContent = '';
+            feedback.className = 'feedback-msg';
+        }
         document.getElementById('next-btn').style.display = 'none';
         document.getElementById('play-btn').style.display = 'inline-flex';
 
@@ -95,7 +97,7 @@
     }
 
     async function playCurrentInterval() {
-        if (isPlayingInterval) return; // interwał juz gra - ignorujemy kolejne klikniecie
+        if (isPlayingInterval) return;
 
         const ok = await KszaAudio.ensureReady(document.getElementById('instrument-select'), onAudioState);
         if (!ok || !KszaAudio.player) return;
@@ -105,14 +107,13 @@
         document.getElementById('play-btn').disabled = true;
         KszaAudio.stopAll();
 
-        function scheduleNote(note, delaySeconds, duration) {
+        const scheduleNote = (note, delaySeconds, duration) => {
             const id = setTimeout(() => {
-                if (KszaAudio.player) KszaAudio.player.play(note, undefined, { duration: duration });
+                if (KszaAudio.player) KszaAudio.player.play(note, undefined, { duration });
             }, delaySeconds * 1000);
             scheduledIntervalTimeouts.push(id);
-        }
+        };
 
-        // Mnożnik z suwaka - większy = szybciej, mniejszy = wolniej.
         const speed = KszaTempo.get();
         const NOTE_DURATION = BASE_NOTE_DURATION / speed;
         const GAP_BEFORE_SECOND = BASE_GAP_BEFORE_SECOND / speed;
@@ -159,7 +160,7 @@
             feedback.textContent = 'Doskonale! To prawidłowa odpowiedź.';
         } else {
             feedback.className = 'feedback-msg feedback-wrong';
-            feedback.textContent = 'Niestety nie. Poprawna odpowiedź: ' + currentInterval.symbol + '.';
+            feedback.textContent = `Niestety nie. Poprawna odpowiedź: ${currentInterval.symbol}.`;
         }
 
         document.getElementById('play-btn').style.display = 'none';
@@ -174,9 +175,9 @@
     document.addEventListener('DOMContentLoaded', () => {
         generateNewInterval();
 
-        document.getElementById('play-btn').addEventListener('click', playCurrentInterval);
-        document.getElementById('next-btn').addEventListener('click', nextInterval);
-        document.getElementById('instrument-select').addEventListener('change', (e) => {
+        document.getElementById('play-btn')?.addEventListener('click', playCurrentInterval);
+        document.getElementById('next-btn')?.addEventListener('click', nextInterval);
+        document.getElementById('instrument-select')?.addEventListener('change', (e) => {
             KszaAudio.stopAll();
             stopScheduledInterval();
             const shift = KszaInstrumentRange.fitOctaveShift([firstNoteName, secondNoteName], e.target.value);

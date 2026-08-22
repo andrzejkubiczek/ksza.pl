@@ -2,7 +2,7 @@
    rytmiczne). Kolejność ODZWIERCIEDLA POSTĘP TRUDNOŚCI, nie numerację klas:
    końcówka cyklu 6-letniego (IV/6-VI/6) odpowiada mniej więcej początkowi
    cyklu 4-letniego (I/4), więc te dwie ścieżki nauki stykają się właśnie tu. */
-window.KszaKlasaFilter = (function () {
+window.KszaKlasaFilter = (() => {
     const ORDER = ['IV/6', 'V/6', 'VI/6', 'I/4', 'II/4', 'III/4', 'IV/4'];
     const ALL_VALUE = '';
 
@@ -27,8 +27,8 @@ window.KszaKlasaFilter = (function () {
     function matches(klasy, selected) {
         if (!selected) return true; // "Wszystkie klasy"
         if (!klasy || klasy.length === 0) return true; // ogólne
-        return klasy.indexOf(selected) !== -1;
+        return klasy.includes(selected);
     }
 
-    return { ORDER: ORDER, populateSelect: populateSelect, matches: matches };
+    return { ORDER, populateSelect, matches };
 })();

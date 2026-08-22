@@ -1,20 +1,19 @@
 /* ksza.pl - trener odmian gam */
-(function () {
+(() => {
     const ST = KszaScaleTonics;
 
-    // "down": null = odwrócenie "up". "dorycka" tu różni się od melodycznej tylko zejściem (nie klasyczny tryb dorycki).
     const SCALE_TYPES = [
-        { key: 'durowa',      label: 'Durowa',             tonics: ST.MAJOR_TONICS, up: [0,2,4,5,7,9,11,12], down: null },
-        { key: 'eolska',      label: 'Molowa eolska',      tonics: ST.MINOR_TONICS, up: [0,2,3,5,7,8,10,12], down: null },
-        { key: 'harmoniczna', label: 'Molowa harmoniczna', tonics: ST.MINOR_TONICS, up: [0,2,3,5,7,8,11,12], down: null },
-        { key: 'dorycka',     label: 'Molowa dorycka',     tonics: ST.MINOR_TONICS, up: [0,2,3,5,7,9,11,12], down: null },
-        { key: 'melodyczna',  label: 'Molowa melodyczna',  tonics: ST.MINOR_TONICS, up: [0,2,3,5,7,9,11,12], down: [12,10,8,7,5,3,2,0] }
+        { key: 'durowa',      label: 'Durowa',             tonics: ST.MAJOR_TONICS, up: [0, 2, 4, 5, 7, 9, 11, 12], down: null },
+        { key: 'eolska',      label: 'Molowa eolska',      tonics: ST.MINOR_TONICS, up: [0, 2, 3, 5, 7, 8, 10, 12], down: null },
+        { key: 'harmoniczna', label: 'Molowa harmoniczna', tonics: ST.MINOR_TONICS, up: [0, 2, 3, 5, 7, 8, 11, 12], down: null },
+        { key: 'dorycka',     label: 'Molowa dorycka',     tonics: ST.MINOR_TONICS, up: [0, 2, 3, 5, 7, 9, 11, 12], down: null },
+        { key: 'melodyczna',  label: 'Molowa melodyczna',  tonics: ST.MINOR_TONICS, up: [0, 2, 3, 5, 7, 9, 11, 12], down: [12, 10, 8, 7, 5, 3, 2, 0] }
     ];
 
     const BASE_NOTE_DURATION = 0.425;        // 0.34 * 1.25 - wolniej o 25% (I stopień, młodsze dzieci)
     const BASE_TURNAROUND_DURATION = 0.6875; // 0.55 * 1.25
     const BASE_TURNAROUND_GAP = 0.225;       // 0.18 * 1.25
-    const TURNAROUND_INDEX = 7;       // pozycja punktu zwrotnego (sekwencja: 8 + 7 nut)
+    const TURNAROUND_INDEX = 7;              // pozycja punktu zwrotnego (sekwencja: 8 + 7 nut)
     const DIRECTIONS = ['up-down', 'down-up'];
 
     let currentScaleType = null;
@@ -26,11 +25,8 @@
     let isPlayingScale = false;
     let scheduledScaleTimeouts = [];
 
-    function currentInstrument() {
-        return document.getElementById('instrument-select').value;
-    }
+    const currentInstrument = () => document.getElementById('instrument-select').value;
 
-    // Nuta w punkcie zwrotnym powtórzona - kończy jeden kierunek i zaczyna drugi.
     function buildScaleNoteNames(scaleType, tonic, direction, tonicOctave) {
         const upNotes = scaleType.up.map((o) => ST.noteAt(tonic.pc, o, tonicOctave));
         const downOffsets = scaleType.down || [...scaleType.up].reverse();
@@ -44,12 +40,15 @@
 
     function setStatus(message, type) {
         const el = document.getElementById('status-line');
-        el.textContent = message || '';
-        el.className = 'status-line' + (type ? ' status-' + type : '');
+        if (el) {
+            el.textContent = message || '';
+            el.className = `status-line${type ? ` status-${type}` : ''}`;
+        }
     }
 
     function onAudioState(state, message) {
-        document.getElementById('play-btn').disabled = state === 'loading';
+        const playBtn = document.getElementById('play-btn');
+        if (playBtn) playBtn.disabled = state === 'loading';
         if (state === 'error') setStatus(message, 'error');
         else if (state === 'loading') setStatus(message, null);
         else setStatus('', null);
@@ -64,6 +63,7 @@
 
     function updatePlayButtonState() {
         const playBtn = document.getElementById('play-btn');
+        if (!playBtn) return;
         playBtn.disabled = isPlayingScale;
         playBtn.innerHTML = isPlayingScale
             ? '<span class="play-icon" aria-hidden="true"></span><span>Gra...</span>'
@@ -73,8 +73,11 @@
     function generateNewScale() {
         stopScheduledScale();
         hasAnswered = false;
-        document.getElementById('feedback').textContent = '';
-        document.getElementById('feedback').className = 'feedback-msg';
+        const feedback = document.getElementById('feedback');
+        if (feedback) {
+            feedback.textContent = '';
+            feedback.className = 'feedback-msg';
+        }
         document.getElementById('play-btn').style.display = 'inline-flex';
         document.getElementById('next-btn').style.display = 'none';
 
@@ -84,7 +87,7 @@
         });
 
         currentScaleType = SCALE_TYPES[Math.floor(Math.random() * SCALE_TYPES.length)];
-        const tonics = currentScaleType.tonics;
+        const { tonics } = currentScaleType;
         currentTonic = tonics[Math.floor(Math.random() * tonics.length)];
         currentDirection = DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)];
         const maxOffset = Math.max(...currentScaleType.up);
@@ -142,12 +145,14 @@
         });
 
         const feedback = document.getElementById('feedback');
-        if (selectedKey === currentScaleType.key) {
-            feedback.className = 'feedback-msg feedback-correct';
-            feedback.textContent = 'Doskonale! To prawidłowa odpowiedź.';
-        } else {
-            feedback.className = 'feedback-msg feedback-wrong';
-            feedback.textContent = 'Niestety nie. Poprawna odpowiedź: ' + currentScaleType.label + '.';
+        if (feedback) {
+            if (selectedKey === currentScaleType.key) {
+                feedback.className = 'feedback-msg feedback-correct';
+                feedback.textContent = 'Doskonale! To prawidłowa odpowiedź.';
+            } else {
+                feedback.className = 'feedback-msg feedback-wrong';
+                feedback.textContent = `Niestety nie. Poprawna odpowiedź: ${currentScaleType.label}.`;
+            }
         }
 
         document.getElementById('play-btn').style.display = 'none';
@@ -162,9 +167,9 @@
     document.addEventListener('DOMContentLoaded', () => {
         generateNewScale();
 
-        document.getElementById('play-btn').addEventListener('click', playCurrentScale);
-        document.getElementById('next-btn').addEventListener('click', nextScale);
-        document.getElementById('instrument-select').addEventListener('change', (e) => {
+        document.getElementById('play-btn')?.addEventListener('click', playCurrentScale);
+        document.getElementById('next-btn')?.addEventListener('click', nextScale);
+        document.getElementById('instrument-select')?.addEventListener('change', (e) => {
             KszaAudio.stopAll();
             stopScheduledScale();
             const shift = KszaInstrumentRange.fitOctaveShift(currentNoteNames, e.target.value);

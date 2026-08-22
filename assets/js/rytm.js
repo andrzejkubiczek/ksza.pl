@@ -3,7 +3,7 @@
    Lista rytmów: ../dyktanda/rytm/rytm.json (manifest - patrz opis.txt).
    Zawsze ksylofon - najlepiej oddaje rytm, bez wyboru instrumentu.
    Silnik: assets/js/puzzle-engine.js. */
-(function () {
+(() => {
     KszaPuzzleEngine.init({
         notation: false,
         manifestUrl: '../dyktanda/rytm/rytm.json',

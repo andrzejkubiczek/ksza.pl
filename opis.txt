@@ -1,102 +1,102 @@
-=== ksza.pl - strona statyczna ===
+=== ksza.pl - dokumentacja techniczna i przewodnik wdrożenia ===
 
-Strona główna, "O projekcie" i sześć ćwiczeń słuchowych: interwały,
-trójdźwięki, gamy, puzzle, dyktanda, rytm. Bez backendu, bez bazy
-danych, bez logowania - same pliki.
-
-WAŻNE - PRZED WDROŻENIEM:
-Próbki dźwiękowe (Tone.js) trzeba wgrać osobno - nie mogłem ich sam
-pobrać podczas pisania kodu. Instrukcja: assets/samples/PRZECZYTAJ.txt.
-Bez tego strona się otworzy, ale dźwięk nie zagra.
+Strona internetowa ksza.pl to w pełni statyczna aplikacja edukacyjna do nauki
+kształcenia słuchu i czytania nut. Działa bezpośrednio w przeglądarce
+(na komputerach, tabletach i telefonach) - bez bazy danych, bez backendu
+i bez konieczności logowania.
 
 
-WDROŻENIE
-Wgraj całą zawartość folderu na serwer (katalog główny domeny) i to
-tyle - nic więcej nie trzeba instalować ani konfigurować.
+1. WDROŻENIE I WYMAGANIA WSTĘPNE
+
+A. Próbki dźwiękowe (Tone.js / VSCO2):
+   Próbki instrumentów należy umieścić w katalogu:
+   assets/samples/<nazwa_instrumentu>/<nuta>.<mp3|ogg|wav>
+   (np. assets/samples/piano/C4.mp3, flute, clarinet, violin, xylophone,
+   trumpet, bassoon). Szczegółowa instrukcja znajduje się w:
+   assets/samples/PRZECZYTAJ.txt.
+
+B. Publikacja:
+   Wgraj całą zawartość repozytorium do katalogu głównego serwera HTTP
+   (np. Apache, Nginx, GitHub Pages, Netlify). Nie jest wymagana żadna
+   instalacja ani konfiguracja po stronie serwera.
 
 
-STRUKTURA
+2. ARCHITEKTURA I STRUKTURA KATALOGÓW
 
-index.html, o-projekcie.html   - strony ogólne
-cwiczenia/*.html               - po jednej stronie na wariant ćwiczenia
-assets/css/                    - style
-assets/js/core.js              - audio (Tone.js), tempo (zawsze 100% na starcie), menu mobilne
-assets/js/*.js (reszta)        - logika ćwiczeń + parę wspólnych modułów
-                                  (music-theory, verovio-render, gesture-layer,
-                                  scale-tonics, puzzle-engine, klasa-filter) -
-                                  każda strona wczytuje tylko to, czego
-                                  faktycznie potrzebuje
-assets/vendor/, assets/samples/ - DO WGRANIA, patrz PRZECZYTAJ.txt
-dyktanda/puzzle/                - dyktanda-puzzle: manifest (puzzle.json) + MusicXML
-dyktanda/wysokosciowe/          - dyktanda wysokościowe: manifest (dyktanda.json) + pliki
-dyktanda/rytm/                  - rytmy-puzzle: manifest (rytm.json) + pliki
-update-nav.py                  - generuje menu we wszystkich stronach naraz
-
-Dyktanda wysokościowe: cały utwór jedną wartością rytmiczną (liczy się
-tylko wysokość dźwięków). Rytm: odwrotnie - cały utwór jedną, stałą
-wysokością (liczy się tylko rytm), zawsze na ksylofonie. Zapis nutowy
-rytmu rysuje samo metrum, bez klucza i tonacji (szczegóły techniczne w
-komentarzu przy KszaPuzzleEngine w puzzle-engine.js).
-
-Przed pełnym odsłuchem (Puzzle, Rytm) słychać odliczenie jednego taktu
-metronomem, w tempie utworu - żeby wiadomo było, jakie jest tempo,
-zanim zabrzmi pierwszy dźwięk. Tylko przy odsłuchu całości od początku,
-nie przy pojedynczym fragmencie ani przy wznowieniu po pauzie.
-
-Pamięć melodyczna (cwiczenia/pamiec-melodyczna.html): druga zakładka
-w rodzinie Dyktanda. Gra się krótka losowa melodia, uczeń powtarza ją
-klikając klawisze na klawiaturze (zawsze C4-C5, dowolny instrument z
-selektora), po dźwięku odniesienia a1 (440 Hz) granym przed każdym
-odtworzeniem. Poziom decyduje o puli dźwięków i długości melodii -
-stała LEVELS w assets/js/pamiec-melodyczna.js.
+index.html, o-projekcie.html   - strony ogólne i informacyjne
+cwiczenia/*.html               - dedykowane strony dla każdego wariantu ćwiczenia
+assets/css/site.css            - globalne style, layout, motyw "Kontrastowe karty", RWD
+assets/css/widgets.css         - style widżetów ćwiczeń, notacji Verovio, klawiatur
+assets/js/core.js              - silnik audio (Tone.js), łańcuch efektów, tempo, zakresy
+assets/js/music-theory.js      - drabina diatoniczna, enharmonia, generator MusicXML
+assets/js/verovio-render.js    - asynchroniczny silnik renderowania nut SVG (Leland font)
+assets/js/gesture-layer.js     - obsługa gestów Pointer Events (przeciąganie/tap)
+assets/js/puzzle-engine.js     - uniwersalny silnik układanek (MusicXML, metronom, SortableJS)
+assets/js/scale-tonics.js      - toniki gam, algorytm doboru oktawy instrumentu
+assets/js/klasa-filter.js      - filtr klasowy (kolejność dydaktyczna: IV/6 - IV/4)
+assets/js/piano-keyboard.js    - statyczna klawiatura pomocnicza (białe/czarne klawisze)
+assets/js/*.js (reszta)        - kontrolery logiki poszczególnych ćwiczeń
+dyktanda/puzzle/               - manifest (puzzle.json) i pliki MusicXML dyktand-puzzle
+dyktanda/wysokosciowe/         - manifest (dyktanda.json) i pliki dyktand wysokościowych
+dyktanda/rytm/                 - manifest (rytm.json) i pliki rytmów-puzzle
+update-nav.py                  - generator menu nawigacyjnego dla wszystkich podstron
 
 
-DODAWANIE NOWEGO DYKTANDA / RYTMU
+3. ZASADY DZIAŁANIA POSZCZEGÓLNYCH ĆWICZEŃ
 
-1. Wyeksportuj z programu nutowego jako NIESKOMPRESOWANY MusicXML
-   (.xml/.musicxml, nie .mxl).
-2. Wgraj plik do właściwego folderu (dyktanda/puzzle/, dyktanda/
-   wysokosciowe/ albo dyktanda/rytm/).
-3. Dopisz wpis do manifestu (puzzle.json, dyktanda.json albo rytm.json):
+- Interwały (interwaly.html, interwaly-zapis.html, interwaly-buduj.html):
+  Rozpoznawanie ze słuchu (melodycznie, harmonicznie, mieszanie), rozpoznawanie
+  zapisu nutowego w kluczu wiolinowym/basowym oraz interaktywne budowanie interwałów.
+  Dźwięki są automatycznie transponowane w oktawach, aby mieściły się w skali instrumentu.
+
+- Trójdźwięki (trojdzwieki.html, trojdzwieki-zapis.html, trojdzwieki-buduj.html):
+  Durowy (+), molowy (o), zmniejszony (>), zwiększony (<) oraz przewroty
+  sekstowe (+₃, o₃) i kwartsekstowe (+₅, o₅). Tryb budowania pozwala na
+  niezależną edycję składników akordu za pomocą kursorów i znaków chromatycznych.
+
+- Gamy i stopnie (gamy.html, gamy-stopnie.html):
+  Gama durowa i cztery odmiany molowej (eolska, harmoniczna, dorycka, melodyczna).
+  Ćwiczenie na stopnie gra gamę (kontekst tonalny), a następnie losowy stopień (I-VIII).
+
+- Puzzle melodyczne (puzzle.html, puzzle-zapis.html):
+  Układanie potasowanych taktów we właściwej kolejności (drag & drop). Pełny odsłuch
+  rozpoczyna się odliczeniem jednego taktu metronomem w tempie utworu.
+
+- Dyktanda wysokościowe (dyktanda-wysokosciowe.html):
+  Rytm i pierwszy dźwięk są podane; uczeń dopasowuje wysokości pozostałych nut
+  przyciskami lub gestem nad pięciolinią. Sprawdzenie nanosi kolory feedbacku
+  (zielony/czerwony) bez blokowania możliwości dalszej edycji.
+
+- Pamięć melodyczna (pamiec-melodyczna.html):
+  Przed każdą frazą odtwarzany jest dźwięk odniesienia a1 (440 Hz). Uczeń powtarza
+  usłyszaną melodię na wbudowanej klawiaturze (C4-C5). 5 poziomów trudności.
+
+- Rytm (rytm.html, rytm-zapis.html):
+  Puzzle rytmiczne – stała wysokość dźwięku (zawsze ksylofon), zmienny rytm.
+  Zapis nutowy rysowany jest na pojedynczej linii z kluczem perkusyjnym.
+
+
+4. DODAWANIE NOWEGO DYKTANDA LUB RYTMU
+
+1. Wyeksportuj utwór z programu nutowego (np. MuseScore, Sibelius, Finale) jako
+   NIESKOMPRESOWANY MusicXML (.xml lub .musicxml).
+2. Wgraj plik do odpowiedniego folderu (dyktanda/puzzle/, dyktanda/wysokosciowe/ lub dyktanda/rytm/).
+3. Dopisz obiekt do właściwego manifestu (puzzle.json, dyktanda.json lub rytm.json):
 
    [
-     { "title": "Dyktando 1 - gama C-dur", "file": "dyktando-01.xml", "klasy": ["I/4"] },
-     { "title": "Dyktando 2 - tercje",     "file": "dyktando-02.xml", "klasy": [] }
+     { "title": "Dyktando 1 - gama C-dur", "file": "dyktando-01.musicxml", "klasy": ["I/4", "IV/6"] },
+     { "title": "Dyktando 2 - ogólne",     "file": "dyktando-02.musicxml", "klasy": [] }
    ]
 
-   Uwaga na format JSON: cudzysłowy proste ("), przecinek między
-   wpisami ale nie po ostatnim, nazwa pliku dokładnie jak na serwerze.
-   Jeśli coś nie działa po edycji, sprawdź plik na jsonlint.com.
-4. Odśwież stronę - nowa pozycja pojawi się na liście.
-
-Pole "klasy": lista klas, do których pasuje dany utwór - dozwolone
-wartości i ich kolejność (IV/6, V/6, VI/6, I/4, II/4, III/4, IV/4) są
-ustalone w assets/js/klasa-filter.js. Można wpisać jedną klasę, dwie
-naraz, albo zostawić puste/pominąć pole - wtedy utwór jest "ogólny" i
-widoczny niezależnie od wybranej klasy w filtrze nad listą.
+   Pole "klasy" przyjmuje oznaczenia: IV/6, V/6, VI/6, I/4, II/4, III/4, IV/4.
+   Pusta tablica [] lub brak pola oznacza utwór ogólny (widoczny zawsze).
 
 
-MENU
+5. AKTUALIZACJA MENU (update-nav.py)
 
-Menu główne nie jest kopiowane ręcznie do każdej strony - jedno źródło
-prawdy to lista w update-nav.py. Żeby dodać albo zmienić pozycję menu:
-edytuj tę listę, potem uruchom
-
+Menu nawigacyjne witryny jest zarządzane centralnie w pliku update-nav.py.
+Aby zmienić strukturę lub nazwy zakładek w menu:
+1. Zmodyfikuj listę NAV_ITEMS lub słownik FAMILY_MAP w update-nav.py.
+2. Uruchom w terminalu:
    python3 update-nav.py
-
-To wstawi świeże menu do wszystkich stron naraz. Rób to zawsze po
-zmianie menu, przed wdrożeniem.
-
-
-DODAWANIE NOWEGO ĆWICZENIA
-
-1. Skopiuj podobną stronę z cwiczenia/ jako szablon.
-2. Napisz logikę w assets/js/<nazwa>.js - z gotowego rdzenia (audio,
-   tempo) i wspólnych modułów korzystaj tam, gdzie pasują.
-3. Dodaj pozycję w update-nav.py i uruchom update-nav.py.
-
-
-CZEGO TU NIE MA
-
-- Panelu administracyjnego - dyktanda dodaje się ręcznie, wgrywając pliki.
-- Statystyk/kont uczniów - wymagałoby to backendu.
+Skrypt automatycznie zaktualizuje blok <nav class="site-nav"> we wszystkich plikach HTML.

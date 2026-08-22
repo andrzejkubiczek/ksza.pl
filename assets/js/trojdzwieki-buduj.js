@@ -2,10 +2,9 @@
    Bas jest dany, uczeń ustawia pozostałe dwa dźwięki - kursor "Poprzednia/
    Następna nuta" wybiera KTÓRY, te same strzałki i przełącznik ♭/♮/♯ działają
    na aktualnie wybranym (stan każdego pamiętany osobno). */
-(function () {
+(() => {
     const MT = KszaMusicTheory;
 
-    // symbol: te same znaki co na przyciskach w ćwiczeniu "rozpoznawanie".
     const TRIAD_TYPES = {
         'durowy_z':    { shape: 'durowy',      inversion: 0, level: 1, label: 'Durowy',                 symbol: '+' },
         'molowy_z':    { shape: 'molowy',      inversion: 0, level: 1, label: 'Molowy',                 symbol: 'o' },
@@ -17,24 +16,15 @@
         'molowy_5':    { shape: 'molowy',      inversion: 2, level: 2, label: 'Molowy - II przewrót',    symbol: 'o₅' }
     };
 
-    // Trzy KOLEJNE nuty (nie akord), żeby było czytelniej.
     function buildNoteXml(note) {
-        return '<note>' + MT.noteToPitchXml(note) +
-            '<duration>1</duration><type>quarter</type>' + MT.accidentalTag(note) + '</note>';
+        return `<note>${MT.noteToPitchXml(note)}<duration>1</duration><type>quarter</type>${MT.accidentalTag(note)}</note>`;
     }
 
     function buildMeasureMusicXML(clef, notes) {
         const clefTag = clef === 'bass'
             ? '<clef><sign>F</sign><line>4</line></clef>'
             : '<clef><sign>G</sign><line>2</line></clef>';
-        return '<?xml version="1.0" encoding="UTF-8"?>' +
-            '<score-partwise version="4.0">' +
-            '<part-list><score-part id="P1"><part-name print-object="no">Trójdźwięk</part-name></score-part></part-list>' +
-            '<part id="P1"><measure number="1">' +
-            '<attributes><divisions>1</divisions><key><fifths>0</fifths></key>' +
-            '<time><beats>3</beats><beat-type>4</beat-type></time>' + clefTag + '</attributes>' +
-            notes.map(buildNoteXml).join('') +
-            '</measure></part></score-partwise>';
+        return `<?xml version="1.0" encoding="UTF-8"?><score-partwise version="4.0"><part-list><score-part id="P1"><part-name print-object="no">Trójdźwięk</part-name></score-part></part-list><part id="P1"><measure number="1"><attributes><divisions>1</divisions><key><fifths>0</fifths></key><time><beats>3</beats><beat-type>4</beat-type></time>${clefTag}</attributes>${notes.map(buildNoteXml).join('')}</measure></part></score-partwise>`;
     }
 
     function renderMeasure(clef, notes) {
@@ -48,13 +38,11 @@
         document.getElementById('notation-container').innerHTML = svg;
     }
 
-    let currentKey = null;
     let clef = 'treble';
     let bassNote = null;
-    let expectedNotes = null;     // [bas, środkowy, górny] - poprawna odpowiedź
+    let expectedNotes = null;
     let hasAnswered = false;
 
-    // Edytowalne pozycje w notes: 1 (środkowy), 2 (górny).
     const EDITABLE_INDICES = [1, 2];
     let editableState = {};
     let cursorPos = 0;
@@ -62,27 +50,28 @@
     const TREBLE_ROOT_OCTAVE = 4;
     const BASS_ROOT_OCTAVE = 2;
 
-    function currentLevel() {
-        return document.getElementById('level-select').value;
-    }
+    const currentLevel = () => document.getElementById('level-select').value;
+
     function pickClef() {
         const selected = document.getElementById('clef-select').value;
         if (selected === 'random') return Math.random() < 0.5 ? 'treble' : 'bass';
         return selected;
     }
+
     function setStatus(message, type) {
         const el = document.getElementById('status-line');
-        el.textContent = message || '';
-        el.className = 'status-line' + (type ? ' status-' + type : '');
+        if (el) {
+            el.textContent = message || '';
+            el.className = `status-line${type ? ` status-${type}` : ''}`;
+        }
     }
 
-    // H + zwiększony wymagałby podwójnego krzyżyka (kwinta = Fisis) - wykluczone.
     function pickRootLetter(shapeName) {
         const pool = shapeName === 'zwiekszony' ? MT.LETTERS.filter((l) => l !== 'B') : MT.LETTERS;
         return pool[Math.floor(Math.random() * pool.length)];
     }
 
-    function currentEditIndex() { return EDITABLE_INDICES[cursorPos]; }
+    const currentEditIndex = () => EDITABLE_INDICES[cursorPos];
 
     function candidateNoteAt(index) {
         const state = editableState[index];
@@ -91,13 +80,10 @@
         return { letter: entry.letter, alter: state.alter, octave: entry.octave };
     }
 
-    function currentNotes() {
-        return [bassNote, candidateNoteAt(1), candidateNoteAt(2)];
-    }
+    const currentNotes = () => [bassNote, candidateNoteAt(1), candidateNoteAt(2)];
 
     function updateCursorLabel() {
-        document.getElementById('note-cursor-label').textContent =
-            'Dźwięk ' + (currentEditIndex() + 1) + ' z 3';
+        document.getElementById('note-cursor-label').textContent = `Dźwięk ${currentEditIndex() + 1} z 3`;
         document.getElementById('note-prev').disabled = hasAnswered || cursorPos === 0;
         document.getElementById('note-next').disabled = hasAnswered || cursorPos === EDITABLE_INDICES.length - 1;
     }
@@ -127,21 +113,24 @@
             setStatus('', null);
         } catch (e) {
             console.error('Błąd renderowania nut:', e);
-            setStatus('Błąd wczytywania biblioteki nutowej: ' + e.message, 'error');
+            setStatus(`Błąd wczytywania biblioteki nutowej: ${e.message}`, 'error');
         }
     }
 
     async function generateNewQuestion() {
         hasAnswered = false;
-        document.getElementById('feedback').textContent = '';
-        document.getElementById('feedback').className = 'feedback-msg';
+        const feedback = document.getElementById('feedback');
+        if (feedback) {
+            feedback.textContent = '';
+            feedback.className = 'feedback-msg';
+        }
         document.getElementById('next-btn').style.display = 'none';
         document.getElementById('check-btn').disabled = false;
         document.querySelectorAll('.accidental-btn').forEach((btn) => { btn.disabled = false; });
 
         const level = currentLevel();
         const pool = Object.keys(TRIAD_TYPES).filter((k) => level === '2' || TRIAD_TYPES[k].level === 1);
-        currentKey = pool[Math.floor(Math.random() * pool.length)];
+        const currentKey = pool[Math.floor(Math.random() * pool.length)];
         const type = TRIAD_TYPES[currentKey];
 
         clef = pickClef();
@@ -156,14 +145,14 @@
         cursorPos = 0;
         syncControlsToCursor();
 
-        document.getElementById('task-line').textContent = 'Zbuduj: ' + type.label + ' (' + type.symbol + ').';
+        document.getElementById('task-line').textContent = `Zbuduj: ${type.label} (${type.symbol}).`;
 
         try {
             await KszaVerovio.ensureReady();
             redraw();
         } catch (e) {
             console.error('Błąd renderowania nut:', e);
-            setStatus('Błąd wczytywania biblioteki nutowej: ' + e.message, 'error');
+            setStatus(`Błąd wczytywania biblioteki nutowej: ${e.message}`, 'error');
         }
     }
 
@@ -217,13 +206,14 @@
         updateLetterButtons();
 
         const feedback = document.getElementById('feedback');
-        if (isCorrect) {
-            feedback.className = 'feedback-msg feedback-correct';
-            feedback.textContent = 'Doskonale! To prawidłowo zbudowany trójdźwięk.';
-        } else {
-            feedback.className = 'feedback-msg feedback-wrong';
-            feedback.textContent = 'Niestety nie. Prawidłowo: środkowy dźwięk to ' + MT.noteLabel(expectedNotes[1]) +
-                ', górny to ' + MT.noteLabel(expectedNotes[2]) + '.';
+        if (feedback) {
+            if (isCorrect) {
+                feedback.className = 'feedback-msg feedback-correct';
+                feedback.textContent = 'Doskonale! To prawidłowo zbudowany trójdźwięk.';
+            } else {
+                feedback.className = 'feedback-msg feedback-wrong';
+                feedback.textContent = `Niestety nie. Prawidłowo: środkowy dźwięk to ${MT.noteLabel(expectedNotes[1])}, górny to ${MT.noteLabel(expectedNotes[2])}.`;
+            }
         }
 
         document.getElementById('next-btn').style.display = 'inline-flex';
@@ -233,18 +223,18 @@
         generateNewQuestion();
         KszaGestureLayer.setup('gesture-layer', {
             canEdit: () => !hasAnswered,
-            moveLetter: moveLetter,
-            cycleAccidental: cycleAccidental
+            moveLetter,
+            cycleAccidental
         });
 
-        document.getElementById('level-select').addEventListener('change', generateNewQuestion);
-        document.getElementById('clef-select').addEventListener('change', generateNewQuestion);
-        document.getElementById('next-btn').addEventListener('click', generateNewQuestion);
-        document.getElementById('note-prev').addEventListener('click', () => moveCursor(-1));
-        document.getElementById('note-next').addEventListener('click', () => moveCursor(1));
-        document.getElementById('letter-up').addEventListener('click', () => moveLetter(1));
-        document.getElementById('letter-down').addEventListener('click', () => moveLetter(-1));
-        document.getElementById('check-btn').addEventListener('click', checkAnswer);
+        document.getElementById('level-select')?.addEventListener('change', generateNewQuestion);
+        document.getElementById('clef-select')?.addEventListener('change', generateNewQuestion);
+        document.getElementById('next-btn')?.addEventListener('click', generateNewQuestion);
+        document.getElementById('note-prev')?.addEventListener('click', () => moveCursor(-1));
+        document.getElementById('note-next')?.addEventListener('click', () => moveCursor(1));
+        document.getElementById('letter-up')?.addEventListener('click', () => moveLetter(1));
+        document.getElementById('letter-down')?.addEventListener('click', () => moveLetter(-1));
+        document.getElementById('check-btn')?.addEventListener('click', checkAnswer);
         document.querySelectorAll('.accidental-btn').forEach((btn) => {
             btn.addEventListener('click', () => setAccidental(parseInt(btn.dataset.alter, 10)));
         });

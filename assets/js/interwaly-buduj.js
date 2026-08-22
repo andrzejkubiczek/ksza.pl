@@ -3,7 +3,7 @@
    literę drugiego dźwięku i osobno ustawia znak chromatyczny (♭/♮/♯, świadomie
    tylko 3 stany - sprawdzone, że przy dozwolonych kombinacjach nigdy nie
    trzeba podwójnego znaku). */
-(function () {
+(() => {
     const MT = KszaMusicTheory;
 
     const INTERVAL_DEFS = {
@@ -23,26 +23,15 @@
     };
     const SYMBOLS = Object.keys(INTERVAL_DEFS);
 
-    // Dwie KOLEJNE nuty, nie akord - przy kroku 0 obie nakładałyby się na
-    // siebie i znak chromatyczny wyglądałby, jakby dotyczył złej nuty.
     function buildNoteXml(note) {
-        return '<note>' + MT.noteToPitchXml(note) +
-            '<duration>2</duration><type>half</type>' + MT.accidentalTag(note) + '</note>';
+        return `<note>${MT.noteToPitchXml(note)}<duration>2</duration><type>half</type>${MT.accidentalTag(note)}</note>`;
     }
 
     function buildMeasureMusicXML(clef, lowerNote, upperNote) {
         const clefTag = clef === 'bass'
             ? '<clef><sign>F</sign><line>4</line></clef>'
             : '<clef><sign>G</sign><line>2</line></clef>';
-        return '<?xml version="1.0" encoding="UTF-8"?>' +
-            '<score-partwise version="4.0">' +
-            '<part-list><score-part id="P1"><part-name print-object="no">Interwał</part-name></score-part></part-list>' +
-            '<part id="P1"><measure number="1">' +
-            '<attributes><divisions>1</divisions><key><fifths>0</fifths></key>' +
-            '<time><beats>4</beats><beat-type>4</beat-type></time>' + clefTag + '</attributes>' +
-            buildNoteXml(lowerNote) +
-            buildNoteXml(upperNote) +
-            '</measure></part></score-partwise>';
+        return `<?xml version="1.0" encoding="UTF-8"?><score-partwise version="4.0"><part-list><score-part id="P1"><part-name print-object="no">Interwał</part-name></score-part></part-list><part id="P1"><measure number="1"><attributes><divisions>1</divisions><key><fifths>0</fifths></key><time><beats>4</beats><beat-type>4</beat-type></time>${clefTag}</attributes>${buildNoteXml(lowerNote)}${buildNoteXml(upperNote)}</measure></part></score-partwise>`;
     }
 
     function renderMeasure(clef, lowerNote, upperNote) {
@@ -67,18 +56,15 @@
     const TREBLE_ROOT_OCTAVE = 4;
     const BASS_ROOT_OCTAVE = 2;
 
-    function currentLevel() {
-        return document.getElementById('level-select').value;
-    }
-
-    function stepBounds() {
-        return direction === 1 ? { min: 0, max: 7 } : { min: -7, max: 0 };
-    }
+    const currentLevel = () => document.getElementById('level-select').value;
+    const stepBounds = () => (direction === 1 ? { min: 0, max: 7 } : { min: -7, max: 0 });
 
     function setStatus(message, type) {
         const el = document.getElementById('status-line');
-        el.textContent = message || '';
-        el.className = 'status-line' + (type ? ' status-' + type : '');
+        if (el) {
+            el.textContent = message || '';
+            el.className = `status-line${type ? ` status-${type}` : ''}`;
+        }
     }
 
     function candidateNote() {
@@ -89,15 +75,17 @@
 
     function updateLetterButtons() {
         const bounds = stepBounds();
-        document.getElementById('letter-down').disabled = hasAnswered || builderStep === bounds.min;
-        document.getElementById('letter-up').disabled = hasAnswered || builderStep === bounds.max;
+        const letterDown = document.getElementById('letter-down');
+        const letterUp = document.getElementById('letter-up');
+        if (letterDown) letterDown.disabled = hasAnswered || builderStep === bounds.min;
+        if (letterUp) letterUp.disabled = hasAnswered || builderStep === bounds.max;
     }
 
     // Poziom 2: dźwięk startowy może być chromatyczny, ale tylko gdy wynikowy
     // drugi dźwięk zmieści się w -1..1 (naturalny jest zawsze bezpieczny).
     function pickRootAlter(letter, symbol, dir) {
         const safeAlters = [-1, 0, 1].filter((alter) => {
-            const probe = { letter: letter, alter: alter, octave: TREBLE_ROOT_OCTAVE };
+            const probe = { letter, alter, octave: TREBLE_ROOT_OCTAVE };
             const result = MT.spellByShape(probe, INTERVAL_DEFS[symbol], dir);
             return Math.abs(result.alter) <= 1;
         });
@@ -110,7 +98,7 @@
             setStatus('', null);
         } catch (e) {
             console.error('Błąd renderowania nut:', e);
-            setStatus('Błąd wczytywania biblioteki nutowej: ' + e.message, 'error');
+            setStatus(`Błąd wczytywania biblioteki nutowej: ${e.message}`, 'error');
         }
     }
 
@@ -122,8 +110,11 @@
 
     async function generateNewQuestion() {
         hasAnswered = false;
-        document.getElementById('feedback').textContent = '';
-        document.getElementById('feedback').className = 'feedback-msg';
+        const feedback = document.getElementById('feedback');
+        if (feedback) {
+            feedback.textContent = '';
+            feedback.className = 'feedback-msg';
+        }
         document.getElementById('next-btn').style.display = 'none';
         document.getElementById('check-btn').disabled = false;
 
@@ -146,15 +137,14 @@
 
         const directionLabel = direction === 1 ? 'w górę' : 'w dół';
         document.getElementById('task-line').textContent =
-            'Zbuduj ' + directionLabel + ' od dźwięku ' + MT.noteLabel(rootNote) + ': ' +
-            INTERVAL_DEFS[currentSymbol].label + ' (' + currentSymbol + ').';
+            `Zbuduj ${directionLabel} od dźwięku ${MT.noteLabel(rootNote)}: ${INTERVAL_DEFS[currentSymbol].label} (${currentSymbol}).`;
 
         try {
             await KszaVerovio.ensureReady();
             redraw();
         } catch (e) {
             console.error('Błąd renderowania nut:', e);
-            setStatus('Błąd wczytywania biblioteki nutowej: ' + e.message, 'error');
+            setStatus(`Błąd wczytywania biblioteki nutowej: ${e.message}`, 'error');
         }
     }
 
@@ -197,12 +187,14 @@
         updateLetterButtons();
 
         const feedback = document.getElementById('feedback');
-        if (isCorrect) {
-            feedback.className = 'feedback-msg feedback-correct';
-            feedback.textContent = 'Doskonale! To prawidłowo zbudowany interwał.';
-        } else {
-            feedback.className = 'feedback-msg feedback-wrong';
-            feedback.textContent = 'Niestety nie. Prawidłowy drugi dźwięk to ' + MT.noteLabel(expected) + '.';
+        if (feedback) {
+            if (isCorrect) {
+                feedback.className = 'feedback-msg feedback-correct';
+                feedback.textContent = 'Doskonale! To prawidłowo zbudowany interwał.';
+            } else {
+                feedback.className = 'feedback-msg feedback-wrong';
+                feedback.textContent = `Niestety nie. Prawidłowy drugi dźwięk to ${MT.noteLabel(expected)}.`;
+            }
         }
 
         document.getElementById('next-btn').style.display = 'inline-flex';
@@ -212,16 +204,16 @@
         generateNewQuestion();
         KszaGestureLayer.setup('gesture-layer', {
             canEdit: () => !hasAnswered,
-            moveLetter: moveLetter,
-            cycleAccidental: cycleAccidental
+            moveLetter,
+            cycleAccidental
         });
 
-        document.getElementById('level-select').addEventListener('change', generateNewQuestion);
-        document.getElementById('clef-select').addEventListener('change', generateNewQuestion);
-        document.getElementById('next-btn').addEventListener('click', generateNewQuestion);
-        document.getElementById('letter-up').addEventListener('click', () => moveLetter(1));
-        document.getElementById('letter-down').addEventListener('click', () => moveLetter(-1));
-        document.getElementById('check-btn').addEventListener('click', checkAnswer);
+        document.getElementById('level-select')?.addEventListener('change', generateNewQuestion);
+        document.getElementById('clef-select')?.addEventListener('change', generateNewQuestion);
+        document.getElementById('next-btn')?.addEventListener('click', generateNewQuestion);
+        document.getElementById('letter-up')?.addEventListener('click', () => moveLetter(1));
+        document.getElementById('letter-down')?.addEventListener('click', () => moveLetter(-1));
+        document.getElementById('check-btn')?.addEventListener('click', checkAnswer);
         document.querySelectorAll('.accidental-btn').forEach((btn) => {
             btn.addEventListener('click', () => setAccidental(parseInt(btn.dataset.alter, 10)));
         });

@@ -3,7 +3,7 @@
    zmienia tylko pulę dźwięków, z której losuje się melodia, i jej długość.
    Sprawdzanie NIE blokuje niczego - jak w dyktandzie wysokościowym, uczeń
    czyści odpowiedź i próbuje ponownie, bez losowania nowej melodii. */
-(function () {
+(() => {
     const WHITE_NOTES = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'];
     const CHROMATIC_NOTES = ['C4', 'C#4', 'D4', 'D#4', 'E4', 'F4', 'F#4', 'G4', 'G#4', 'A4', 'A#4', 'B4', 'C5'];
     const BLACK_KEYS_AFTER = [
@@ -36,26 +36,26 @@
     let isPlaying = false;
     let scheduledTimeouts = [];
 
-    function currentLevel() {
-        return LEVELS[document.getElementById('level-select').value];
-    }
+    const currentLevel = () => LEVELS[document.getElementById('level-select').value];
 
     function setStatus(message, type) {
         const el = document.getElementById('status-line');
-        el.textContent = message || '';
-        el.className = 'status-line' + (type ? ' status-' + type : '');
+        if (el) {
+            el.textContent = message || '';
+            el.className = `status-line${type ? ` status-${type}` : ''}`;
+        }
     }
 
     function onAudioState(state, message) {
-        document.getElementById('play-btn').disabled = state === 'loading';
+        const playBtn = document.getElementById('play-btn');
+        if (playBtn) playBtn.disabled = state === 'loading';
         if (state === 'error') setStatus(message, 'error');
         else if (state === 'loading') setStatus(message, null);
         else setStatus('', null);
     }
 
-    async function ensureInstrumentReady() {
-        return KszaAudio.ensureReady(document.getElementById('instrument-select'), onAudioState);
-    }
+    const ensureInstrumentReady = async () =>
+        KszaAudio.ensureReady(document.getElementById('instrument-select'), onAudioState);
 
     /* ---------- Klawiatura ---------- */
     function buildKeyboardHtml() {
@@ -64,30 +64,27 @@
         let blackHtml = '';
 
         WHITE_NOTES.forEach((note, i) => {
-            whiteHtml += '<button type="button" class="echo-white-key" data-note="' + note + '" ' +
-                'style="left:' + (i * WHITE_KEY_WIDTH) + 'px;width:' + WHITE_KEY_WIDTH + 'px;" ' +
-                'aria-label="Zagraj ' + note + '"></button>';
+            const left = i * WHITE_KEY_WIDTH;
+            whiteHtml += `<button type="button" class="echo-white-key" data-note="${note}" style="left:${left}px;width:${WHITE_KEY_WIDTH}px;" aria-label="Zagraj ${note}"></button>`;
         });
 
         BLACK_KEYS_AFTER.forEach((bk) => {
             const centerX = (bk.afterIndex + 1) * WHITE_KEY_WIDTH;
             const left = centerX - BLACK_KEY_WIDTH / 2;
-            blackHtml += '<button type="button" class="echo-black-key" data-note="' + bk.note + '" ' +
-                'style="left:' + left + 'px;width:' + BLACK_KEY_WIDTH + 'px;" ' +
-                'aria-label="Zagraj ' + bk.note + '"></button>';
+            blackHtml += `<button type="button" class="echo-black-key" data-note="${bk.note}" style="left:${left}px;width:${BLACK_KEY_WIDTH}px;" aria-label="Zagraj ${bk.note}"></button>`;
         });
 
-        return '<div class="echo-keyboard" style="width:' + totalWidth + 'px;height:' + WHITE_KEY_HEIGHT + 'px;">' +
-            whiteHtml + blackHtml + '</div>';
+        return `<div class="echo-keyboard" style="width:${totalWidth}px;height:${WHITE_KEY_HEIGHT}px;">${whiteHtml}${blackHtml}</div>`;
     }
 
     /* ---------- Ślad odpowiedzi ---------- */
     function renderTrail() {
         const trail = document.getElementById('answer-trail');
+        if (!trail) return;
         trail.innerHTML = '';
         for (let i = 0; i < targetSequence.length; i++) {
             const slot = document.createElement('span');
-            slot.className = 'answer-slot' + (i < userSequence.length ? ' is-filled' : '');
+            slot.className = `answer-slot${i < userSequence.length ? ' is-filled' : ''}`;
             trail.appendChild(slot);
         }
     }
@@ -107,8 +104,11 @@
         targetSequence = generateSequence();
         userSequence = [];
 
-        document.getElementById('feedback').textContent = '';
-        document.getElementById('feedback').className = 'feedback-msg';
+        const feedback = document.getElementById('feedback');
+        if (feedback) {
+            feedback.textContent = '';
+            feedback.className = 'feedback-msg';
+        }
         document.getElementById('next-btn').style.display = 'none';
         document.getElementById('check-btn').disabled = true;
         renderTrail();
@@ -119,7 +119,8 @@
         scheduledTimeouts.forEach((id) => clearTimeout(id));
         scheduledTimeouts = [];
         isPlaying = false;
-        document.getElementById('play-btn').disabled = false;
+        const playBtn = document.getElementById('play-btn');
+        if (playBtn) playBtn.disabled = false;
     }
 
     async function playTarget() {
@@ -138,7 +139,7 @@
         const noteDuration = BASE_NOTE_DURATION / speed;
         const melodyStart = referenceDuration + referenceGap;
 
-        // dźwięk odniesienia gra pełną długość, bez ucinania - ma wybrzmieć
+        // Dźwięk odniesienia gra pełną długość, bez ucinania - ma wybrzmieć
         const refId = setTimeout(() => {
             if (KszaAudio.player) KszaAudio.player.play(REFERENCE_NOTE, undefined, { duration: referenceDuration });
         }, 0);
@@ -175,8 +176,11 @@
         userSequence = [];
         renderTrail();
         document.getElementById('check-btn').disabled = true;
-        document.getElementById('feedback').textContent = '';
-        document.getElementById('feedback').className = 'feedback-msg';
+        const feedback = document.getElementById('feedback');
+        if (feedback) {
+            feedback.textContent = '';
+            feedback.className = 'feedback-msg';
+        }
     }
 
     function checkAnswer() {
@@ -192,12 +196,14 @@
         document.getElementById('check-btn').disabled = true;
 
         const feedback = document.getElementById('feedback');
-        if (allCorrect) {
-            feedback.className = 'feedback-msg feedback-correct';
-            feedback.textContent = 'Brawo! Cała melodia poprawna.';
-        } else {
-            feedback.className = 'feedback-msg feedback-wrong';
-            feedback.textContent = 'Niektóre dźwięki nie pasują - wyczyść odpowiedź i spróbuj ponownie.';
+        if (feedback) {
+            if (allCorrect) {
+                feedback.className = 'feedback-msg feedback-correct';
+                feedback.textContent = 'Brawo! Cała melodia poprawna.';
+            } else {
+                feedback.className = 'feedback-msg feedback-wrong';
+                feedback.textContent = 'Niektóre dźwięki nie pasują - wyczyść odpowiedź i spróbuj ponownie.';
+            }
         }
         document.getElementById('next-btn').style.display = 'inline-flex';
     }
@@ -208,21 +214,24 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('echo-keyboard-mount').innerHTML = buildKeyboardHtml();
+        const mount = document.getElementById('echo-keyboard-mount');
+        if (mount) {
+            mount.innerHTML = buildKeyboardHtml();
+        }
         document.querySelectorAll('.echo-white-key, .echo-black-key').forEach((btn) => {
             btn.addEventListener('click', () => handleKeyClick(btn.dataset.note));
         });
 
         generateNewQuestion();
 
-        document.getElementById('level-select').addEventListener('change', generateNewQuestion);
-        document.getElementById('instrument-select').addEventListener('change', (e) => {
+        document.getElementById('level-select')?.addEventListener('change', generateNewQuestion);
+        document.getElementById('instrument-select')?.addEventListener('change', (e) => {
             stopScheduled();
             KszaAudio.loadInstrument(e.target.value, onAudioState);
         });
-        document.getElementById('play-btn').addEventListener('click', playTarget);
-        document.getElementById('reset-btn').addEventListener('click', resetAnswer);
-        document.getElementById('check-btn').addEventListener('click', checkAnswer);
-        document.getElementById('next-btn').addEventListener('click', nextQuestion);
+        document.getElementById('play-btn')?.addEventListener('click', playTarget);
+        document.getElementById('reset-btn')?.addEventListener('click', resetAnswer);
+        document.getElementById('check-btn')?.addEventListener('click', checkAnswer);
+        document.getElementById('next-btn')?.addEventListener('click', nextQuestion);
     });
 })();

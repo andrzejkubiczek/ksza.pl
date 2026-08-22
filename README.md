@@ -1,71 +1,71 @@
 # ksza.pl
 
-Statyczna strona z ćwiczeniami do nauki kształcenia słuchu - bez
-logowania, bez bazy danych, bez backendu. Działa od razu w
-przeglądarce, na komputerze, tablecie i telefonie.
+Interaktywna, bezpłatna platforma internetowa do nauki **kształcenia słuchu** i czytania nut. Aplikacja działa w 100% po stronie klienta (statyczny frontend bez backendu, bazy danych i konieczności logowania) na komputerach, tabletach oraz smartfonach.
 
-Pełny opis projektu jest na stronie ["O projekcie"](o-projekcie.html).
-Instrukcja wdrożenia i utrzymania jest w [opis.txt](opis.txt).
+Opis idei projektu znajduje się na podstronie [O projekcie](o-projekcie.html). Szczegółowa dokumentacja techniczna i instrukcja utrzymania dostępna jest w pliku [opis.txt](opis.txt).
 
-## Ćwiczenia
+---
 
-- **Interwały** - ze słuchu, zapis nutowy i budowanie zapisu.
-- **Trójdźwięki** - durowy, molowy, zmniejszony, zwiększony; ze słuchu,
-  zapis nutowy i budowanie zapisu; postać zasadnicza i przewroty.
-- **Gamy** - durowa i cztery odmiany molowej, plus osobne ćwiczenie na
-  stopnie gamy (I-VIII).
-- **Puzzle** - układanie fragmentów melodii we właściwej kolejności, ze
-  słuchu albo z zapisu nutowego. Pełny odsłuch zaczyna się od odliczenia
-  jednego taktu metronomem, w tempie utworu.
-- **Dyktanda** - dyktando wysokościowe (klucz, tonacja i pierwszy
-  dźwięk są dane, reszta wysokości do uzupełnienia ze słuchu) oraz
-  pamięć melodyczna (usłysz krótką melodię i powtórz ją, klikając
-  klawisze fortepianu; 5 poziomów trudności).
-- **Rytm** - to samo co Puzzle (razem z odliczeniem metronomem), ale
-  odwrotnie: wysokość dźwięku jest stała (zawsze ksylofon), liczy się
-  tylko rytm.
+## Moduły i ćwiczenia
 
-Puzzle, Dyktanda i Rytm mają osobne listy plików i można każdy utwór
-przypisać do jednej lub dwóch klas (np. `I/4`, `IV/6`) - selektor
-"Klasa" wtedy filtruje listę; utwory bez klasy są widoczne zawsze.
+* **Interwały** – rozpoznawanie ze słuchu (tryb melodyczny w górę/dół, harmoniczny oraz mieszany), czytanie zapisu nutowego (klucz wiolinowy i basowy) oraz interaktywne budowanie interwałów.
+* **Trójdźwięki** – durowy, molowy, zmniejszony i zwiększony w postaci zasadniczej oraz z przewrotami (sekstowy, kwartsekstowy); warianty: ze słuchu, zapis nutowy, budowanie na pięciolinii.
+* **Gamy i stopnie** – rozpoznawanie gamy durowej oraz 4 odmian molowej (eolska, harmoniczna, dorycka, melodyczna) granych w obu kierunkach; osobny trening rozpoznawania stopni gamy (solmizacja I–VIII) w kontekście tonalnym.
+* **Puzzle melodyczne** – układanie potasowanych fragmentów melodii we właściwej kolejności (ze słuchu lub z zapisu nutowego); pełny odsłuch poprzedzony jest odliczeniem jednego taktu metronomem w zadanym tempie.
+* **Dyktanda** – dyktando wysokościowe (podany klucz, tonacja i pierwszy dźwięk, reszta wysokości do uzupełnienia ze słuchu i sprawdzenia z natychmiastowym kolorowaniem nut) oraz pamięć melodyczna (powtarzanie usłyszanej frazy na klawiaturze po dźwięku odniesienia $a^1 = 440\text{ Hz}$).
+* **Rytm** – puzzle rytmiczne oparte na ksylofonie i pojedynczej linii z kluczem perkusyjnym.
+
+---
 
 ## Stos technologiczny
 
-- Czysty HTML/CSS/JS, bez frameworka i bez kroku budowania.
-- [Tone.js](https://tonejs.github.io/) + próbki
-  [tonejs-instruments](https://github.com/nbrosowsky/tonejs-instruments)
-  do dźwięku.
-- [Verovio](https://www.verovio.org/) (z jsDelivr, wersja przypięta,
-  czcionka Leland) do rysowania zapisu nutowego.
+* **Frontend:** Czysty, semantyczny HTML5, nowoczesny CSS3 (CSS Custom Properties, Grid, Flexbox, stylistyka *Kontrastowe karty*, RWD, a11y) oraz nowoczesny JavaScript (ES6+).
+* **Audio Engine:** [Tone.js](https://tonejs.github.io/) z łańcuchem efektów (filtr górnoprzepustowy, pogłos, limiter) oraz próbkami [tonejs-instruments](https://github.com/nbrosowsky/tonejs-instruments) (VSCO2).
+* **Renderowanie nut:** [Verovio](https://www.verovio.org/) (WebAssembly/JS) generujące wektory SVG w czcionce Leland.
+* **Interakcje Drag & Drop:** [SortableJS](https://sortablejs.github.io/Sortable/).
 
-## Struktura
+---
 
+## Struktura projektu
+
+```text
+index.html, o-projekcie.html   Strony ogólne i informacyjne
+cwiczenia/*.html               Strony poszczególnych wariantów ćwiczeń
+assets/css/site.css            Główny arkusz stylów, layout, motyw, RWD
+assets/css/widgets.css         Style widżetów ćwiczeń, notacji Verovio, klawiatur
+assets/js/core.js              Rdzeń audio (Tone.js), tempo, zakresy instrumentów
+assets/js/music-theory.js      Matematyczny model teorii muzyki, enharmonia, MusicXML
+assets/js/verovio-render.js    Wrapper silnika renderującego Verovio SVG
+assets/js/gesture-layer.js     Obsługa gestów wskaźnikowych i dotykowych nad notacją
+assets/js/puzzle-engine.js     Uniwersalny silnik układanek taktowych (audio timeline)
+assets/js/scale-tonics.js      Baza tonik gam i algorytmy doboru oktaw
+assets/js/klasa-filter.js      Obsługa filtrowania utworów według klas
+assets/js/piano-keyboard.js    Generator pomocniczej klawiatury fortepianu
+assets/js/*.js                 Kontrolery logiki poszczególnych ćwiczeń
+dyktanda/puzzle/               Manifest (puzzle.json) i pliki MusicXML dyktand-puzzle
+dyktanda/wysokosciowe/         Manifest (dyktanda.json) i pliki dyktand wysokościowych
+dyktanda/rytm/                 Manifest (rytm.json) i pliki rytmów-puzzle
+update-nav.py                  Skrypt automatycznie synchronizujący menu we wszystkich stronach
 ```
-index.html, o-projekcie.html   strony ogólne
-cwiczenia/*.html               po jednej stronie na wariant ćwiczenia
-assets/css/                    style
-assets/js/core.js              audio, tempo, menu mobilne
-assets/js/*.js                 logika ćwiczeń + kilka wspólnych modułów
-dyktanda/puzzle/                manifest (puzzle.json) i pliki dyktand-puzzle
-dyktanda/wysokosciowe/          manifest i pliki dyktanda wysokościowego
-dyktanda/rytm/                  manifest i pliki rytmów-puzzle
-update-nav.py                  generuje menu we wszystkich stronach naraz
+
+---
+
+## Uruchomienie lokalne
+
+Do uruchomienia wystarczy dowolny lokalny serwer HTTP:
+
+```bash
+python3 -m http.server 8000
 ```
 
-Szczegóły (każdy plik, dodawanie nowego dyktanda, wdrożenie) są w
-[opis.txt](opis.txt).
+Następnie otwórz w przeglądarce adres: [http://localhost:8000](http://localhost:8000).
 
-## Podgląd lokalny
+> **Ważne:** Przed pierwszym uruchomieniem z dźwiękiem upewnij się, że próbki instrumentów zostały umieszczone w folderze `assets/samples/` zgodnie z instrukcją w `assets/samples/PRZECZYTAJ.txt`.
 
-```
-python3 -m http.server
-```
-
-i wejść na `localhost:8000`.
+---
 
 ## Licencja
 
-Próbki instrumentów: VSCO2 (CC-BY 3.0) via tonejs-instruments. Verovio:
-LGPL (RISM Digital Center). Kod własny bez osobnej licencji.
-
-&copy; ksza.pl (aK)
+* Próbki instrumentów: VSCO2 (CC-BY 3.0) via tonejs-instruments.
+* Silnik nutowy: Verovio (LGPL, RISM Digital Center).
+* Kod źródłowy: ksza.pl (&copy; aK).

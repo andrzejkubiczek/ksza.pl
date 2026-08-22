@@ -1,5 +1,5 @@
 /* ksza.pl - trener trójdźwięków */
-(function () {
+(() => {
     const CHROMATIC = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
     const BASS_OCTAVE_OPTIONS = [3, 4]; // mała/razkreślna - awaryjny zestaw, gdy zakres instrumentu jest za wąski
 
@@ -32,15 +32,11 @@
         const total = bassPc + semitoneOffset;
         const pc = ((total % 12) + 12) % 12;
         const octave = bassOctave + Math.floor(total / 12);
-        return CHROMATIC[pc] + octave;
+        return `${CHROMATIC[pc]}${octave}`;
     }
 
-    function currentInstrument() {
-        return document.getElementById('instrument-select').value;
-    }
+    const currentInstrument = () => document.getElementById('instrument-select').value;
 
-    // Bas (jako absolutny półton) tak, by cały akord zmieścił się w zakresie
-    // instrumentu; gdyby się nie dało - awaryjnie generyczny zestaw oktaw.
     function pickBassAbsolute(maxOffset) {
         const range = KszaInstrumentRange.range(currentInstrument());
         let lo = range.min;
@@ -55,12 +51,15 @@
 
     function setStatus(message, type) {
         const el = document.getElementById('status-line');
-        el.textContent = message || '';
-        el.className = 'status-line' + (type ? ' status-' + type : '');
+        if (el) {
+            el.textContent = message || '';
+            el.className = `status-line${type ? ` status-${type}` : ''}`;
+        }
     }
 
     function onAudioState(state, message) {
-        document.getElementById('play-btn').disabled = state === 'loading';
+        const playBtn = document.getElementById('play-btn');
+        if (playBtn) playBtn.disabled = state === 'loading';
         if (state === 'error') setStatus(message, 'error');
         else if (state === 'loading') setStatus(message, null);
         else setStatus('', null);
@@ -70,12 +69,11 @@
         scheduledTimeouts.forEach((id) => clearTimeout(id));
         scheduledTimeouts = [];
         isPlaying = false;
-        document.getElementById('play-btn').disabled = false;
+        const playBtn = document.getElementById('play-btn');
+        if (playBtn) playBtn.disabled = false;
     }
 
-    function currentLevel() {
-        return document.getElementById('level-select').value;
-    }
+    const currentLevel = () => document.getElementById('level-select').value;
 
     function applyLevelVisibility() {
         const level = currentLevel();
@@ -87,8 +85,11 @@
     function generateNewTriad() {
         stopScheduled();
         hasAnswered = false;
-        document.getElementById('feedback').textContent = '';
-        document.getElementById('feedback').className = 'feedback-msg';
+        const feedback = document.getElementById('feedback');
+        if (feedback) {
+            feedback.textContent = '';
+            feedback.className = 'feedback-msg';
+        }
         document.getElementById('next-btn').style.display = 'none';
         document.getElementById('play-btn').style.display = 'inline-flex';
 
@@ -122,12 +123,12 @@
         document.getElementById('play-btn').disabled = true;
         KszaAudio.stopAll();
 
-        function scheduleNote(note, delaySeconds, duration) {
+        const scheduleNote = (note, delaySeconds, duration) => {
             const id = setTimeout(() => {
-                if (KszaAudio.player) KszaAudio.player.play(note, undefined, { duration: duration });
+                if (KszaAudio.player) KszaAudio.player.play(note, undefined, { duration });
             }, delaySeconds * 1000);
             scheduledTimeouts.push(id);
-        }
+        };
 
         const speed = KszaTempo.get();
         const NOTE_DURATION = BASE_NOTE_DURATION / speed;
@@ -182,12 +183,14 @@
         });
 
         const feedback = document.getElementById('feedback');
-        if (selectedKey === currentTriadType.key) {
-            feedback.className = 'feedback-msg feedback-correct';
-            feedback.textContent = 'Doskonale! To prawidłowa odpowiedź.';
-        } else {
-            feedback.className = 'feedback-msg feedback-wrong';
-            feedback.textContent = 'Niestety nie. Poprawna odpowiedź: ' + currentTriadType.label + '.';
+        if (feedback) {
+            if (selectedKey === currentTriadType.key) {
+                feedback.className = 'feedback-msg feedback-correct';
+                feedback.textContent = 'Doskonale! To prawidłowa odpowiedź.';
+            } else {
+                feedback.className = 'feedback-msg feedback-wrong';
+                feedback.textContent = `Niestety nie. Poprawna odpowiedź: ${currentTriadType.label}.`;
+            }
         }
 
         document.getElementById('play-btn').style.display = 'none';
@@ -202,9 +205,9 @@
     document.addEventListener('DOMContentLoaded', () => {
         generateNewTriad();
 
-        document.getElementById('play-btn').addEventListener('click', playCurrentTriad);
-        document.getElementById('next-btn').addEventListener('click', nextTriad);
-        document.getElementById('instrument-select').addEventListener('change', (e) => {
+        document.getElementById('play-btn')?.addEventListener('click', playCurrentTriad);
+        document.getElementById('next-btn')?.addEventListener('click', nextTriad);
+        document.getElementById('instrument-select')?.addEventListener('change', (e) => {
             KszaAudio.stopAll();
             stopScheduled();
             const shift = KszaInstrumentRange.fitOctaveShift(currentNotes, e.target.value);
@@ -213,7 +216,7 @@
             }
             KszaAudio.loadInstrument(e.target.value, onAudioState);
         });
-        document.getElementById('level-select').addEventListener('change', generateNewTriad);
+        document.getElementById('level-select')?.addEventListener('change', generateNewTriad);
         document.querySelectorAll('.interval-choice').forEach((btn) => {
             btn.addEventListener('click', () => checkAnswer(btn.dataset.key));
         });

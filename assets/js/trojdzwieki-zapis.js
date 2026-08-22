@@ -2,11 +2,9 @@
    Trudniejsze niż interwały: PRZEWROTY - pisownia dźwięków nie zmienia się
    między postaciami, zmienia się tylko który składnik jest w basie. Budujemy
    zawsze od prawdziwego prymu, a dla przewrotu "obracamy" gotowy akord. */
-(function () {
+(() => {
     const MT = KszaMusicTheory;
 
-    // Klucze odpowiedzi - te same co w wersji "ze słuchu". inversion: 0=zasadnicza,
-    // 1=I przewrót (tercja w basie), 2=II przewrót (kwinta w basie).
     const TRIAD_TYPES = {
         'durowy_z':    { shape: 'durowy',      inversion: 0, level: 1, label: 'Durowy' },
         'molowy_z':    { shape: 'molowy',      inversion: 0, level: 1, label: 'Molowy' },
@@ -18,24 +16,15 @@
         'molowy_5':    { shape: 'molowy',      inversion: 2, level: 2, label: 'Molowy - II przewrót' }
     };
 
-    // Trzy dźwięki jako AKORD.
     function buildNoteXml(note, isChordTone) {
-        return '<note>' + (isChordTone ? '<chord/>' : '') + MT.noteToPitchXml(note) +
-            '<duration>4</duration><type>whole</type>' + MT.accidentalTag(note) + '</note>';
+        return `<note>${isChordTone ? '<chord/>' : ''}${MT.noteToPitchXml(note)}<duration>4</duration><type>whole</type>${MT.accidentalTag(note)}</note>`;
     }
 
     function buildMeasureMusicXML(clef, notes) {
         const clefTag = clef === 'bass'
             ? '<clef><sign>F</sign><line>4</line></clef>'
             : '<clef><sign>G</sign><line>2</line></clef>';
-        return '<?xml version="1.0" encoding="UTF-8"?>' +
-            '<score-partwise version="4.0">' +
-            '<part-list><score-part id="P1"><part-name print-object="no">Trójdźwięk</part-name></score-part></part-list>' +
-            '<part id="P1"><measure number="1">' +
-            '<attributes><divisions>1</divisions><key><fifths>0</fifths></key>' +
-            '<time><beats>4</beats><beat-type>4</beat-type></time>' + clefTag + '</attributes>' +
-            notes.map((n, i) => buildNoteXml(n, i > 0)).join('') +
-            '</measure></part></score-partwise>';
+        return `<?xml version="1.0" encoding="UTF-8"?><score-partwise version="4.0"><part-list><score-part id="P1"><part-name print-object="no">Trójdźwięk</part-name></score-part></part-list><part id="P1"><measure number="1"><attributes><divisions>1</divisions><key><fifths>0</fifths></key><time><beats>4</beats><beat-type>4</beat-type></time>${clefTag}</attributes>${notes.map((n, i) => buildNoteXml(n, i > 0)).join('')}</measure></part></score-partwise>`;
     }
 
     function renderMeasure(clef, notes) {
@@ -60,25 +49,31 @@
         if (selected === 'random') return Math.random() < 0.5 ? 'treble' : 'bass';
         return selected;
     }
-    function currentLevel() {
-        return document.getElementById('level-select').value;
-    }
+
+    const currentLevel = () => document.getElementById('level-select').value;
+
     function applyLevelVisibility() {
         const level = currentLevel();
         document.querySelectorAll('.level-2-only').forEach((btn) => {
             btn.style.display = level === '2' ? '' : 'none';
         });
     }
+
     function setStatus(message, type) {
         const el = document.getElementById('status-line');
-        el.textContent = message || '';
-        el.className = 'status-line' + (type ? ' status-' + type : '');
+        if (el) {
+            el.textContent = message || '';
+            el.className = `status-line${type ? ` status-${type}` : ''}`;
+        }
     }
 
     async function generateNewQuestion() {
         hasAnswered = false;
-        document.getElementById('feedback').textContent = '';
-        document.getElementById('feedback').className = 'feedback-msg';
+        const feedback = document.getElementById('feedback');
+        if (feedback) {
+            feedback.textContent = '';
+            feedback.className = 'feedback-msg';
+        }
         document.getElementById('next-btn').style.display = 'none';
         applyLevelVisibility();
 
@@ -105,7 +100,7 @@
             setStatus('', null);
         } catch (e) {
             console.error('Błąd renderowania nut:', e);
-            setStatus('Błąd wczytywania biblioteki nutowej: ' + e.message, 'error');
+            setStatus(`Błąd wczytywania biblioteki nutowej: ${e.message}`, 'error');
         }
     }
 
@@ -123,12 +118,14 @@
         });
 
         const feedback = document.getElementById('feedback');
-        if (selectedKey === currentKey) {
-            feedback.className = 'feedback-msg feedback-correct';
-            feedback.textContent = 'Doskonale! To prawidłowa odpowiedź.';
-        } else {
-            feedback.className = 'feedback-msg feedback-wrong';
-            feedback.textContent = 'Niestety nie. Poprawna odpowiedź: ' + TRIAD_TYPES[currentKey].label + '.';
+        if (feedback) {
+            if (selectedKey === currentKey) {
+                feedback.className = 'feedback-msg feedback-correct';
+                feedback.textContent = 'Doskonale! To prawidłowa odpowiedź.';
+            } else {
+                feedback.className = 'feedback-msg feedback-wrong';
+                feedback.textContent = `Niestety nie. Poprawna odpowiedź: ${TRIAD_TYPES[currentKey].label}.`;
+            }
         }
 
         document.getElementById('next-btn').style.display = 'inline-flex';
@@ -137,9 +134,9 @@
     document.addEventListener('DOMContentLoaded', () => {
         generateNewQuestion();
 
-        document.getElementById('clef-select').addEventListener('change', generateNewQuestion);
-        document.getElementById('level-select').addEventListener('change', generateNewQuestion);
-        document.getElementById('next-btn').addEventListener('click', generateNewQuestion);
+        document.getElementById('clef-select')?.addEventListener('change', generateNewQuestion);
+        document.getElementById('level-select')?.addEventListener('change', generateNewQuestion);
+        document.getElementById('next-btn')?.addEventListener('click', generateNewQuestion);
         document.querySelectorAll('.interval-choice').forEach((btn) => {
             btn.addEventListener('click', () => checkAnswer(btn.dataset.key));
         });

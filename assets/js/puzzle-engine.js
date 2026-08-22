@@ -2,9 +2,8 @@
    (proste i pełne, z pauzą), tasowanie i sprawdzanie kolejności. Używany przez
    puzzle.js, puzzle-zapis.js, rytm.js, rytm-zapis.js - różni je tylko
    manifest, teksty komunikatów i to, czy każdy takt jest też rysowany
-   (notation: true) przez Verovio (KszaVerovio).
-   Konfiguracja - patrz init() niżej. */
-window.KszaPuzzleEngine = (function () {
+   (notation: true) przez Verovio (KszaVerovio). */
+window.KszaPuzzleEngine = (() => {
     const TEMPO_SLOWDOWN = 1.25; // I stopień, młodsze dzieci - wolniej niż tempo w pliku
 
     function parseMusicXML(xmlText, notation, minFragmentsMessage, rhythmStaff) {
@@ -37,24 +36,9 @@ window.KszaPuzzleEngine = (function () {
         if (notation) {
             if (rhythmStaff) {
                 // Rytm: bez klucza/tonacji, samo metrum, 1 linia + klucz perkusyjny.
-                // Verovio NIE ignoruje wysokość nuty przy tym kluczu - stąd wymuszone
-                // E4 przy serializacji niżej (dokładnie na tej jednej linii).
-                notationHeaderXml =
-                    '<attributes><divisions>' + attrText('divisions', '1') + '</divisions>' +
-                    '<time><beats>' + attrText('time beats', '4') + '</beats>' +
-                    '<beat-type>' + attrText('time beat-type', '4') + '</beat-type></time>' +
-                    '<clef><sign>percussion</sign></clef>' +
-                    '<staff-details><staff-lines>1</staff-lines></staff-details>' +
-                    '</attributes>';
+                notationHeaderXml = `<attributes><divisions>${attrText('divisions', '1')}</divisions><time><beats>${attrText('time beats', '4')}</beats><beat-type>${attrText('time beat-type', '4')}</beat-type></time><clef><sign>percussion</sign></clef><staff-details><staff-lines>1</staff-lines></staff-details></attributes>`;
             } else {
-                notationHeaderXml =
-                    '<attributes><divisions>' + attrText('divisions', '1') + '</divisions>' +
-                    '<key><fifths>' + attrText('key fifths', '0') + '</fifths></key>' +
-                    '<time><beats>' + attrText('time beats', '4') + '</beats>' +
-                    '<beat-type>' + attrText('time beat-type', '4') + '</beat-type></time>' +
-                    '<clef><sign>' + attrText('clef sign', 'G') + '</sign>' +
-                    '<line>' + attrText('clef line', '2') + '</line></clef>' +
-                    '</attributes>';
+                notationHeaderXml = `<attributes><divisions>${attrText('divisions', '1')}</divisions><key><fifths>${attrText('key fifths', '0')}</fifths></key><time><beats>${attrText('time beats', '4')}</beats><beat-type>${attrText('time beat-type', '4')}</beat-type></time><clef><sign>${attrText('clef sign', 'G')}</sign><line>${attrText('clef line', '2')}</line></clef></attributes>`;
             }
         }
 
@@ -88,9 +72,9 @@ window.KszaPuzzleEngine = (function () {
                     if (!durationEl) return;
                     const beats = parseInt(durationEl.textContent, 10) / divisions;
 
-                    const isRest = !!el.querySelector('rest');
-                    const tieStart = !!el.querySelector('tie[type="start"]');
-                    const tieStop = !!el.querySelector('tie[type="stop"]');
+                    const isRest = Boolean(el.querySelector('rest'));
+                    const tieStart = Boolean(el.querySelector('tie[type="start"]'));
+                    const tieStop = Boolean(el.querySelector('tie[type="stop"]'));
 
                     let pitchName = null;
                     if (!isRest) {
@@ -100,16 +84,16 @@ window.KszaPuzzleEngine = (function () {
                         const alterEl = pitchEl.querySelector('alter');
                         const alter = alterEl ? parseInt(alterEl.textContent, 10) : 0;
                         const accidental = alter === 1 ? '#' : alter === -1 ? 'b' : alter === 2 ? '##' : alter === -2 ? 'bb' : '';
-                        pitchName = step + accidental + octave;
+                        pitchName = `${step}${accidental}${octave}`;
                     }
 
                     if (tieStop && pendingTie && pendingTie.pitch === pitchName) {
                         pendingTie.event.beats += beats;
                         pendingTie = tieStart ? pendingTie : null;
                     } else {
-                        const event = { pitch: pitchName, beats: beats };
+                        const event = { pitch: pitchName, beats };
                         events.push(event);
-                        pendingTie = tieStart ? { pitch: pitchName, event: event } : null;
+                        pendingTie = tieStart ? { pitch: pitchName, event } : null;
                     }
                 }
             });
@@ -118,8 +102,6 @@ window.KszaPuzzleEngine = (function () {
                 if (notation) {
                     const noteXmls = noteEls.map((n) => {
                         if (!rhythmStaff) return serializer.serializeToString(n);
-                        // Wysokość dźwięku w danych zostaje (audio gra ją bez zmian) -
-                        // do WYŚWIETLENIA klonujemy nutę i wymuszamy E4 (patrz wyżej).
                         const clone = n.cloneNode(true);
                         const pitchEl = clone.querySelector('pitch');
                         if (pitchEl) {
@@ -128,12 +110,12 @@ window.KszaPuzzleEngine = (function () {
                             const alterEl = pitchEl.querySelector('alter');
                             if (stepEl) stepEl.textContent = 'E';
                             if (octaveEl) octaveEl.textContent = '4';
-                            if (alterEl) alterEl.parentNode.removeChild(alterEl);
+                            if (alterEl) alterEl.remove();
                         }
                         return serializer.serializeToString(clone);
                     });
                     const notationXml = notationHeaderXml + noteXmls.join('');
-                    fragments.push({ events: events, notationXml: notationXml });
+                    fragments.push({ events, notationXml });
                 } else {
                     fragments.push(events);
                 }
@@ -142,34 +124,21 @@ window.KszaPuzzleEngine = (function () {
 
         if (fragments.length < 2) throw new Error(minFragmentsMessage);
 
-        return { fragments: fragments, tempoBPM: tempoBPM, meterBeats: meterBeats };
+        return { fragments, tempoBPM, meterBeats };
     }
 
-    // config: { notation, partNameLabel, manifestUrl, fileBaseUrl, labels: {...}, fixedInstrument, rhythmStaff }
-    // fixedInstrument: gdy podane, strona nie ma #instrument-select (jeden stały
-    // instrument, np. rytm - ksylofon) - reszta silnika działa bez zmian.
-    // rhythmStaff: rytm zapisany na pięciolinii jednolinijkowej z kluczem
-    // perkusyjnym, bez tonacji - patrz parseMusicXML.
     function init(config) {
-        const notation = !!config.notation;
-        const labels = config.labels;
+        const notation = Boolean(config.notation);
+        const { labels } = config;
 
-        function instrumentSelectEl() {
-            return config.fixedInstrument
-                ? { value: config.fixedInstrument }
-                : document.getElementById('instrument-select');
-        }
+        const instrumentSelectEl = () => config.fixedInstrument
+            ? { value: config.fixedInstrument }
+            : document.getElementById('instrument-select');
 
         function buildFragmentMusicXML(innerXml) {
-            // print-object="no" - nazwa jest w danych, ale nieukazywana (Verovio nie rysuje incipitu).
-            return '<?xml version="1.0" encoding="UTF-8"?>' +
-                '<score-partwise version="4.0">' +
-                '<part-list><score-part id="P1"><part-name print-object="no">' + config.partNameLabel + '</part-name></score-part></part-list>' +
-                '<part id="P1"><measure number="1">' + innerXml + '</measure></part></score-partwise>';
+            return `<?xml version="1.0" encoding="UTF-8"?><score-partwise version="4.0"><part-list><score-part id="P1"><part-name print-object="no">${config.partNameLabel || 'Fragment'}</part-name></score-part></part-list><part id="P1"><measure number="1">${innerXml}</measure></part></score-partwise>`;
         }
 
-        // Domyślne marginesy strony Verovio (50px z każdej strony) NIE skalują się
-        // z "scale" - zmniejszone tutaj, żeby w małej ramce zostało miejsce na nuty.
         function renderFragmentSvg(notationXml) {
             return KszaVerovio.render(buildFragmentMusicXML(notationXml), {
                 pageWidth: 380,
@@ -191,27 +160,27 @@ window.KszaPuzzleEngine = (function () {
         let fragmentNumberMap = {};
         let sortableInstance = null;
 
-        // Silnik odtwarzania z pauzą - planowanie/anulowanie przez setTimeout,
-        // bo Tone.Sampler nie zwraca uchwytu do pojedynczej, niezagranej nuty.
         let fullPlaybackTimeline = [];
         let fullPlaybackTotalDuration = 0;
         let playbackState = 'stopped';
-        let scheduleStartWallClock = 0; // performance.now() (ms) przy ostatnim zaplanowaniu
-        let scheduleStartOffset = 0;    // pozycja w sekundach, od której zaczęto planować
-        let scheduleSpeed = 1;          // mnożnik tempa z suwaka przy planowaniu
+        let scheduleStartWallClock = 0;
+        let scheduleStartOffset = 0;
+        let scheduleSpeed = 1;
         let pausedOffset = 0;
         let scheduledTimeouts = [];
-        let scheduledSimpleTimeouts = []; // fragment / "mój układ" - osobne śledzenie
+        let scheduledSimpleTimeouts = [];
         let playbackWatcher = null;
-        let countInTimeouts = [];      // odliczenie taktu - tylko przed pełnym odsłuchem od początku
+        let countInTimeouts = [];
         let pendingStartTimeout = null;
 
-        function fragmentEvents(fragment) { return notation ? fragment.events : fragment; }
+        const fragmentEvents = (fragment) => (notation ? fragment.events : fragment);
 
         function setStatus(message, type) {
             const el = document.getElementById('status-line');
-            el.textContent = message || '';
-            el.className = 'status-line' + (type ? ' status-' + type : '');
+            if (el) {
+                el.textContent = message || '';
+                el.className = `status-line${type ? ` status-${type}` : ''}`;
+            }
         }
 
         function onAudioState(state, message) {
@@ -240,7 +209,7 @@ window.KszaPuzzleEngine = (function () {
                 if (e.pitch) {
                     const duration = durSeconds * 0.92;
                     const id = setTimeout(() => {
-                        if (KszaAudio.player) KszaAudio.player.play(e.pitch, undefined, { duration: duration });
+                        if (KszaAudio.player) KszaAudio.player.play(e.pitch, undefined, { duration });
                     }, cursor * 1000);
                     scheduledSimpleTimeouts.push(id);
                 }
@@ -259,7 +228,7 @@ window.KszaPuzzleEngine = (function () {
             if (!active) return;
             const ok = await KszaAudio.ensureReady(instrumentSelectEl(), onAudioState);
             if (!ok) return;
-            const ordered = [].concat(...displayOrder.map((i) => fragmentEvents(active.fragments[i])));
+            const ordered = displayOrder.flatMap((i) => fragmentEvents(active.fragments[i]));
             playEvents(ordered, active.tempoBPM);
         }
 
@@ -269,7 +238,7 @@ window.KszaPuzzleEngine = (function () {
             if (!active) return;
 
             const quarterSeconds = (60 / active.tempoBPM) * TEMPO_SLOWDOWN;
-            const allEvents = [].concat(...active.fragments.map(fragmentEvents));
+            const allEvents = active.fragments.flatMap(fragmentEvents);
             let cursor = 0;
             allEvents.forEach((e) => {
                 const durSeconds = e.beats * quarterSeconds;
@@ -284,17 +253,21 @@ window.KszaPuzzleEngine = (function () {
         function stopScheduledTimeouts() {
             scheduledTimeouts.forEach((id) => clearTimeout(id));
             scheduledTimeouts = [];
-            if (playbackWatcher) { clearTimeout(playbackWatcher); playbackWatcher = null; }
+            if (playbackWatcher) {
+                clearTimeout(playbackWatcher);
+                playbackWatcher = null;
+            }
         }
 
-        // Zatrzymuje wszystko zaplanowane (fragment i całość) - wywoływana na
-        // początku każdej akcji odtwarzania, żeby ścieżki się nie nałożyły.
         function stopAllPlayback() {
             scheduledSimpleTimeouts.forEach((id) => clearTimeout(id));
             scheduledSimpleTimeouts = [];
             countInTimeouts.forEach((id) => clearTimeout(id));
             countInTimeouts = [];
-            if (pendingStartTimeout) { clearTimeout(pendingStartTimeout); pendingStartTimeout = null; }
+            if (pendingStartTimeout) {
+                clearTimeout(pendingStartTimeout);
+                pendingStartTimeout = null;
+            }
             stopScheduledTimeouts();
             KszaAudio.stopAll();
             playbackState = 'stopped';
@@ -302,10 +275,6 @@ window.KszaPuzzleEngine = (function () {
             updatePlaybackButtons();
         }
 
-        // Odliczenie jednego taktu metronomem (akcent na "raz") w tym samym
-        // tempie co utwór - tylko przed odsłuchem CAŁOŚCI od początku, nie przy
-        // pojedynczym fragmencie ani przy wznowieniu po pauzie. Zwraca czas
-        // trwania odliczenia w sekundach, o który przesuwa się start melodii.
         function scheduleCountIn(meterBeats, tempoBPM) {
             const quarterSeconds = (60 / tempoBPM) * TEMPO_SLOWDOWN / KszaTempo.get();
             for (let i = 0; i < meterBeats; i++) {
@@ -315,7 +284,6 @@ window.KszaPuzzleEngine = (function () {
             return meterBeats * quarterSeconds;
         }
 
-        // Planuje pozostałą część utworu od offsetSeconds, nuta po nucie.
         function scheduleFullFrom(offsetSeconds) {
             stopScheduledTimeouts();
             scheduleStartWallClock = performance.now();
@@ -361,7 +329,6 @@ window.KszaPuzzleEngine = (function () {
         function pausePlayback() {
             if (playbackState !== 'playing') return;
             if (pendingStartTimeout) {
-                // Wciąż trwa odliczenie taktu - melodia jeszcze się nie zaczęła.
                 clearTimeout(pendingStartTimeout);
                 pendingStartTimeout = null;
                 countInTimeouts.forEach((id) => clearTimeout(id));
@@ -423,12 +390,15 @@ window.KszaPuzzleEngine = (function () {
 
             renderPuzzleList();
             const feedback = document.getElementById('result-feedback');
-            feedback.textContent = '';
-            feedback.className = 'feedback-msg';
+            if (feedback) {
+                feedback.textContent = '';
+                feedback.className = 'feedback-msg';
+            }
         }
 
         function renderPuzzleList() {
             const list = document.getElementById('puzzle-list');
+            if (!list) return;
             list.innerHTML = '';
 
             displayOrder.forEach((originalIndex) => {
@@ -438,15 +408,17 @@ window.KszaPuzzleEngine = (function () {
 
                 const number = fragmentNumberMap[originalIndex] || '?';
 
-                li.innerHTML =
-                    '<span class="drag-handle" aria-hidden="true">&#8942;&#8942;</span>' +
-                    '<span class="fragment-badge">' + number + '</span>' +
-                    '<button type="button" class="fragment-play-btn" aria-label="Odtwórz fragment ' + number + '">' +
-                    '<span class="play-icon" aria-hidden="true"></span></button>' +
-                    (notation
-                        ? '<div class="fragment-notation" aria-label="Zapis nutowy fragmentu ' + number + '"></div>'
-                        : '<span class="fragment-label">Fragment ' + number + '</span>') +
-                    '<span class="result-icon" aria-hidden="true"></span>';
+                li.innerHTML = `
+                    <span class="drag-handle" aria-hidden="true">&#8942;&#8942;</span>
+                    <span class="fragment-badge">${number}</span>
+                    <button type="button" class="fragment-play-btn" aria-label="Odtwórz fragment ${number}">
+                        <span class="play-icon" aria-hidden="true"></span>
+                    </button>
+                    ${notation
+                        ? `<div class="fragment-notation" aria-label="Zapis nutowy fragmentu ${number}"></div>`
+                        : `<span class="fragment-label">Fragment ${number}</span>`}
+                    <span class="result-icon" aria-hidden="true"></span>
+                `;
 
                 li.querySelector('.fragment-play-btn').addEventListener('click', () => {
                     playFragmentByOriginalIndex(originalIndex);
@@ -469,19 +441,22 @@ window.KszaPuzzleEngine = (function () {
                 animation: 150,
                 ghostClass: 'sortable-ghost',
                 chosenClass: 'sortable-chosen',
-                onEnd: () => {
+                onEnd() {
                     displayOrder = Array.from(list.children).map((li) => parseInt(li.dataset.originalIndex, 10));
                     Array.from(list.children).forEach((li) => li.classList.remove('is-correct', 'is-wrong'));
                     Array.from(list.querySelectorAll('.result-icon')).forEach((icon) => (icon.textContent = ''));
                     const feedback = document.getElementById('result-feedback');
-                    feedback.textContent = '';
-                    feedback.className = 'feedback-msg';
+                    if (feedback) {
+                        feedback.textContent = '';
+                        feedback.className = 'feedback-msg';
+                    }
                 }
             });
         }
 
         function checkOrder() {
             const list = document.getElementById('puzzle-list');
+            if (!list) return;
             const cards = Array.from(list.children);
             let correctCount = 0;
 
@@ -491,33 +466,39 @@ window.KszaPuzzleEngine = (function () {
                 li.classList.remove('is-correct', 'is-wrong');
                 if (originalIndex === position) {
                     li.classList.add('is-correct');
-                    icon.textContent = '✓';
+                    if (icon) icon.textContent = '✓';
                     correctCount++;
                 } else {
                     li.classList.add('is-wrong');
-                    icon.textContent = '✕';
+                    if (icon) icon.textContent = '✕';
                 }
             });
 
             const feedback = document.getElementById('result-feedback');
-            if (correctCount === cards.length) {
-                feedback.className = 'feedback-msg feedback-correct';
-                feedback.textContent = 'Brawo! Cała kolejność poprawna.';
-            } else {
-                feedback.className = 'feedback-msg feedback-partial';
-                feedback.textContent = 'Dobrze ułożone fragmenty: ' + correctCount + ' z ' + cards.length + '. Popraw kolejność i sprawdź ponownie.';
+            if (feedback) {
+                if (correctCount === cards.length) {
+                    feedback.className = 'feedback-msg feedback-correct';
+                    feedback.textContent = 'Brawo! Cała kolejność poprawna.';
+                } else {
+                    feedback.className = 'feedback-msg feedback-partial';
+                    feedback.textContent = `Dobrze ułożone fragmenty: ${correctCount} z ${cards.length}. Popraw kolejność i sprawdź ponownie.`;
+                }
             }
         }
 
         async function loadManifest() {
             try {
                 const res = await fetch(config.manifestUrl, { cache: 'no-store' });
-                if (!res.ok) return; // brak manifestu = pusta lista, bez błędu
+                if (!res.ok) return;
                 const items = await res.json();
                 if (!Array.isArray(items)) return;
                 items.forEach((item, i) => {
                     if (item && item.file) {
-                        sources['m-' + i] = { url: config.fileBaseUrl + item.file, title: item.title || item.file, klasy: item.klasy || [] };
+                        sources[`m-${i}`] = {
+                            url: config.fileBaseUrl + item.file,
+                            title: item.title || item.file,
+                            klasy: item.klasy || []
+                        };
                     }
                 });
             } catch (e) {
@@ -532,6 +513,7 @@ window.KszaPuzzleEngine = (function () {
 
         function populateSelect() {
             const select = document.getElementById('dictation-select');
+            if (!select) return;
             select.innerHTML = '';
 
             const klasa = currentKlasa();
@@ -563,7 +545,7 @@ window.KszaPuzzleEngine = (function () {
                 try {
                     if (notation) await KszaVerovio.ensureReady();
                     const res = await fetch(sources[id].url);
-                    if (!res.ok) throw new Error('Nie udało się pobrać pliku (kod ' + res.status + ').');
+                    if (!res.ok) throw new Error(`Nie udało się pobrać pliku (kod ${res.status}).`);
                     const text = await res.text();
                     item = parseMusicXML(text, notation, labels.minFragments, config.rhythmStaff);
                     library[id] = item;
@@ -590,12 +572,13 @@ window.KszaPuzzleEngine = (function () {
             populateSelect();
 
             const select = document.getElementById('dictation-select');
-            loadById(select.value);
-
-            select.addEventListener('change', (e) => loadById(e.target.value));
+            if (select) {
+                loadById(select.value);
+                select.addEventListener('change', (e) => loadById(e.target.value));
+            }
 
             const klasaSelect = document.getElementById('klasa-select');
-            if (klasaSelect) {
+            if (klasaSelect && select) {
                 klasaSelect.addEventListener('change', () => {
                     populateSelect();
                     loadById(select.value);
@@ -610,15 +593,15 @@ window.KszaPuzzleEngine = (function () {
                 });
             }
 
-            document.getElementById('play-full-btn').addEventListener('click', playFromStart);
-            document.getElementById('pause-btn').addEventListener('click', pausePlayback);
-            document.getElementById('resume-btn').addEventListener('click', resumePlayback);
-            document.getElementById('restart-btn').addEventListener('click', playFromStart);
-            document.getElementById('listen-arrangement-btn').addEventListener('click', playCurrentArrangement);
-            document.getElementById('shuffle-btn').addEventListener('click', buildPuzzle);
-            document.getElementById('check-btn').addEventListener('click', checkOrder);
+            document.getElementById('play-full-btn')?.addEventListener('click', playFromStart);
+            document.getElementById('pause-btn')?.addEventListener('click', pausePlayback);
+            document.getElementById('resume-btn')?.addEventListener('click', resumePlayback);
+            document.getElementById('restart-btn')?.addEventListener('click', playFromStart);
+            document.getElementById('listen-arrangement-btn')?.addEventListener('click', playCurrentArrangement);
+            document.getElementById('shuffle-btn')?.addEventListener('click', buildPuzzle);
+            document.getElementById('check-btn')?.addEventListener('click', checkOrder);
         });
     }
 
-    return { init: init };
+    return { init };
 })();

@@ -2,7 +2,7 @@
    Ta sama lista i pliki co wersja "ze słuchu" - dodatkowo każdy takt jest
    rysowany przez Verovio (patrz assets/js/verovio-render.js).
    Silnik: assets/js/puzzle-engine.js. */
-(function () {
+(() => {
     KszaPuzzleEngine.init({
         notation: true,
         partNameLabel: 'Dyktando',

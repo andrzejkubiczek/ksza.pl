@@ -1,6 +1,6 @@
 /* ksza.pl - wspólna inicjalizacja i renderowanie Verovio.
    Używane przez każde ćwiczenie z zapisem nutowym. */
-window.KszaVerovio = (function () {
+window.KszaVerovio = (() => {
     let toolkit = null;
     let readyPromise = null;
 
@@ -24,7 +24,9 @@ window.KszaVerovio = (function () {
                     clearInterval(pollId);
                     clearTimeout(timeoutId);
                     resolve();
-                } catch (e) { /* moduł jeszcze nie gotowy - spróbujemy ponownie */ }
+                } catch (e) {
+                    /* Moduł jeszcze nie gotowy - kolejna próba nastąpi wkrótce */
+                }
             };
 
             verovio.module.onRuntimeInitialized = tryInit;
@@ -40,9 +42,7 @@ window.KszaVerovio = (function () {
         return readyPromise;
     }
 
-    function render(musicXml, options) {
-        return toolkit.renderData(musicXml, options);
-    }
+    const render = (musicXml, options) => toolkit.renderData(musicXml, options);
 
-    return { ensureReady: ensureReady, render: render };
+    return { ensureReady, render };
 })();

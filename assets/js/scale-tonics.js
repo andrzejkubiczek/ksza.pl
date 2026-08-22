@@ -1,5 +1,5 @@
 /* ksza.pl - wspólne toniki gam + budowanie nut od toniki. Używane przez gamy.js i gamy-stopnie.js. */
-window.KszaScaleTonics = (function () {
+window.KszaScaleTonics = (() => {
     const CHROMATIC = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
     const TONIC_OCTAVE_OPTIONS = [3, 4]; // awaryjne, patrz pickTonicOctave
 
@@ -18,7 +18,7 @@ window.KszaScaleTonics = (function () {
         const total = tonicPc + semitoneOffset;
         const pc = ((total % 12) + 12) % 12;
         const octave = tonicOctave + Math.floor(total / 12);
-        return CHROMATIC[pc] + octave;
+        return `${CHROMATIC[pc]}${octave}`;
     }
 
     // Oktawa toniki tak, by cała gama zmieściła się w zakresie instrumentu;
@@ -28,7 +28,9 @@ window.KszaScaleTonics = (function () {
         const candidates = [];
         for (let oct = 0; oct <= 8; oct++) {
             const abs = oct * 12 + tonicPc;
-            if (abs >= range.min && abs + maxOffset <= range.max) candidates.push(oct);
+            if (abs >= range.min && abs + maxOffset <= range.max) {
+                candidates.push(oct);
+            }
         }
         if (candidates.length) {
             return candidates[Math.floor(Math.random() * candidates.length)];
@@ -48,9 +50,9 @@ window.KszaScaleTonics = (function () {
     }
 
     return {
-        MAJOR_TONICS: MAJOR_TONICS,
-        MINOR_TONICS: MINOR_TONICS,
-        noteAt: noteAt,
-        pickTonicOctave: pickTonicOctave
+        MAJOR_TONICS,
+        MINOR_TONICS,
+        noteAt,
+        pickTonicOctave
     };
 })();

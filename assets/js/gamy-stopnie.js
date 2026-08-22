@@ -1,7 +1,7 @@
 /* ksza.pl - stopnie gamy (solmizacja).
    Gra gamę w górę (kontekst tonalny), potem jeden dźwięk z tej gamy -
    uczeń wskazuje, który to stopień (1-8). */
-(function () {
+(() => {
     const ST = KszaScaleTonics;
     const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
 
@@ -24,20 +24,20 @@
     let isPlaying = false;
     let scheduledTimeouts = [];
 
-    function currentInstrument() {
-        return document.getElementById('instrument-select').value;
-    }
-    function currentLevel() {
-        return document.getElementById('level-select').value;
-    }
+    const currentInstrument = () => document.getElementById('instrument-select').value;
+    const currentLevel = () => document.getElementById('level-select').value;
 
     function setStatus(message, type) {
         const el = document.getElementById('status-line');
-        el.textContent = message || '';
-        el.className = 'status-line' + (type ? ' status-' + type : '');
+        if (el) {
+            el.textContent = message || '';
+            el.className = `status-line${type ? ` status-${type}` : ''}`;
+        }
     }
+
     function onAudioState(state, message) {
-        document.getElementById('play-btn').disabled = state === 'loading';
+        const playBtn = document.getElementById('play-btn');
+        if (playBtn) playBtn.disabled = state === 'loading';
         if (state === 'error') setStatus(message, 'error');
         else if (state === 'loading') setStatus(message, null);
         else setStatus('', null);
@@ -49,8 +49,10 @@
         isPlaying = false;
         updatePlayButtonState();
     }
+
     function updatePlayButtonState() {
         const btn = document.getElementById('play-btn');
+        if (!btn) return;
         btn.disabled = isPlaying;
         btn.innerHTML = isPlaying
             ? '<span class="play-icon" aria-hidden="true"></span><span>Gra...</span>'
@@ -60,8 +62,11 @@
     function generateNewQuestion() {
         stopPlayback();
         hasAnswered = false;
-        document.getElementById('feedback').textContent = '';
-        document.getElementById('feedback').className = 'feedback-msg';
+        const feedback = document.getElementById('feedback');
+        if (feedback) {
+            feedback.textContent = '';
+            feedback.className = 'feedback-msg';
+        }
         document.getElementById('play-btn').style.display = 'inline-flex';
         document.getElementById('next-btn').style.display = 'none';
 
@@ -73,7 +78,7 @@
         const level = currentLevel();
         const pool = SCALE_TYPES.filter((t) => level === '2' || t.level === 1);
         currentScaleType = pool[Math.floor(Math.random() * pool.length)];
-        const tonics = currentScaleType.tonics;
+        const { tonics } = currentScaleType;
         currentTonic = tonics[Math.floor(Math.random() * tonics.length)];
         currentTonicOctave = ST.pickTonicOctave(currentTonic.pc, 12, currentInstrument());
         currentDegreeIndex = Math.floor(Math.random() * 8);
@@ -96,12 +101,12 @@
         const TARGET_DURATION = BASE_TARGET_DURATION / speed;
         const TARGET_GAP = BASE_TARGET_GAP / speed;
 
-        function scheduleNote(note, delaySeconds, duration) {
+        const scheduleNote = (note, delaySeconds, duration) => {
             const id = setTimeout(() => {
-                if (KszaAudio.player) KszaAudio.player.play(note, undefined, { duration: duration * 0.92 });
+                if (KszaAudio.player) KszaAudio.player.play(note, undefined, { duration });
             }, delaySeconds * 1000);
             scheduledTimeouts.push(id);
-        }
+        };
 
         let cursor = 0;
         currentNoteNames.forEach((note) => {
@@ -135,12 +140,14 @@
         });
 
         const feedback = document.getElementById('feedback');
-        if (selectedDegree === correctDegree) {
-            feedback.className = 'feedback-msg feedback-correct';
-            feedback.textContent = 'Doskonale! To prawidłowa odpowiedź.';
-        } else {
-            feedback.className = 'feedback-msg feedback-wrong';
-            feedback.textContent = 'Niestety nie. Poprawna odpowiedź: stopień ' + ROMAN[currentDegreeIndex] + '.';
+        if (feedback) {
+            if (selectedDegree === correctDegree) {
+                feedback.className = 'feedback-msg feedback-correct';
+                feedback.textContent = 'Doskonale! To prawidłowa odpowiedź.';
+            } else {
+                feedback.className = 'feedback-msg feedback-wrong';
+                feedback.textContent = `Niestety nie. Poprawna odpowiedź: stopień ${ROMAN[currentDegreeIndex]}.`;
+            }
         }
 
         document.getElementById('play-btn').style.display = 'none';
@@ -155,10 +162,10 @@
     document.addEventListener('DOMContentLoaded', () => {
         generateNewQuestion();
 
-        document.getElementById('play-btn').addEventListener('click', playQuestion);
-        document.getElementById('next-btn').addEventListener('click', nextQuestion);
-        document.getElementById('level-select').addEventListener('change', generateNewQuestion);
-        document.getElementById('instrument-select').addEventListener('change', (e) => {
+        document.getElementById('play-btn')?.addEventListener('click', playQuestion);
+        document.getElementById('next-btn')?.addEventListener('click', nextQuestion);
+        document.getElementById('level-select')?.addEventListener('change', generateNewQuestion);
+        document.getElementById('instrument-select')?.addEventListener('change', (e) => {
             KszaAudio.stopAll();
             stopPlayback();
             const shift = KszaInstrumentRange.fitOctaveShift(currentNoteNames, e.target.value);
