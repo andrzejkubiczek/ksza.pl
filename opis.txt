@@ -6,17 +6,27 @@ kształcenia słuchu i czytania nut. Działa bezpośrednio w przeglądarce
 i bez konieczności logowania.
 
 
-1. WDROŻENIE I ARCHITEKTURA AUDIO
+1. ARCHITEKTURA AUDIO (smplr + Versilian / VSCO2 / Steinway)
 
-A. Silnik dźwiękowy (smplr + Web Audio API):
-   Aplikacja korzysta z nowoczesnego, ultra-lekkiego silnika samplera "smplr"
+A. Silnik dźwiękowy:
+   Aplikacja korzysta z silnika samplera "smplr", trwałego magazynu CacheStorage
    oraz natywnego Web Audio API:
-   - Fortepian: Splendid Grand Piano (wielowarstwowe próbki akustycznego fortepianu koncertowego Steinway).
-   - Pozostałe instrumenty (flet, klarnet, skrzypce, trąbka, fagot, ksylofon):
-     studyjny bank Soundfont FluidR3_GM (General MIDI).
-   - Metronom: natywny, bezlatencyjny generator impulsów OscillatorNode.
+   - Fortepian (piano): Splendid Grand Piano (wielowarstwowy fortepian koncertowy Steinway B).
+   - Ksylofon (xylophone): Versilian VCSL (koncertowy ksylofon sztabkowy na twardych pałkach).
+   - Instrumenty orkiestrowe (klarnet, skrzypce, flet, trąbka, fagot):
+     autentyczne, akustyczne nagrania orkiestry kameralnej Versilian VSCO2
+     znajdujące się lokalnie w katalogu "assets/audio/".
+   - Metronom: bezlatencyjny generator impulsów trójkątnych OscillatorNode.
 
-B. Publikacja:
+B. Próbki audio (assets/audio/):
+   Wszystkie próbki orkiestrowe VSCO2 są umieszczone bezpośrednio w projekcie:
+   - assets/audio/clarinet/ (11 próbek MP3)
+   - assets/audio/violin/   (14 próbek MP3)
+   - assets/audio/flute/    (10 próbek MP3)
+   - assets/audio/trumpet/  (11 próbek MP3)
+   - assets/audio/bassoon/  (10 próbek MP3)
+
+C. Publikacja:
    Wgraj całą zawartość repozytorium do katalogu głównego serwera HTTP
    (np. Apache, Nginx, GitHub Pages, Netlify). Nie jest wymagana żadna
    instalacja ani konfiguracja po stronie serwera.
@@ -28,7 +38,8 @@ index.html, o-projekcie.html   - strony ogólne i informacyjne
 cwiczenia/*.html               - dedykowane strony dla każdego wariantu ćwiczenia
 assets/css/site.css            - globalne style, layout, motyw "Kontrastowe karty", RWD
 assets/css/widgets.css         - style widżetów ćwiczeń, notacji Verovio, klawiatur
-assets/vendor/smplr.js         - lekki silnik samplera Web Audio API
+assets/audio/                  - lokalne próbki akustyczne orkiestry Versilian VSCO2
+assets/vendor/smplr.js         - silnik samplera Web Audio API
 assets/js/core.js              - moduł audio (KszaAudio), tempo, zakresy instrumentów
 assets/js/music-theory.js      - drabina diatoniczna, enharmonia, generator MusicXML
 assets/js/verovio-render.js    - asynchroniczny silnik renderowania nut SVG (Leland font)

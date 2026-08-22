@@ -20,7 +20,7 @@ Opis idei projektu znajduje się na podstronie [O projekcie](o-projekcie.html). 
 ## Stos technologiczny
 
 * **Frontend:** Czysty, semantyczny HTML5, nowoczesny CSS3 (CSS Custom Properties, Grid, Flexbox, stylistyka *Kontrastowe karty*, RWD, a11y) oraz nowoczesny JavaScript (ES6+).
-* **Silnik audio:** [smplr](https://github.com/danigb/smplr) (Splendid Grand Piano &middot; FluidR3_GM Soundfont) + natywny Web Audio API.
+* **Silnik audio:** [smplr](https://github.com/danigb/smplr) (Splendid Grand Piano &middot; Versilian Studios VCSL &amp; VSCO2) + natywny Web Audio API.
 * **Renderowanie nut:** [Verovio](https://www.verovio.org/) (WebAssembly/JS) generujące wektory SVG w czcionce Leland.
 * **Interakcje Drag & Drop:** [SortableJS](https://sortablejs.github.io/Sortable/).
 
@@ -33,6 +33,7 @@ index.html, o-projekcie.html   Strony ogólne i informacyjne
 cwiczenia/*.html               Strony poszczególnych wariantów ćwiczeń
 assets/css/site.css            Główny arkusz stylów, layout, motyw, RWD
 assets/css/widgets.css         Style widżetów ćwiczeń, notacji Verovio, klawiatur
+assets/audio/                  Lokalne próbki akustyczne orkiestry Versilian VSCO2
 assets/vendor/smplr.js         Lekki silnik samplera Web Audio API
 assets/js/core.js              Moduł audio (KszaAudio), tempo, zakresy instrumentów
 assets/js/music-theory.js      Matematyczny model teorii muzyki, enharmonia, MusicXML
@@ -65,6 +66,6 @@ Następnie otwórz w przeglądarce adres: [http://localhost:8000](http://localho
 
 ## Licencja
 
-* Próbki instrumentów: Splendid Grand Piano / FluidR3_GM Soundfont (CC-BY / Public Domain via smplr).
+* Próbki instrumentów: Splendid Grand Piano / Versilian Studios VCSL & VSCO2 (CC-BY / CC0 / Public Domain via smplr).
 * Silnik nutowy: Verovio (LGPL, RISM Digital Center).
 * Kod źródłowy: ksza.pl (&copy; aK).

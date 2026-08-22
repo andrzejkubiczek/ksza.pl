@@ -407,8 +407,11 @@ function resolveParams(defaults, group, region, midi, velocity, overrides) {
   const merged = __spreadValues(__spreadValues(__spreadValues(__spreadValues({}, PARAM_DEFAULTS), defaults), pickPlaybackParams(group)), pickPlaybackParams(region));
   const pitch = (_b = (_a = region.pitch) != null ? _a : region.key) != null ? _b : midi;
   const semitones = midi - pitch;
-  let detune = (semitones + merged.tune) * 100 + merged.detune;
-  if ((overrides == null ? void 0 : overrides.detune) !== void 0) detune += overrides.detune;
+  const tune = typeof merged.tune === "number" ? merged.tune : 0;
+  const baseDetune = typeof merged.detune === "number" ? merged.detune : 0;
+  let detune = (semitones + tune) * 100 + baseDetune;
+  if (typeof (overrides == null ? void 0 : overrides.detune) === "number") detune += overrides.detune;
+  if (isNaN(detune)) detune = 0;
   return {
     detune,
     velocity,
@@ -553,8 +556,13 @@ function loadAudioBuffer(context, url, storage) {
     }
     try {
       const audioData = yield response.arrayBuffer();
-      const buffer = yield context.decodeAudioData(audioData);
-      return buffer;
+      const copy = audioData.slice(0);
+      return yield new Promise((resolve, reject) => {
+        const res = context.decodeAudioData(copy, (buf) => resolve(buf), (err) => reject(err));
+        if (res && typeof res.then === "function") {
+          res.then(resolve, reject);
+        }
+      });
     } catch (error) {
       console.warn("Error loading buffer", error, url);
     }
@@ -785,7 +793,7 @@ var Voice = class {
     __privateSet(this, _ampRelease, params.ampRelease);
     const source = context.createBufferSource();
     source.buffer = buffer;
-    const cents = params.detune;
+    const cents = typeof params.detune === "number" && isFinite(params.detune) ? params.detune : 0;
     if (source.detune) {
       source.detune.value = cents;
     } else {
@@ -3588,9 +3596,8 @@ function samplerToPreset(source, options = {}) {
   const allMidi = nonMidiKeys.length === 0;
   const entries = [];
   if (allMidi && midiEntries.length > 0) {
-    const spread = spreadKeyRanges(
-      midiEntries.map(([midi, key]) => [midi, key])
-    );
+    midiEntries.sort((a, b) => a[0] - b[0]);
+    const spread = spreadKeyRanges(midiEntries);
     for (let i = 0; i < midiEntries.length; i++) {
       const [midi, key] = midiEntries[i];
       const { keyRange, pitch } = spread[i];
@@ -3644,7 +3651,7 @@ function samplerToPreset(source, options = {}) {
     defaults: {
       ampRelease: options.decayTime,
       lpfCutoffHz: options.lpfCutoffHz,
-      detune: options.detune
+      detune: typeof options.detune === "number" ? options.detune : 0
     }
   };
   return { json, urlMap, preloaded };
