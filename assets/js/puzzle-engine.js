@@ -187,6 +187,27 @@ window.KszaPuzzleEngine = (() => {
             });
         }
 
+        function getActiveInstrumentKey() {
+            const el = instrumentSelectEl();
+            return el ? el.value : 'piano';
+        }
+
+        function getOctaveShift() {
+            if (!active || typeof KszaInstrumentRange === 'undefined') return 0;
+            const allPitches = active.fragments
+                .flatMap(fragmentEvents)
+                .map((e) => e.pitch)
+                .filter(Boolean);
+            if (!allPitches.length) return 0;
+            return KszaInstrumentRange.fitOctaveShift(allPitches, getActiveInstrumentKey());
+        }
+
+        function adaptPitch(pitch) {
+            if (!pitch || typeof KszaInstrumentRange === 'undefined') return pitch;
+            const shift = getOctaveShift();
+            return shift !== 0 ? KszaInstrumentRange.transposeNoteName(pitch, shift) : pitch;
+        }
+
         function playEvents(events, tempoBPM) {
             if (!KszaAudio.player) return;
             stopAllPlayback();
@@ -198,8 +219,9 @@ window.KszaPuzzleEngine = (() => {
                 const durSeconds = e.beats * quarterSeconds;
                 if (e.pitch) {
                     const duration = durSeconds * 0.92;
+                    const adapted = adaptPitch(e.pitch);
                     const id = setTimeout(() => {
-                        if (KszaAudio.player) KszaAudio.player.play(e.pitch, undefined, { duration });
+                        if (KszaAudio.player) KszaAudio.player.play(adapted, undefined, { duration });
                     }, cursor * 1000);
                     scheduledSimpleTimeouts.push(id);
                 }
@@ -283,9 +305,10 @@ window.KszaPuzzleEngine = (() => {
             fullPlaybackTimeline.forEach((e) => {
                 if (e.offset + e.duration <= offsetSeconds) return;
                 const delayMs = Math.max(0, (e.offset - offsetSeconds) / scheduleSpeed * 1000);
+                const adapted = adaptPitch(e.pitch);
                 const timeoutId = setTimeout(() => {
                     if (KszaAudio.player) {
-                        KszaAudio.player.play(e.pitch, undefined, { duration: e.duration / scheduleSpeed });
+                        KszaAudio.player.play(adapted, undefined, { duration: e.duration / scheduleSpeed });
                     }
                 }, delayMs);
                 scheduledTimeouts.push(timeoutId);

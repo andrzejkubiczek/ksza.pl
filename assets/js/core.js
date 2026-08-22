@@ -248,9 +248,24 @@ window.KszaInstrumentRange = (() => {
         bassoon:   { min: 'G2',  max: 'D#5' }
     };
 
+    const NOTE_OFFSETS = {
+        'C': 0, 'C#': 1, 'Db': 1,
+        'D': 2, 'D#': 3, 'Eb': 3,
+        'E': 4, 'Fb': 4, 'E#': 5,
+        'F': 5, 'F#': 6, 'Gb': 6,
+        'G': 7, 'G#': 8, 'Ab': 8,
+        'A': 9, 'A#': 10, 'Bb': 10,
+        'B': 11, 'Cb': 11, 'B#': 0
+    };
+
     function toSemitone(name) {
-        const m = /^([A-G]#?)(-?\d+)$/.exec(name);
-        return m ? parseInt(m[2], 10) * 12 + CHROMATIC.indexOf(m[1]) : 0;
+        if (!name) return 0;
+        const m = /^([A-G][#b]?)(-?\d+)$/.exec(name);
+        if (!m) return 0;
+        const note = m[1];
+        const octave = parseInt(m[2], 10);
+        const pitchClass = NOTE_OFFSETS[note] !== undefined ? NOTE_OFFSETS[note] : CHROMATIC.indexOf(note);
+        return octave * 12 + (pitchClass >= 0 ? pitchClass : 0);
     }
 
     function fromSemitone(abs) {
@@ -269,13 +284,17 @@ window.KszaInstrumentRange = (() => {
     }
 
     function fitOctaveShift(noteNames, instrumentKey) {
+        if (!noteNames || !noteNames.length) return 0;
         const r = range(instrumentKey);
         const semis = noteNames.map(toSemitone);
         const lo = Math.min(...semis);
         const hi = Math.max(...semis);
+
+        const candidates = [0, -1, 1, -2, 2, -3, 3, -4, 4];
         let best = 0;
         let bestOverflow = Infinity;
-        for (let shift = -8; shift <= 8; shift++) {
+
+        for (const shift of candidates) {
             const newLo = lo + shift * 12;
             const newHi = hi + shift * 12;
             const overflow = Math.max(0, r.min - newLo) + Math.max(0, newHi - r.max);
@@ -283,7 +302,9 @@ window.KszaInstrumentRange = (() => {
                 bestOverflow = overflow;
                 best = shift;
             }
-            if (overflow === 0) break;
+            if (overflow === 0) {
+                break;
+            }
         }
         return best;
     }
