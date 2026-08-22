@@ -1,100 +1,91 @@
 window.KszaAudio = (() => {
+    let audioCtx = null;
+    let cacheStorage = null;
     const samplerCache = {};
     let currentSampler = null;
     let loadedName = '';
     let loadGeneration = 0;
-    let audioStarted = false;
-    let effectsChainPromise = null;
+
+    function getAudioContext() {
+        if (!audioCtx) {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContextClass();
+        }
+        return audioCtx;
+    }
+
+    function getStorage() {
+        if (!cacheStorage && typeof smplr !== 'undefined' && smplr.CacheStorage) {
+            cacheStorage = new smplr.CacheStorage('ksza-audio-v2');
+        }
+        return cacheStorage || undefined;
+    }
+
+    async function ensureAudioStarted() {
+        const ctx = getAudioContext();
+        if (ctx.state === 'suspended') {
+            try {
+                await ctx.resume();
+            } catch (e) {}
+        }
+    }
 
     const makePlayerWrapper = (sampler) => ({
         play(note, time, opts) {
             const duration = (opts && opts.duration) || 0.5;
-            const when = typeof time === 'number' ? time : Tone.now();
-            sampler.triggerAttackRelease(note, duration, when);
+            sampler.start({ note, time: typeof time === 'number' ? time : undefined, duration });
         },
         stop() {
-            sampler.releaseAll(Tone.now());
+            sampler.stop();
         },
         raw: sampler
     });
 
-    async function ensureAudioStarted() {
-        if (!audioStarted) {
-            try {
-                await Tone.start();
-            } catch (e) {}
-            audioStarted = true;
+    function createSamplerInstance(name, ctx) {
+        const storage = getStorage();
+        if (name === 'piano') {
+            return new smplr.SplendidGrandPiano(ctx, {
+                storage,
+                decayTime: 0.28,
+                volume: 95
+            });
         }
-    }
-
-    async function getEffectsChain() {
-        if (!effectsChainPromise) {
-            effectsChainPromise = (async () => {
-                Tone.Destination.volume.value = -8;
-
-                const limiter = new Tone.Limiter(-6).toDestination();
-                const reverb = new Tone.Reverb({ decay: 1.2, wet: 0.16, preDelay: 0.01 }).connect(limiter);
-                await reverb.ready;
-                const highpass = new Tone.Filter({ frequency: 100, type: 'highpass', rolloff: -24 }).connect(reverb);
-
-                return highpass;
-            })();
-        }
-        return effectsChainPromise;
-    }
-
-    function withTimeout(promise, ms, label) {
-        return Promise.race([
-            promise,
-            new Promise((_, reject) =>
-                setTimeout(() => reject(new Error(`Przekroczono limit czasu ładowania (${label})`)), ms)
-            )
-        ]);
+        return new smplr.Soundfont(ctx, {
+            instrument: name,
+            kit: 'FluidR3_GM',
+            storage,
+            extraGain: 3.5,
+            volume: 95
+        });
     }
 
     async function loadInstrument(name, onStateChange = () => {}) {
         if (samplerCache[name]) {
             currentSampler = samplerCache[name];
             loadedName = name;
+            await currentSampler.load;
             onStateChange('ready', '');
             return true;
         }
 
         await ensureAudioStarted();
+        const ctx = getAudioContext();
 
         const myGeneration = ++loadGeneration;
         onStateChange('loading', `Ładowanie instrumentu: ${name}...`);
 
         try {
-            const baseUrl = window.KSZA_SAMPLES_BASE || 'assets/samples/';
-            const sampler = await withTimeout(
-                new Promise((resolve, reject) => {
-                    let settled = false;
-                    const instrument = SampleLibrary.load({
-                        instruments: name,
-                        baseUrl,
-                        onload() {
-                            if (settled) return;
-                            settled = true;
-                            resolve(instrument);
-                        }
-                    });
-                    // Fallback na Tone.loaded() dla wersji SampleLibrary bez wsparcia onload
-                    Tone.loaded().then(() => {
-                        if (settled) return;
-                        settled = true;
-                        resolve(instrument);
-                    }).catch(reject);
-                }),
-                20000,
-                name
-            );
+            if (typeof smplr === 'undefined') {
+                throw new Error('Biblioteka smplr nie została wczytana.');
+            }
+
+            const sampler = createSamplerInstance(name, ctx);
+            samplerCache[name] = sampler;
+
+            await sampler.load;
 
             if (myGeneration !== loadGeneration) return false;
 
-            const chainInput = await getEffectsChain();
-            sampler.connect(chainInput);
-            samplerCache[name] = sampler;
             currentSampler = sampler;
             loadedName = name;
             onStateChange('ready', '');
@@ -119,32 +110,50 @@ window.KszaAudio = (() => {
     function stopAll() {
         if (currentSampler) {
             try {
-                currentSampler.releaseAll(Tone.now());
+                currentSampler.stop();
             } catch (e) {}
         }
     }
 
-    let clickSynth = null;
-    function getClickSynth() {
-        if (!clickSynth) {
-            clickSynth = new Tone.Synth({
-                oscillator: { type: 'triangle' },
-                envelope: { attack: 0.001, decay: 0.05, sustain: 0, release: 0.05 }
-            }).toDestination();
-            clickSynth.volume.value = -4;
+    function playClick(accent = false) {
+        const ctx = getAudioContext();
+        if (ctx.state === 'suspended') {
+            ctx.resume();
         }
-        return clickSynth;
+        const t = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(accent ? 880 : 587.33, t);
+
+        gain.gain.setValueAtTime(0.25, t);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.04);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(t);
+        osc.stop(t + 0.045);
     }
 
-    function playClick(accent = false) {
-        getClickSynth().triggerAttackRelease(accent ? 'C6' : 'G5', 0.05, Tone.now());
+    function prewarmDefaultInstrument() {
+        if (typeof smplr === 'undefined') return;
+        const ctx = getAudioContext();
+        if (!samplerCache['piano']) {
+            samplerCache['piano'] = createSamplerInstance('piano', ctx);
+        }
     }
 
     return {
+        get context() {
+            return getAudioContext();
+        },
         loadInstrument,
         ensureReady,
         stopAll,
         playClick,
+        prewarmDefaultInstrument,
         get player() {
             return currentSampler ? makePlayerWrapper(currentSampler) : null;
         }
@@ -255,5 +264,13 @@ document.addEventListener('DOMContentLoaded', () => {
             KszaTempo.set(percent / 100);
             if (valueLabel) valueLabel.textContent = `${percent}%`;
         });
+    }
+
+    if (typeof KszaAudio !== 'undefined' && KszaAudio.prewarmDefaultInstrument) {
+        if ('requestIdleCallback' in window) {
+            window.requestIdleCallback(KszaAudio.prewarmDefaultInstrument);
+        } else {
+            setTimeout(KszaAudio.prewarmDefaultInstrument, 300);
+        }
     }
 });

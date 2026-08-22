@@ -20,7 +20,7 @@ Opis idei projektu znajduje się na podstronie [O projekcie](o-projekcie.html). 
 ## Stos technologiczny
 
 * **Frontend:** Czysty, semantyczny HTML5, nowoczesny CSS3 (CSS Custom Properties, Grid, Flexbox, stylistyka *Kontrastowe karty*, RWD, a11y) oraz nowoczesny JavaScript (ES6+).
-* **Audio Engine:** [Tone.js](https://tonejs.github.io/) z łańcuchem efektów (filtr górnoprzepustowy, pogłos, limiter) oraz próbkami [tonejs-instruments](https://github.com/nbrosowsky/tonejs-instruments) (VSCO2).
+* **Silnik audio:** [smplr](https://github.com/danigb/smplr) (Splendid Grand Piano &middot; FluidR3_GM Soundfont) + natywny Web Audio API.
 * **Renderowanie nut:** [Verovio](https://www.verovio.org/) (WebAssembly/JS) generujące wektory SVG w czcionce Leland.
 * **Interakcje Drag & Drop:** [SortableJS](https://sortablejs.github.io/Sortable/).
 
@@ -33,7 +33,8 @@ index.html, o-projekcie.html   Strony ogólne i informacyjne
 cwiczenia/*.html               Strony poszczególnych wariantów ćwiczeń
 assets/css/site.css            Główny arkusz stylów, layout, motyw, RWD
 assets/css/widgets.css         Style widżetów ćwiczeń, notacji Verovio, klawiatur
-assets/js/core.js              Rdzeń audio (Tone.js), tempo, zakresy instrumentów
+assets/vendor/smplr.js         Lekki silnik samplera Web Audio API
+assets/js/core.js              Moduł audio (KszaAudio), tempo, zakresy instrumentów
 assets/js/music-theory.js      Matematyczny model teorii muzyki, enharmonia, MusicXML
 assets/js/verovio-render.js    Wrapper silnika renderującego Verovio SVG
 assets/js/gesture-layer.js     Obsługa gestów wskaźnikowych i dotykowych nad notacją
@@ -60,12 +61,10 @@ python3 -m http.server 8000
 
 Następnie otwórz w przeglądarce adres: [http://localhost:8000](http://localhost:8000).
 
-> **Ważne:** Przed pierwszym uruchomieniem z dźwiękiem upewnij się, że próbki instrumentów zostały umieszczone w folderze `assets/samples/` zgodnie z instrukcją w `assets/samples/PRZECZYTAJ.txt`.
-
 ---
 
 ## Licencja
 
-* Próbki instrumentów: VSCO2 (CC-BY 3.0) via tonejs-instruments.
+* Próbki instrumentów: Splendid Grand Piano / FluidR3_GM Soundfont (CC-BY / Public Domain via smplr).
 * Silnik nutowy: Verovio (LGPL, RISM Digital Center).
 * Kod źródłowy: ksza.pl (&copy; aK).
