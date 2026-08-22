@@ -1,15 +1,13 @@
 ---
 export interface Props {
-  isRoot?: boolean;
   creditType?: 'none' | 'smplr' | 'verovio' | 'both';
 }
 
-const { isRoot = false, creditType = 'smplr' } = Astro.props;
-const oProjekcieHref = isRoot ? 'o-projekcie.html' : '../o-projekcie.html';
+const { creditType = 'smplr' } = Astro.props;
 ---
 <footer class="site-footer">
   <div class="container">
-    &copy; <span id="footer-year">2026</span> ksza.pl (aK) &middot; <a href={oProjekcieHref}>O projekcie</a>
+    &copy; <span id="footer-year">2026</span> ksza.pl (aK) &middot; <a href="/o-projekcie">O projekcie</a>
     {(creditType === 'smplr' || creditType === 'both') && (
       <>
         <br /><small>Próbki instrumentów: <a href="https://github.com/danigb/smplr" target="_blank" rel="noopener">smplr</a> (Splendid Grand Piano &middot; Versilian Studios VCSL & VSCO2)</small>
@@ -22,4 +20,3 @@ const oProjekcieHref = isRoot ? 'o-projekcie.html' : '../o-projekcie.html';
     )}
   </div>
 </footer>
-

@@ -5,7 +5,6 @@ import Layout from '../layouts/Layout.astro';
   title="ksza.pl - ćwiczenia słuchowe z kształcenia słuchu"
   description="Bezpłatne, interaktywne ćwiczenia z kształcenia słuchu: interwały, trójdźwięki, gamy, puzzle, dyktanda i rytm."
   currentFamily="Start"
-  isRoot={true}
   creditType="smplr"
 >
   <main>
@@ -23,7 +22,7 @@ import Layout from '../layouts/Layout.astro';
 
     <section class="container">
       <div class="exercise-grid">
-        <a class="exercise-card accent-gold" href="cwiczenia/interwaly.html">
+        <a class="exercise-card accent-gold" href="/cwiczenia/interwaly">
           <span class="icon" aria-hidden="true">
             <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
               <circle cx="11" cy="28" r="3.2"/>
@@ -34,7 +33,7 @@ import Layout from '../layouts/Layout.astro';
           <h3>Interwały</h3>
           <p>Rozpoznawanie interwałów prostych do oktawy, granych w górę i w dół, na wielu instrumentach.</p>
         </a>
-        <a class="exercise-card accent-indigo" href="cwiczenia/trojdzwieki.html">
+        <a class="exercise-card accent-indigo" href="/cwiczenia/trojdzwieki">
           <span class="icon" aria-hidden="true">
             <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
               <circle cx="20" cy="30" r="3.2"/>
@@ -46,7 +45,7 @@ import Layout from '../layouts/Layout.astro';
           <h3>Trójdźwięki</h3>
           <p>Rozpoznawanie trójdźwięków: durowy, molowy, zmniejszony i zwiększony - w postaci zasadniczej i z przewrotami.</p>
         </a>
-        <a class="exercise-card accent-plum" href="cwiczenia/gamy.html">
+        <a class="exercise-card accent-plum" href="/cwiczenia/gamy">
           <span class="icon" aria-hidden="true">
             <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M7 30h5v-6h5v-6h5v-6h5v-6h6"/>
@@ -55,7 +54,7 @@ import Layout from '../layouts/Layout.astro';
           <h3>Odmiany gam</h3>
           <p>Rozpoznawanie gamy durowej i czterech odmian molowej, granych w obu kierunkach.</p>
         </a>
-        <a class="exercise-card accent-teal" href="cwiczenia/puzzle.html">
+        <a class="exercise-card accent-teal" href="/cwiczenia/puzzle">
           <span class="icon" aria-hidden="true">
             <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round">
               <path d="M9 9h9v3a2.5 2.5 0 0 0 5 0V9h9v9h-3a2.5 2.5 0 0 0 0 5h3v9h-9v-3a2.5 2.5 0 0 0-5 0v3H9v-9h3a2.5 2.5 0 0 0 0-5H9z"/>
@@ -64,7 +63,7 @@ import Layout from '../layouts/Layout.astro';
           <h3>Puzzle</h3>
           <p>Układanie potasowanych fragmentów melodii we właściwej kolejności - ze słuchu albo czytając zapis nutowy.</p>
         </a>
-        <a class="exercise-card accent-coral" href="cwiczenia/dyktanda-wysokosciowe.html">
+        <a class="exercise-card accent-coral" href="/cwiczenia/dyktanda-wysokosciowe">
           <span class="icon" aria-hidden="true">
             <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
               <path d="M6 14h28M6 20h28M6 26h28"/>
@@ -75,7 +74,7 @@ import Layout from '../layouts/Layout.astro';
           <h3>Dyktanda</h3>
           <p>Uzupełnianie wysokości dźwięków w melodii ze słuchu, a także pamięć melodyczna - powtarzanie usłyszanej melodii na klawiaturze.</p>
         </a>
-        <a class="exercise-card accent-green" href="cwiczenia/rytm.html">
+        <a class="exercise-card accent-green" href="/cwiczenia/rytm">
           <span class="icon" aria-hidden="true">
             <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M8 27V11M18 24V9"/>
@@ -94,7 +93,6 @@ import Layout from '../layouts/Layout.astro';
   </main>
 
   <Fragment slot="scripts">
-    <script is:inline src="assets/js/core.js"></script>
+    <script is:inline src="/assets/js/core.js"></script>
   </Fragment>
 </Layout>
-

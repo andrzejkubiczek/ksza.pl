@@ -3,15 +3,14 @@ import Layout from '../../layouts/Layout.astro';
 import SubNav from '../../components/SubNav.astro';
 
 const subNavItems = [
-  { label: 'Odmiany gam', href: 'gamy.html', active: true },
-  { label: 'Stopnie gamy', href: 'gamy-stopnie.html' },
+  { label: 'Odmiany gam', href: '/cwiczenia/gamy', active: true },
+  { label: 'Stopnie gamy', href: '/cwiczenia/gamy-stopnie' },
 ];
 ---
 <Layout
   title="Gamy - ksza.pl"
   description="Ćwiczenie słuchowe: rozpoznawanie odmian gam (durowa, eolska, harmoniczna, dorycka, melodyczna)."
   currentFamily="Gamy"
-  isRoot={false}
   creditType="smplr"
   includeWidgetsCss={true}
 >
@@ -71,10 +70,9 @@ const subNavItems = [
   </main>
 
   <Fragment slot="scripts">
-    <script is:inline src="../assets/vendor/smplr.js"></script>
-    <script is:inline src="../assets/js/core.js"></script>
-    <script is:inline src="../assets/js/scale-tonics.js"></script>
-    <script is:inline src="../assets/js/gamy.js"></script>
+    <script is:inline src="/assets/vendor/smplr.js"></script>
+    <script is:inline src="/assets/js/core.js"></script>
+    <script is:inline src="/assets/js/scale-tonics.js"></script>
+    <script is:inline src="/assets/js/gamy.js"></script>
   </Fragment>
 </Layout>
-

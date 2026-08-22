@@ -2,8 +2,8 @@
     KszaPuzzleEngine.init({
         notation: true,
         partNameLabel: 'Rytm',
-        manifestUrl: '../dyktanda/rytm/rytm.json',
-        fileBaseUrl: '../dyktanda/rytm/',
+        manifestUrl: '/dyktanda/rytm/rytm.json',
+        fileBaseUrl: '/dyktanda/rytm/',
         fixedInstrument: 'xylophone',
         rhythmStaff: true,
         labels: {

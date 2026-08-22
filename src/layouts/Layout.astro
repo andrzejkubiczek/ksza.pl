@@ -6,7 +6,6 @@ export interface Props {
   title: string;
   description?: string;
   currentFamily?: string;
-  isRoot?: boolean;
   creditType?: 'none' | 'smplr' | 'verovio' | 'both';
   includeWidgetsCss?: boolean;
 }
@@ -15,14 +14,9 @@ const {
   title,
   description = "Bezpłatne, interaktywne ćwiczenia z kształcenia słuchu: interwały, trójdźwięki, gamy, puzzle, dyktanda i rytm.",
   currentFamily,
-  isRoot = false,
   creditType = 'smplr',
   includeWidgetsCss = false,
 } = Astro.props;
-
-const brandHref = isRoot ? 'index.html' : '../index.html';
-const siteCssHref = isRoot ? 'assets/css/site.css' : '../assets/css/site.css';
-const widgetsCssHref = isRoot ? 'assets/css/widgets.css' : '../assets/css/widgets.css';
 ---
 <!doctype html>
 <html lang="pl">
@@ -34,22 +28,22 @@ const widgetsCssHref = isRoot ? 'assets/css/widgets.css' : '../assets/css/widget
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href={siteCssHref}>
-  {includeWidgetsCss && <link rel="stylesheet" href={widgetsCssHref}>}
+  <link rel="stylesheet" href="/assets/css/site.css">
+  {includeWidgetsCss && <link rel="stylesheet" href="/assets/css/widgets.css">}
 </head>
 <body>
 
 <header class="site-header">
   <div class="container site-header-inner">
-    <a class="brand" href={brandHref}>ksza.pl<small>kształcenie słuchu</small></a>
+    <a class="brand" href="/">ksza.pl<small>kształcenie słuchu</small></a>
     <button class="nav-toggle" aria-controls="site-menu" aria-expanded="false">Menu</button>
-    <NavMenu currentFamily={currentFamily} isRoot={isRoot} />
+    <NavMenu currentFamily={currentFamily} />
   </div>
 </header>
 
 <slot />
 
-<Footer isRoot={isRoot} creditType={creditType} />
+<Footer creditType={creditType} />
 
 <slot name="scripts" />
 </body>

@@ -1,8 +1,8 @@
 (() => {
     KszaPuzzleEngine.init({
         notation: false,
-        manifestUrl: '../dyktanda/rytm/rytm.json',
-        fileBaseUrl: '../dyktanda/rytm/',
+        manifestUrl: '/dyktanda/rytm/rytm.json',
+        fileBaseUrl: '/dyktanda/rytm/',
         fixedInstrument: 'xylophone',
         labels: {
             minFragments: 'Rytm musi mieć co najmniej 2 takty, żeby dało się ułożyć puzzle.',

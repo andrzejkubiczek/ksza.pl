@@ -3,16 +3,15 @@ import Layout from '../../layouts/Layout.astro';
 import SubNav from '../../components/SubNav.astro';
 
 const subNavItems = [
-  { label: 'Ze słuchu', href: 'trojdzwieki.html' },
-  { label: 'Zapis nutowy', href: 'trojdzwieki-zapis.html', active: true },
-  { label: 'Zbuduj trójdźwięk', href: 'trojdzwieki-buduj.html' },
+  { label: 'Ze słuchu', href: '/cwiczenia/trojdzwieki' },
+  { label: 'Zapis nutowy', href: '/cwiczenia/trojdzwieki-zapis', active: true },
+  { label: 'Zbuduj trójdźwięk', href: '/cwiczenia/trojdzwieki-buduj' },
 ];
 ---
 <Layout
   title="Trójdźwięki - zapis nutowy - ksza.pl"
   description="Ćwiczenie: rozpoznawanie zapisu nutowego trójdźwięków w kluczu wiolinowym i basowym."
   currentFamily="Trójdźwięki"
-  isRoot={false}
   creditType="verovio"
   includeWidgetsCss={true}
 >
@@ -79,11 +78,10 @@ const subNavItems = [
 
   <Fragment slot="scripts">
     <script is:inline src="https://cdn.jsdelivr.net/npm/verovio@6.2.0/dist/verovio-toolkit-wasm.js"></script>
-    <script is:inline src="../assets/js/core.js"></script>
-    <script is:inline src="../assets/js/music-theory.js"></script>
-    <script is:inline src="../assets/js/verovio-render.js"></script>
-    <script is:inline src="../assets/js/piano-keyboard.js"></script>
-    <script is:inline src="../assets/js/trojdzwieki-zapis.js"></script>
+    <script is:inline src="/assets/js/core.js"></script>
+    <script is:inline src="/assets/js/music-theory.js"></script>
+    <script is:inline src="/assets/js/verovio-render.js"></script>
+    <script is:inline src="/assets/js/piano-keyboard.js"></script>
+    <script is:inline src="/assets/js/trojdzwieki-zapis.js"></script>
   </Fragment>
 </Layout>
-

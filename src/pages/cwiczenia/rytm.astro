@@ -3,15 +3,14 @@ import Layout from '../../layouts/Layout.astro';
 import SubNav from '../../components/SubNav.astro';
 
 const subNavItems = [
-  { label: 'Ze słuchu', href: 'rytm.html', active: true },
-  { label: 'Zapis nutowy', href: 'rytm-zapis.html' },
+  { label: 'Ze słuchu', href: '/cwiczenia/rytm', active: true },
+  { label: 'Zapis nutowy', href: '/cwiczenia/rytm-zapis' },
 ];
 ---
 <Layout
   title="Rytm - puzzle - ksza.pl"
   description="Ćwiczenie: układanie potasowanych taktów rytmicznych we właściwej kolejności ze słuchu."
   currentFamily="Rytm"
-  isRoot={false}
   creditType="smplr"
   includeWidgetsCss={true}
 >
@@ -77,12 +76,11 @@ const subNavItems = [
   </main>
 
   <Fragment slot="scripts">
-    <script is:inline src="../assets/vendor/smplr.js"></script>
+    <script is:inline src="/assets/vendor/smplr.js"></script>
     <script is:inline src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.7/Sortable.min.js"></script>
-    <script is:inline src="../assets/js/core.js"></script>
-    <script is:inline src="../assets/js/klasa-filter.js"></script>
-    <script is:inline src="../assets/js/puzzle-engine.js"></script>
-    <script is:inline src="../assets/js/rytm.js"></script>
+    <script is:inline src="/assets/js/core.js"></script>
+    <script is:inline src="/assets/js/klasa-filter.js"></script>
+    <script is:inline src="/assets/js/puzzle-engine.js"></script>
+    <script is:inline src="/assets/js/rytm.js"></script>
   </Fragment>
 </Layout>
-

@@ -3,15 +3,14 @@ import Layout from '../../layouts/Layout.astro';
 import SubNav from '../../components/SubNav.astro';
 
 const subNavItems = [
-  { label: 'Dyktando', href: 'dyktanda-wysokosciowe.html', active: true },
-  { label: 'Pamięć melodyczna', href: 'pamiec-melodyczna.html' },
+  { label: 'Dyktando', href: '/cwiczenia/dyktanda-wysokosciowe', active: true },
+  { label: 'Pamięć melodyczna', href: '/cwiczenia/pamiec-melodyczna' },
 ];
 ---
 <Layout
   title="Dyktanda wysokościowe - ksza.pl"
   description="Ćwiczenie: uzupełnianie wysokości dźwięków w melodii ze słuchu z natychmiastowym feedbackiem nutowym."
   currentFamily="Dyktanda"
-  isRoot={false}
   creditType="both"
   includeWidgetsCss={true}
 >
@@ -98,14 +97,13 @@ const subNavItems = [
   </main>
 
   <Fragment slot="scripts">
-    <script is:inline src="../assets/vendor/smplr.js"></script>
+    <script is:inline src="/assets/vendor/smplr.js"></script>
     <script is:inline src="https://cdn.jsdelivr.net/npm/verovio@6.2.0/dist/verovio-toolkit-wasm.js"></script>
-    <script is:inline src="../assets/js/core.js"></script>
-    <script is:inline src="../assets/js/klasa-filter.js"></script>
-    <script is:inline src="../assets/js/music-theory.js"></script>
-    <script is:inline src="../assets/js/verovio-render.js"></script>
-    <script is:inline src="../assets/js/gesture-layer.js"></script>
-    <script is:inline src="../assets/js/dyktanda-wysokosciowe.js"></script>
+    <script is:inline src="/assets/js/core.js"></script>
+    <script is:inline src="/assets/js/klasa-filter.js"></script>
+    <script is:inline src="/assets/js/music-theory.js"></script>
+    <script is:inline src="/assets/js/verovio-render.js"></script>
+    <script is:inline src="/assets/js/gesture-layer.js"></script>
+    <script is:inline src="/assets/js/dyktanda-wysokosciowe.js"></script>
   </Fragment>
 </Layout>
-

@@ -3,15 +3,14 @@ import Layout from '../../layouts/Layout.astro';
 import SubNav from '../../components/SubNav.astro';
 
 const subNavItems = [
-  { label: 'Dyktando', href: 'dyktanda-wysokosciowe.html' },
-  { label: 'Pamięć melodyczna', href: 'pamiec-melodyczna.html', active: true },
+  { label: 'Dyktando', href: '/cwiczenia/dyktanda-wysokosciowe' },
+  { label: 'Pamięć melodyczna', href: '/cwiczenia/pamiec-melodyczna', active: true },
 ];
 ---
 <Layout
   title="Pamięć melodyczna - ksza.pl"
   description="Ćwiczenie słuchowe: powtarzanie usłyszanej frazy melodycznej na klawiaturze po dźwięku odniesienia A=440Hz."
   currentFamily="Dyktanda"
-  isRoot={false}
   creditType="smplr"
   includeWidgetsCss={true}
 >
@@ -87,9 +86,8 @@ const subNavItems = [
   </main>
 
   <Fragment slot="scripts">
-    <script is:inline src="../assets/vendor/smplr.js"></script>
-    <script is:inline src="../assets/js/core.js"></script>
-    <script is:inline src="../assets/js/pamiec-melodyczna.js"></script>
+    <script is:inline src="/assets/vendor/smplr.js"></script>
+    <script is:inline src="/assets/js/core.js"></script>
+    <script is:inline src="/assets/js/pamiec-melodyczna.js"></script>
   </Fragment>
 </Layout>
-

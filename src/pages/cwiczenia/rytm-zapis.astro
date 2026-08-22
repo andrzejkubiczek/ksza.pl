@@ -3,15 +3,14 @@ import Layout from '../../layouts/Layout.astro';
 import SubNav from '../../components/SubNav.astro';
 
 const subNavItems = [
-  { label: 'Ze słuchu', href: 'rytm.html' },
-  { label: 'Zapis nutowy', href: 'rytm-zapis.html', active: true },
+  { label: 'Ze słuchu', href: '/cwiczenia/rytm' },
+  { label: 'Zapis nutowy', href: '/cwiczenia/rytm-zapis', active: true },
 ];
 ---
 <Layout
   title="Rytm - puzzle (zapis nutowy) - ksza.pl"
   description="Ćwiczenie: układanie potasowanych taktów rytmicznych na podstawie zapisu nutowego na pojedynczej linii i odsłuchu."
   currentFamily="Rytm"
-  isRoot={false}
   creditType="both"
   includeWidgetsCss={true}
 >
@@ -75,14 +74,13 @@ const subNavItems = [
   </main>
 
   <Fragment slot="scripts">
-    <script is:inline src="../assets/vendor/smplr.js"></script>
+    <script is:inline src="/assets/vendor/smplr.js"></script>
     <script is:inline src="https://cdn.jsdelivr.net/npm/verovio@6.2.0/dist/verovio-toolkit-wasm.js"></script>
     <script is:inline src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.7/Sortable.min.js"></script>
-    <script is:inline src="../assets/js/core.js"></script>
-    <script is:inline src="../assets/js/klasa-filter.js"></script>
-    <script is:inline src="../assets/js/verovio-render.js"></script>
-    <script is:inline src="../assets/js/puzzle-engine.js"></script>
-    <script is:inline src="../assets/js/rytm-zapis.js"></script>
+    <script is:inline src="/assets/js/core.js"></script>
+    <script is:inline src="/assets/js/klasa-filter.js"></script>
+    <script is:inline src="/assets/js/verovio-render.js"></script>
+    <script is:inline src="/assets/js/puzzle-engine.js"></script>
+    <script is:inline src="/assets/js/rytm-zapis.js"></script>
   </Fragment>
 </Layout>
-

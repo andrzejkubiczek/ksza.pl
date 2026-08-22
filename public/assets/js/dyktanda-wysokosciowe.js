@@ -317,14 +317,14 @@
 
     async function loadManifest() {
         try {
-            const res = await fetch('../dyktanda/wysokosciowe/dyktanda.json', { cache: 'no-store' });
+            const res = await fetch('/dyktanda/wysokosciowe/dyktanda.json', { cache: 'no-store' });
             if (!res.ok) return;
             const items = await res.json();
             if (!Array.isArray(items)) return;
             items.forEach((item, i) => {
                 if (item && item.file) {
                     dictationSources[`m-${i}`] = {
-                        url: `../dyktanda/wysokosciowe/${item.file}`,
+                        url: `/dyktanda/wysokosciowe/${item.file}`,
                         title: item.title || item.file,
                         klasy: item.klasy || []
                     };

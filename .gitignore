@@ -4,4 +4,4 @@ dist/
 .astro/
 .env
 .env.*
-node_modules
+_legacy/

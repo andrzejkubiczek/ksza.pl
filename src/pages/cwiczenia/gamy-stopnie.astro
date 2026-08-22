@@ -3,15 +3,14 @@ import Layout from '../../layouts/Layout.astro';
 import SubNav from '../../components/SubNav.astro';
 
 const subNavItems = [
-  { label: 'Odmiany gam', href: 'gamy.html' },
-  { label: 'Stopnie gamy', href: 'gamy-stopnie.html', active: true },
+  { label: 'Odmiany gam', href: '/cwiczenia/gamy' },
+  { label: 'Stopnie gamy', href: '/cwiczenia/gamy-stopnie', active: true },
 ];
 ---
 <Layout
   title="Stopnie gamy - ksza.pl"
   description="Ćwiczenie słuchowe: rozpoznawanie stopni gamy w kontekście tonalnym."
   currentFamily="Gamy"
-  isRoot={false}
   creditType="smplr"
   includeWidgetsCss={true}
 >
@@ -83,10 +82,9 @@ const subNavItems = [
   </main>
 
   <Fragment slot="scripts">
-    <script is:inline src="../assets/vendor/smplr.js"></script>
-    <script is:inline src="../assets/js/core.js"></script>
-    <script is:inline src="../assets/js/scale-tonics.js"></script>
-    <script is:inline src="../assets/js/gamy-stopnie.js"></script>
+    <script is:inline src="/assets/vendor/smplr.js"></script>
+    <script is:inline src="/assets/js/core.js"></script>
+    <script is:inline src="/assets/js/scale-tonics.js"></script>
+    <script is:inline src="/assets/js/gamy-stopnie.js"></script>
   </Fragment>
 </Layout>
-

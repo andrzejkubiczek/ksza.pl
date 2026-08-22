@@ -3,16 +3,15 @@ import Layout from '../../layouts/Layout.astro';
 import SubNav from '../../components/SubNav.astro';
 
 const subNavItems = [
-  { label: 'Ze słuchu', href: 'interwaly.html' },
-  { label: 'Zapis nutowy', href: 'interwaly-zapis.html', active: true },
-  { label: 'Zbuduj interwał', href: 'interwaly-buduj.html' },
+  { label: 'Ze słuchu', href: '/cwiczenia/interwaly' },
+  { label: 'Zapis nutowy', href: '/cwiczenia/interwaly-zapis', active: true },
+  { label: 'Zbuduj interwał', href: '/cwiczenia/interwaly-buduj' },
 ];
 ---
 <Layout
   title="Interwały - zapis nutowy - ksza.pl"
   description="Ćwiczenie: rozpoznawanie zapisu nutowego interwałów w kluczu wiolinowym i basowym."
   currentFamily="Interwały"
-  isRoot={false}
   creditType="verovio"
   includeWidgetsCss={true}
 >
@@ -75,11 +74,10 @@ const subNavItems = [
 
   <Fragment slot="scripts">
     <script is:inline src="https://cdn.jsdelivr.net/npm/verovio@6.2.0/dist/verovio-toolkit-wasm.js"></script>
-    <script is:inline src="../assets/js/core.js"></script>
-    <script is:inline src="../assets/js/music-theory.js"></script>
-    <script is:inline src="../assets/js/verovio-render.js"></script>
-    <script is:inline src="../assets/js/piano-keyboard.js"></script>
-    <script is:inline src="../assets/js/interwaly-zapis.js"></script>
+    <script is:inline src="/assets/js/core.js"></script>
+    <script is:inline src="/assets/js/music-theory.js"></script>
+    <script is:inline src="/assets/js/verovio-render.js"></script>
+    <script is:inline src="/assets/js/piano-keyboard.js"></script>
+    <script is:inline src="/assets/js/interwaly-zapis.js"></script>
   </Fragment>
 </Layout>
-

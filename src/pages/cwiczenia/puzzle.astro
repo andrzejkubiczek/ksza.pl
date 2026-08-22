@@ -3,15 +3,14 @@ import Layout from '../../layouts/Layout.astro';
 import SubNav from '../../components/SubNav.astro';
 
 const subNavItems = [
-  { label: 'Ze słuchu', href: 'puzzle.html', active: true },
-  { label: 'Zapis nutowy', href: 'puzzle-zapis.html' },
+  { label: 'Ze słuchu', href: '/cwiczenia/puzzle', active: true },
+  { label: 'Zapis nutowy', href: '/cwiczenia/puzzle-zapis' },
 ];
 ---
 <Layout
   title="Dyktando muzyczne - puzzle - ksza.pl"
   description="Ćwiczenie: układanie potasowanych taktów dyktanda melodycznego we właściwej kolejności ze słuchu."
   currentFamily="Puzzle"
-  isRoot={false}
   creditType="smplr"
   includeWidgetsCss={true}
 >
@@ -91,12 +90,11 @@ const subNavItems = [
   </main>
 
   <Fragment slot="scripts">
-    <script is:inline src="../assets/vendor/smplr.js"></script>
+    <script is:inline src="/assets/vendor/smplr.js"></script>
     <script is:inline src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.7/Sortable.min.js"></script>
-    <script is:inline src="../assets/js/core.js"></script>
-    <script is:inline src="../assets/js/klasa-filter.js"></script>
-    <script is:inline src="../assets/js/puzzle-engine.js"></script>
-    <script is:inline src="../assets/js/puzzle.js"></script>
+    <script is:inline src="/assets/js/core.js"></script>
+    <script is:inline src="/assets/js/klasa-filter.js"></script>
+    <script is:inline src="/assets/js/puzzle-engine.js"></script>
+    <script is:inline src="/assets/js/puzzle.js"></script>
   </Fragment>
 </Layout>
-

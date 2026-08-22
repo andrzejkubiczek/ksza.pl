@@ -3,16 +3,15 @@ import Layout from '../../layouts/Layout.astro';
 import SubNav from '../../components/SubNav.astro';
 
 const subNavItems = [
-  { label: 'Ze słuchu', href: 'interwaly.html', active: true },
-  { label: 'Zapis nutowy', href: 'interwaly-zapis.html' },
-  { label: 'Zbuduj interwał', href: 'interwaly-buduj.html' },
+  { label: 'Ze słuchu', href: '/cwiczenia/interwaly', active: true },
+  { label: 'Zapis nutowy', href: '/cwiczenia/interwaly-zapis' },
+  { label: 'Zbuduj interwał', href: '/cwiczenia/interwaly-buduj' },
 ];
 ---
 <Layout
   title="Interwały - ksza.pl"
   description="Ćwiczenie słuchowe: rozpoznawanie interwałów prostych do oktawy, granych w górę i w dół."
   currentFamily="Interwały"
-  isRoot={false}
   creditType="smplr"
   includeWidgetsCss={true}
 >
@@ -90,9 +89,8 @@ const subNavItems = [
   </main>
 
   <Fragment slot="scripts">
-    <script is:inline src="../assets/vendor/smplr.js"></script>
-    <script is:inline src="../assets/js/core.js"></script>
-    <script is:inline src="../assets/js/interwaly.js"></script>
+    <script is:inline src="/assets/vendor/smplr.js"></script>
+    <script is:inline src="/assets/js/core.js"></script>
+    <script is:inline src="/assets/js/interwaly.js"></script>
   </Fragment>
 </Layout>
-

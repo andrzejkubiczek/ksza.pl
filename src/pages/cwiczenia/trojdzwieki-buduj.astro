@@ -3,16 +3,15 @@ import Layout from '../../layouts/Layout.astro';
 import SubNav from '../../components/SubNav.astro';
 
 const subNavItems = [
-  { label: 'Ze słuchu', href: 'trojdzwieki.html' },
-  { label: 'Zapis nutowy', href: 'trojdzwieki-zapis.html' },
-  { label: 'Zbuduj trójdźwięk', href: 'trojdzwieki-buduj.html', active: true },
+  { label: 'Ze słuchu', href: '/cwiczenia/trojdzwieki' },
+  { label: 'Zapis nutowy', href: '/cwiczenia/trojdzwieki-zapis' },
+  { label: 'Zbuduj trójdźwięk', href: '/cwiczenia/trojdzwieki-buduj', active: true },
 ];
 ---
 <Layout
   title="Zbuduj trójdźwięk - ksza.pl"
   description="Ćwiczenie: interaktywne budowanie trójdźwięków na pięciolinii w kluczu wiolinowym i basowym."
   currentFamily="Trójdźwięki"
-  isRoot={false}
   creditType="verovio"
   includeWidgetsCss={true}
 >
@@ -92,12 +91,11 @@ const subNavItems = [
 
   <Fragment slot="scripts">
     <script is:inline src="https://cdn.jsdelivr.net/npm/verovio@6.2.0/dist/verovio-toolkit-wasm.js"></script>
-    <script is:inline src="../assets/js/core.js"></script>
-    <script is:inline src="../assets/js/music-theory.js"></script>
-    <script is:inline src="../assets/js/verovio-render.js"></script>
-    <script is:inline src="../assets/js/gesture-layer.js"></script>
-    <script is:inline src="../assets/js/piano-keyboard.js"></script>
-    <script is:inline src="../assets/js/trojdzwieki-buduj.js"></script>
+    <script is:inline src="/assets/js/core.js"></script>
+    <script is:inline src="/assets/js/music-theory.js"></script>
+    <script is:inline src="/assets/js/verovio-render.js"></script>
+    <script is:inline src="/assets/js/gesture-layer.js"></script>
+    <script is:inline src="/assets/js/piano-keyboard.js"></script>
+    <script is:inline src="/assets/js/trojdzwieki-buduj.js"></script>
   </Fragment>
 </Layout>
-

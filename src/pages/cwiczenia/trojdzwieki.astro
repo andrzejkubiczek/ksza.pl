@@ -3,16 +3,15 @@ import Layout from '../../layouts/Layout.astro';
 import SubNav from '../../components/SubNav.astro';
 
 const subNavItems = [
-  { label: 'Ze słuchu', href: 'trojdzwieki.html', active: true },
-  { label: 'Zapis nutowy', href: 'trojdzwieki-zapis.html' },
-  { label: 'Zbuduj trójdźwięk', href: 'trojdzwieki-buduj.html' },
+  { label: 'Ze słuchu', href: '/cwiczenia/trojdzwieki', active: true },
+  { label: 'Zapis nutowy', href: '/cwiczenia/trojdzwieki-zapis' },
+  { label: 'Zbuduj trójdźwięk', href: '/cwiczenia/trojdzwieki-buduj' },
 ];
 ---
 <Layout
   title="Trójdźwięki - ksza.pl"
   description="Ćwiczenie słuchowe: rozpoznawanie trójdźwięków w postaci zasadniczej i z przewrotami."
   currentFamily="Trójdźwięki"
-  isRoot={false}
   creditType="smplr"
   includeWidgetsCss={true}
 >
@@ -94,9 +93,8 @@ const subNavItems = [
   </main>
 
   <Fragment slot="scripts">
-    <script is:inline src="../assets/vendor/smplr.js"></script>
-    <script is:inline src="../assets/js/core.js"></script>
-    <script is:inline src="../assets/js/trojdzwieki.js"></script>
+    <script is:inline src="/assets/vendor/smplr.js"></script>
+    <script is:inline src="/assets/js/core.js"></script>
+    <script is:inline src="/assets/js/trojdzwieki.js"></script>
   </Fragment>
 </Layout>
-
