@@ -53,8 +53,11 @@ window.KszaAudio = (() => {
 
     function getAudioBaseUrl() {
         if (window.KSZA_AUDIO_BASE) return window.KSZA_AUDIO_BASE;
-        const isCwiczenia = window.location.pathname.includes('/cwiczenia');
-        return isCwiczenia ? '../assets/audio/' : 'assets/audio/';
+        if (window.location.protocol === 'file:') {
+            const isCwiczenia = window.location.pathname.includes('/cwiczenia');
+            return isCwiczenia ? '../assets/audio/' : 'assets/audio/';
+        }
+        return '/assets/audio/';
     }
 
     async function ensureAudioStarted() {
