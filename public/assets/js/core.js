@@ -74,9 +74,20 @@ window.KszaAudio = (() => {
             }
             const duration = (opts && opts.duration) || 0.5;
             sampler.start({ note, time: typeof time === 'number' ? time : undefined, duration });
+
+            const playBtn = document.getElementById('play-btn');
+            if (playBtn) {
+                playBtn.classList.add('is-playing');
+                clearTimeout(playBtn._playingTimer);
+                playBtn._playingTimer = setTimeout(() => {
+                    playBtn.classList.remove('is-playing');
+                }, Math.max(duration * 1000, 650));
+            }
         },
         stop() {
             sampler.stop();
+            const playBtn = document.getElementById('play-btn');
+            if (playBtn) playBtn.classList.remove('is-playing');
         },
         raw: sampler
     });
