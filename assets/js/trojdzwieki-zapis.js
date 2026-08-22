@@ -1,7 +1,3 @@
-/* ksza.pl - trójdźwięki: rozpoznawanie zapisu nutowego.
-   Trudniejsze niż interwały: PRZEWROTY - pisownia dźwięków nie zmienia się
-   między postaciami, zmienia się tylko który składnik jest w basie. Budujemy
-   zawsze od prawdziwego prymu, a dla przewrotu "obracamy" gotowy akord. */
 (() => {
     const MT = KszaMusicTheory;
 

@@ -1,22 +1,10 @@
 #!/usr/bin/env python3
-"""ksza.pl - jedno źródło prawdy dla menu głównego (site-nav).
-
-Strona jest statyczna (bez backendu, bez includes), więc <nav class="site-nav">
-był dotąd kopiowany ręcznie w każdym pliku HTML - dodanie nowej pozycji menu
-oznaczało edycję kilkunastu plików naraz. Ten skrypt generuje ten fragment
-z jednej listy (NAV_ITEMS) i wstawia go do wszystkich plików HTML w repo.
-
-Użycie: edytuj NAV_ITEMS / FAMILY_MAP niżej, potem uruchom:
-    python3 update-nav.py
-Skrypt tylko podmienia zawartość <nav class="site-nav">...</nav> - nic
-więcej w plikach nie rusza. Zawsze uruchom PRZED wdrożeniem po zmianie menu.
-"""
+"""Synchronizuje znacznik <nav class="site-nav"> we wszystkich plikach HTML na podstawie NAV_ITEMS i FAMILY_MAP."""
 import pathlib
 import re
 
 ROOT = pathlib.Path(__file__).resolve().parent
 
-# (etykieta w menu, plik docelowy, czy plik leży w katalogu głównym repo)
 NAV_ITEMS = [
     ("Start", "index.html", True),
     ("Interwały", "interwaly.html", False),
@@ -28,7 +16,6 @@ NAV_ITEMS = [
     ("O projekcie", "o-projekcie.html", True),
 ]
 
-# plik HTML -> etykieta pozycji menu, która dla niego dostaje aria-current="page"
 FAMILY_MAP = {
     "index.html": "Start",
     "o-projekcie.html": "O projekcie",

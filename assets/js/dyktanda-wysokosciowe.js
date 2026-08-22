@@ -1,14 +1,9 @@
-/* ksza.pl - dyktando wysokościowe. Klucz, tonacja i pierwszy dźwięk są
-   stałe; kursor "Poprzedni/Następny dźwięk" wybiera, który z pozostałych
-   uczeń ustawia (ten sam mechanizm co w interwałach/trójdźwiękach). Znak
-   chromatyczny liczy się WZGLĘDEM tonacji - patrz keySignatureAlter. */
 (() => {
     const MT = KszaMusicTheory;
     const SHARP_ORDER = ['F', 'C', 'G', 'D', 'A', 'E', 'B'];
     const FLAT_ORDER = ['B', 'E', 'A', 'D', 'G', 'C', 'F'];
     const TYPE_DURATION = { whole: 16, half: 8, quarter: 4, eighth: 2, '16th': 1 };
 
-    // Alteracja, jaką tonacja narzuca danej literze (np. F w G-dur = +1).
     function keySignatureAlter(letter, fifths) {
         if (fifths > 0) return SHARP_ORDER.slice(0, fifths).includes(letter) ? 1 : 0;
         if (fifths < 0) return FLAT_ORDER.slice(0, -fifths).includes(letter) ? -1 : 0;
@@ -71,7 +66,6 @@
         };
     }
 
-    // Klucz-aware: dźwięk zgodny z tonacją nie potrzebuje żadnego znaku.
     function accidentalTag(note, keyFifths) {
         const keyAlter = keySignatureAlter(note.letter, keyFifths);
         if (note.alter === keyAlter) return '';
@@ -129,8 +123,8 @@
     const dictationSources = {};
 
     let activeDictation = null;
-    let editableState = {};      // { flatIndex: {step, alter} }, względem pierwszego dźwięku
-    let editableIndices = [];    // [1, 2, ..., N-1]
+    let editableState = {};
+    let editableIndices = [];
     let cursorPos = 0;
     let feedbackColors = null;
 

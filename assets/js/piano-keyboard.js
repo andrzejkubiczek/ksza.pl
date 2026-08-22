@@ -1,16 +1,10 @@
-/* ksza.pl - statyczna klawiatura fortepianu (pomoc do liczenia całych/półtonów).
-   Bez numeracji oktaw - powtórzenie liter jest celowe. Montuje się sama
-   w każdym ".piano-keyboard-mount" na stronie. */
 (() => {
     const WHITE_KEY_WIDTH = 46;
     const WHITE_KEY_HEIGHT = 170;
     const BLACK_KEY_WIDTH = 28;
 
-    // Razkreślna (c-h) + dwukreślna do f
     const WHITE_LETTERS = ['c', 'd', 'e', 'f', 'g', 'a', 'h', 'c', 'd', 'e', 'f'];
 
-    // Krzyżyk i bemol na każdym czarnym klawiszu. Obniżone h w tej konwencji
-    // to zawsze samo "b" (nie "hes") - jedyny nieregularny przypadek.
     const BLACK_KEYS_AFTER = [
         { afterIndex: 0, sharp: 'cis', flat: 'des' },
         { afterIndex: 1, sharp: 'dis', flat: 'es' },

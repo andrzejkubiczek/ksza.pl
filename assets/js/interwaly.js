@@ -1,4 +1,3 @@
-/* ksza.pl - trener interwałów */
 (() => {
     const notesArray = [
         'C3', 'C#3', 'D3', 'D#3', 'E3', 'F3', 'F#3', 'G3', 'G#3', 'A3', 'A#3', 'B3',
@@ -14,13 +13,13 @@
         { semitones: 12, symbol: '8' }
     ];
 
-    const BASE_NOTE_DURATION = 0.9375;        // 0.75 * 1.25 - wolniej o 25% (I stopień, młodsze dzieci)
-    const BASE_GAP_BEFORE_SECOND = 1.1875;    // 0.95 * 1.25
-    const BASE_SECOND_NOTE_DURATION = 1.75;   // 1.4 * 1.25
-    const BASE_HARMONIC_DURATION = 1.75;      // czas trwania obu dźwięków granych razem (tryb harmoniczny/mieszany)
-    const BASE_MIXED_GAP = 1.0;               // cisza między częścią melodyczną a harmoniczną w trybie mieszanym
+    const BASE_NOTE_DURATION = 0.9375;
+    const BASE_GAP_BEFORE_SECOND = 1.1875;
+    const BASE_SECOND_NOTE_DURATION = 1.75;
+    const BASE_HARMONIC_DURATION = 1.75;
+    const BASE_MIXED_GAP = 1.0;
 
-    const ARRAY_BASE_SEMITONE = KszaInstrumentRange.toSemitone(notesArray[0]); // C3
+    const ARRAY_BASE_SEMITONE = KszaInstrumentRange.toSemitone(notesArray[0]);
 
     let currentInterval = null;
     let firstNoteName = '';

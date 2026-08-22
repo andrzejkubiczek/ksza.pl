@@ -1,6 +1,3 @@
-/* ksza.pl - dyktanda muzyczne (puzzle), ze słuchu.
-   Lista dyktand: ../dyktanda/puzzle/puzzle.json (manifest - patrz opis.txt).
-   Silnik: assets/js/puzzle-engine.js. */
 (() => {
     KszaPuzzleEngine.init({
         notation: false,

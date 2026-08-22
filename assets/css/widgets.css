@@ -1,8 +1,3 @@
-/* ============================================================
-   ksza.pl - wspólne style widżetów ćwiczeń
-   (trener interwałów, trener gam, dyktanda-puzzle, pamięć itp.)
-   ============================================================ */
-
 .widget {
     font-family: var(--font-body);
     color: var(--ink);
@@ -28,7 +23,6 @@
     margin: 0;
 }
 
-/* ---------- Selektory (instrument / dyktando) ---------- */
 .controls-row {
     display: flex;
     gap: 12px;
@@ -87,7 +81,6 @@
     background: var(--key-hover);
 }
 
-/* ---------- Suwak tempa ---------- */
 .field.tempo-field {
     display: flex;
     flex-direction: column;
@@ -151,7 +144,6 @@
     cursor: pointer;
 }
 
-/* ---------- Status / komunikaty ---------- */
 .status-line {
     min-height: 20px;
     font-size: 0.82rem;
@@ -164,7 +156,6 @@
     font-weight: 600;
 }
 
-/* ---------- Przyciski odtwarzania ---------- */
 .player-controls {
     margin: 20px 0 24px;
     display: flex;
@@ -267,7 +258,6 @@
     border-radius: 1px;
 }
 
-/* ---------- Informacja zwrotna ---------- */
 .feedback-msg {
     min-height: 26px;
     font-weight: 600;
@@ -279,7 +269,6 @@
 .feedback-msg.feedback-wrong   { color: var(--coral); }
 .feedback-msg.feedback-partial { color: var(--coral); }
 
-/* ---------- Trener interwałów: siatka odpowiedzi ---------- */
 .intervals-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -328,7 +317,6 @@
     cursor: not-allowed;
 }
 
-/* ---------- Trener gam: lista odpowiedzi ---------- */
 .scale-choices {
     display: flex;
     flex-direction: column;
@@ -372,7 +360,6 @@
     color: var(--coral);
 }
 
-/* ---------- Dyktanda: puzzle ---------- */
 .puzzle-list {
     list-style: none;
     margin: 0 0 20px;
@@ -511,7 +498,6 @@
     margin-bottom: 8px;
 }
 
-/* ---------- Zakładki podstron (np. "Ze słuchu" / "Zapis nutowy") ---------- */
 .subnav {
     display: flex;
     justify-content: center;
@@ -541,14 +527,12 @@
     border-color: var(--ink);
 }
 
-/* ---------- Trener interwałów: zadanie (tekst polecenia) ---------- */
 .task-line {
     font-size: 1.05rem;
     font-weight: 600;
     margin: 4px 0 18px;
 }
 
-/* ---------- Trener interwałów: panel budowania nuty ---------- */
 .note-builder {
     display: flex;
     flex-direction: column;
@@ -642,7 +626,6 @@
     cursor: not-allowed;
 }
 
-/* ---------- Notacja (Verovio) ---------- */
 .notation-container {
     background: var(--key);
     border: 1px solid var(--border);
@@ -661,7 +644,7 @@
     height: auto;
 }
 
-/* Kolorowanie pojedynczych nut po "Sprawdź" (dyktando wysokościowe) */
+/* Klasy feedbacku nanoszone dynamicznie na elementy SVG wyrenderowane przez Verovio */
 .notation-container g.note.note-feedback-correct,
 .notation-container g.note.note-feedback-correct * {
     fill: var(--green) !important;
@@ -695,7 +678,6 @@
     margin: -14px 0 18px;
 }
 
-/* ---------- Klawiatura fortepianu (statyczna) ---------- */
 .piano-keyboard-wrap {
     margin: 0 0 22px;
 }
@@ -764,7 +746,6 @@
     color: #fdfbf6;
 }
 
-/* ---------- Pamięć melodyczna: klawiatura interaktywna ---------- */
 .echo-keyboard-wrap {
     margin: 0 0 22px;
     overflow-x: auto;
@@ -825,7 +806,6 @@
     opacity: 0.55;
 }
 
-/* ---------- Pamięć melodyczna: ślad odpowiedzi ---------- */
 .answer-trail {
     display: flex;
     gap: 8px;

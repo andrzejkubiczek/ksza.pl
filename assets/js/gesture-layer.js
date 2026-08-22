@@ -1,7 +1,3 @@
-/* ksza.pl - wspólna obsługa gestu nad zapisem nutowym: przeciągnięcie
-   góra/dół = krok o literę, stuknięcie bez przesunięcia = zmiana znaku.
-   Przesunięcie WZGLĘDNE (co ile pikseli = jeden krok), bo Verovio przerysowuje
-   nuty od zera i nie znamy ich dokładnej pozycji na ekranie. */
 window.KszaGestureLayer = {
     setup(layerId, handlers) {
         const layer = document.getElementById(layerId);

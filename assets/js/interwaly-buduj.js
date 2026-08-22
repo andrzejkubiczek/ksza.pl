@@ -1,8 +1,3 @@
-/* ksza.pl - interwały: budowanie zapisu nutowego.
-   Odwrotność "zapis nutowy": tu uczeń buduje interwał - strzałkami przesuwa
-   literę drugiego dźwięku i osobno ustawia znak chromatyczny (♭/♮/♯, świadomie
-   tylko 3 stany - sprawdzone, że przy dozwolonych kombinacjach nigdy nie
-   trzeba podwójnego znaku). */
 (() => {
     const MT = KszaMusicTheory;
 
@@ -46,11 +41,11 @@
     }
 
     let currentSymbol = null;
-    let direction = 1;     // 1 = w górę, -1 = w dół
+    let direction = 1;
     let rootNote = null;
     let clef = 'treble';
-    let builderStep = 0;   // względem rootNote: 0 = ta sama litera .. +-7 = oktawa
-    let builderAlter = 0;  // -1 bemol, 0 naturalny, 1 krzyżyk
+    let builderStep = 0;
+    let builderAlter = 0;
     let hasAnswered = false;
 
     const TREBLE_ROOT_OCTAVE = 4;
@@ -81,8 +76,6 @@
         if (letterUp) letterUp.disabled = hasAnswered || builderStep === bounds.max;
     }
 
-    // Poziom 2: dźwięk startowy może być chromatyczny, ale tylko gdy wynikowy
-    // drugi dźwięk zmieści się w -1..1 (naturalny jest zawsze bezpieczny).
     function pickRootAlter(letter, symbol, dir) {
         const safeAlters = [-1, 0, 1].filter((alter) => {
             const probe = { letter, alter, octave: TREBLE_ROOT_OCTAVE };

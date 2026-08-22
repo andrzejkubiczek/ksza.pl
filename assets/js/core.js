@@ -1,5 +1,3 @@
-/* ksza.pl - wspólny rdzeń audio (Tone.js). Wymaga PRZED tym plikiem: Tone.js,
-   assets/vendor/Tonejs-Instruments.js, window.KSZA_SAMPLES_BASE. */
 window.KszaAudio = (() => {
     const samplerCache = {};
     let currentSampler = null;
@@ -24,14 +22,11 @@ window.KszaAudio = (() => {
         if (!audioStarted) {
             try {
                 await Tone.start();
-            } catch (e) {
-                /* Wymaga gestu użytkownika */
-            }
+            } catch (e) {}
             audioStarted = true;
         }
     }
 
-    // Wspólny łańcuch: highpass (tnie dudnienie) -> pogłos -> limiter, plus obniżona głośność bazowa.
     async function getEffectsChain() {
         if (!effectsChainPromise) {
             effectsChainPromise = (async () => {
@@ -39,7 +34,7 @@ window.KszaAudio = (() => {
 
                 const limiter = new Tone.Limiter(-6).toDestination();
                 const reverb = new Tone.Reverb({ decay: 1.2, wet: 0.16, preDelay: 0.01 }).connect(limiter);
-                await reverb.ready; // Tone.Reverb jest asynchroniczny
+                await reverb.ready;
                 const highpass = new Tone.Filter({ frequency: 100, type: 'highpass', rolloff: -24 }).connect(reverb);
 
                 return highpass;
@@ -57,7 +52,6 @@ window.KszaAudio = (() => {
         ]);
     }
 
-    /** Ładuje instrument (z cache jeśli już pobrany). onStateChange(state, message). */
     async function loadInstrument(name, onStateChange = () => {}) {
         if (samplerCache[name]) {
             currentSampler = samplerCache[name];
@@ -85,7 +79,7 @@ window.KszaAudio = (() => {
                             resolve(instrument);
                         }
                     });
-                    // Nie wszystkie wersje SampleLibrary wspierają onload - fallback na Tone.loaded().
+                    // Fallback na Tone.loaded() dla wersji SampleLibrary bez wsparcia onload
                     Tone.loaded().then(() => {
                         if (settled) return;
                         settled = true;
@@ -126,14 +120,10 @@ window.KszaAudio = (() => {
         if (currentSampler) {
             try {
                 currentSampler.releaseAll(Tone.now());
-            } catch (e) {
-                /* Nic nie grało */
-            }
+            } catch (e) {}
         }
     }
 
-    // Klik metronomu (odliczenie taktu przed pełnym odsłuchem) - osobny
-    // syntezator, niezależny od wybranego instrumentu.
     let clickSynth = null;
     function getClickSynth() {
         if (!clickSynth) {
@@ -161,9 +151,6 @@ window.KszaAudio = (() => {
     };
 })();
 
-// Wspólne tempo (suwak 50%-150%). 1.0 = normalna prędkość. Resetuje się do
-// 100% przy każdym wejściu na stronę - ćwiczenia zbyt się różnią, żeby
-// jedno zapamiętane tempo miało sens między nimi.
 window.KszaTempo = (() => {
     const DEFAULT = 1.0;
     let current = DEFAULT;
@@ -179,7 +166,6 @@ window.KszaTempo = (() => {
     };
 })();
 
-// Zakres brzmieniowy każdego instrumentu - żeby losowe ćwiczenia nie prosiły np. fagotu o dźwięk poza jego skalą.
 window.KszaInstrumentRange = (() => {
     const CHROMATIC = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
@@ -204,7 +190,6 @@ window.KszaInstrumentRange = (() => {
         return `${CHROMATIC[pc]}${octave}`;
     }
 
-    // {min, max} jako absolutne półtony; nieznany instrument -> zakres fortepianu.
     function range(instrumentKey) {
         const r = RANGES[instrumentKey] || RANGES.piano;
         return { min: toSemitone(r.min), max: toSemitone(r.max) };
@@ -214,7 +199,6 @@ window.KszaInstrumentRange = (() => {
         return fromSemitone(toSemitone(name) + octaveShift * 12);
     }
 
-    // Przesuwa wszystkie dźwięki o tyle samo oktaw, żeby zmieściły się w zakresie instrumentu; 0, gdy już się mieszczą.
     function fitOctaveShift(noteNames, instrumentKey) {
         const r = range(instrumentKey);
         const semis = noteNames.map(toSemitone);
@@ -244,15 +228,12 @@ window.KszaInstrumentRange = (() => {
     };
 })();
 
-/* Nawigacja mobilna + suwak tempa + stopka - wspólne dla wszystkich stron. */
 document.addEventListener('DOMContentLoaded', () => {
-    // Aktualizacja roku w stopce (jeśli element istnieje)
     const footerYear = document.getElementById('footer-year');
     if (footerYear) {
         footerYear.textContent = new Date().getFullYear();
     }
 
-    // Menu mobilne
     const toggle = document.querySelector('.nav-toggle');
     const nav = document.querySelector('.site-nav');
     if (toggle && nav) {
@@ -262,7 +243,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Suwak tempa
     const slider = document.getElementById('tempo-slider');
     const valueLabel = document.getElementById('tempo-value');
     if (slider) {

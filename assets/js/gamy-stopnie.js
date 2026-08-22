@@ -1,6 +1,3 @@
-/* ksza.pl - stopnie gamy (solmizacja).
-   Gra gamę w górę (kontekst tonalny), potem jeden dźwięk z tej gamy -
-   uczeń wskazuje, który to stopień (1-8). */
 (() => {
     const ST = KszaScaleTonics;
     const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
@@ -18,7 +15,7 @@
     let currentScaleType = null;
     let currentTonic = null;
     let currentTonicOctave = 4;
-    let currentDegreeIndex = 0; // 0-7 -> stopień 1-8
+    let currentDegreeIndex = 0;
     let currentNoteNames = [];
     let hasAnswered = false;
     let isPlaying = false;

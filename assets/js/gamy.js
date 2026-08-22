@@ -1,4 +1,3 @@
-/* ksza.pl - trener odmian gam */
 (() => {
     const ST = KszaScaleTonics;
 
@@ -10,10 +9,10 @@
         { key: 'melodyczna',  label: 'Molowa melodyczna',  tonics: ST.MINOR_TONICS, up: [0, 2, 3, 5, 7, 9, 11, 12], down: [12, 10, 8, 7, 5, 3, 2, 0] }
     ];
 
-    const BASE_NOTE_DURATION = 0.425;        // 0.34 * 1.25 - wolniej o 25% (I stopień, młodsze dzieci)
-    const BASE_TURNAROUND_DURATION = 0.6875; // 0.55 * 1.25
-    const BASE_TURNAROUND_GAP = 0.225;       // 0.18 * 1.25
-    const TURNAROUND_INDEX = 7;              // pozycja punktu zwrotnego (sekwencja: 8 + 7 nut)
+    const BASE_NOTE_DURATION = 0.425;
+    const BASE_TURNAROUND_DURATION = 0.6875;
+    const BASE_TURNAROUND_GAP = 0.225;
+    const TURNAROUND_INDEX = 7;
     const DIRECTIONS = ['up-down', 'down-up'];
 
     let currentScaleType = null;

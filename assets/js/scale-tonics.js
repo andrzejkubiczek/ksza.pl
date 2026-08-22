@@ -1,7 +1,6 @@
-/* ksza.pl - wspólne toniki gam + budowanie nut od toniki. Używane przez gamy.js i gamy-stopnie.js. */
 window.KszaScaleTonics = (() => {
     const CHROMATIC = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-    const TONIC_OCTAVE_OPTIONS = [3, 4]; // awaryjne, patrz pickTonicOctave
+    const TONIC_OCTAVE_OPTIONS = [3, 4];
 
     const MAJOR_TONICS = [
         { name: 'C-dur', pc: 0 }, { name: 'G-dur', pc: 7 }, { name: 'D-dur', pc: 2 },
@@ -21,8 +20,6 @@ window.KszaScaleTonics = (() => {
         return `${CHROMATIC[pc]}${octave}`;
     }
 
-    // Oktawa toniki tak, by cała gama zmieściła się w zakresie instrumentu;
-    // gdy żadna nie pasuje w całości, bierzemy tę z najmniejszym przekroczeniem.
     function pickTonicOctave(tonicPc, maxOffset, instrumentKey) {
         const range = KszaInstrumentRange.range(instrumentKey);
         const candidates = [];

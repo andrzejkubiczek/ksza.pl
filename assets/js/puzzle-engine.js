@@ -1,10 +1,5 @@
-/* ksza.pl - wspólny silnik puzzli z taktami: parsowanie MusicXML, odtwarzanie
-   (proste i pełne, z pauzą), tasowanie i sprawdzanie kolejności. Używany przez
-   puzzle.js, puzzle-zapis.js, rytm.js, rytm-zapis.js - różni je tylko
-   manifest, teksty komunikatów i to, czy każdy takt jest też rysowany
-   (notation: true) przez Verovio (KszaVerovio). */
 window.KszaPuzzleEngine = (() => {
-    const TEMPO_SLOWDOWN = 1.25; // I stopień, młodsze dzieci - wolniej niż tempo w pliku
+    const TEMPO_SLOWDOWN = 1.25;
 
     function parseMusicXML(xmlText, notation, minFragmentsMessage, rhythmStaff) {
         const parser = new DOMParser();
@@ -20,8 +15,6 @@ window.KszaPuzzleEngine = (() => {
 
         const measureEls = Array.from(part.querySelectorAll('measure'));
 
-        // Metrum czytane zawsze (nie tylko przy notation:true) - potrzebne też
-        // do odliczenia taktu metronomem przed pełnym odsłuchem.
         const firstAttrs = measureEls.length ? measureEls[0].querySelector('attributes') : null;
         const attrText = (selector, fallback) => {
             const el = firstAttrs ? firstAttrs.querySelector(selector) : null;
@@ -29,13 +22,9 @@ window.KszaPuzzleEngine = (() => {
         };
         const meterBeats = parseInt(attrText('time beats', '4'), 10) || 4;
 
-        // Nagłówek każdego taktu-fragmentu (notation:true): ten sam klucz/metrum/
-        // tonacja co cały utwór, żeby żaden fragment nie zdradzał, który jest
-        // naprawdę pierwszy w kolejności.
         let notationHeaderXml = '';
         if (notation) {
             if (rhythmStaff) {
-                // Rytm: bez klucza/tonacji, samo metrum, 1 linia + klucz perkusyjny.
                 notationHeaderXml = `<attributes><divisions>${attrText('divisions', '1')}</divisions><time><beats>${attrText('time beats', '4')}</beats><beat-type>${attrText('time beat-type', '4')}</beat-type></time><clef><sign>percussion</sign></clef><staff-details><staff-lines>1</staff-lines></staff-details></attributes>`;
             } else {
                 notationHeaderXml = `<attributes><divisions>${attrText('divisions', '1')}</divisions><key><fifths>${attrText('key fifths', '0')}</fifths></key><time><beats>${attrText('time beats', '4')}</beats><beat-type>${attrText('time beat-type', '4')}</beat-type></time><clef><sign>${attrText('clef sign', 'G')}</sign><line>${attrText('clef line', '2')}</line></clef></attributes>`;
@@ -102,6 +91,7 @@ window.KszaPuzzleEngine = (() => {
                 if (notation) {
                     const noteXmls = noteEls.map((n) => {
                         if (!rhythmStaff) return serializer.serializeToString(n);
+                        // Przy kluczu perkusyjnym Verovio wymaga stałej wysokości E4 do wyrenderowania na 1 linii
                         const clone = n.cloneNode(true);
                         const pitchEl = clone.querySelector('pitch');
                         if (pitchEl) {

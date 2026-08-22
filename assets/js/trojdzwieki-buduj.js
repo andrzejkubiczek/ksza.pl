@@ -1,7 +1,3 @@
-/* ksza.pl - trójdźwięki: budowanie zapisu nutowego.
-   Bas jest dany, uczeń ustawia pozostałe dwa dźwięki - kursor "Poprzednia/
-   Następna nuta" wybiera KTÓRY, te same strzałki i przełącznik ♭/♮/♯ działają
-   na aktualnie wybranym (stan każdego pamiętany osobno). */
 (() => {
     const MT = KszaMusicTheory;
 

@@ -1,10 +1,8 @@
-/* ksza.pl - trener trójdźwięków */
 (() => {
     const CHROMATIC = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-    const BASS_OCTAVE_OPTIONS = [3, 4]; // mała/razkreślna - awaryjny zestaw, gdy zakres instrumentu jest za wąski
+    const BASS_OCTAVE_OPTIONS = [3, 4];
 
-    // Offsety liczone od NAJNIŻSZEGO granego dźwięku (basu danej postaci), nie od
-    // "prymy" akordu - nie trzeba śledzić harmonicznego prymu, liczy się struktura.
+    // Offsety liczone od najniższego granego dźwięku (basu postaci akordu)
     const TRIAD_TYPES = [
         { key: 'durowy_z',     label: 'Durowy',                 offsets: [0, 4, 7], level: 1 },
         { key: 'molowy_z',     label: 'Molowy',                 offsets: [0, 3, 7], level: 1 },
@@ -16,11 +14,11 @@
         { key: 'molowy_5',     label: 'Molowy - II przewrót',   offsets: [0, 5, 8], level: 2 }
     ];
 
-    const BASE_NOTE_DURATION = 0.9375;        // pojedynczy dźwięk w części melodycznej
-    const BASE_GAP_BETWEEN_NOTES = 1.1875;    // odstęp między startami kolejnych dźwięków (melodycznie)
-    const BASE_FINAL_NOTE_DURATION = 1.75;    // ostatni dźwięk części melodycznej - trzymany dłużej
-    const BASE_HARMONIC_DURATION = 1.75;      // wszystkie dźwięki grane razem
-    const BASE_MIXED_GAP = 1.0;               // cisza między częścią melodyczną a harmoniczną (tryb mieszany)
+    const BASE_NOTE_DURATION = 0.9375;
+    const BASE_GAP_BETWEEN_NOTES = 1.1875;
+    const BASE_FINAL_NOTE_DURATION = 1.75;
+    const BASE_HARMONIC_DURATION = 1.75;
+    const BASE_MIXED_GAP = 1.0;
 
     let currentTriadType = null;
     let currentNotes = [];

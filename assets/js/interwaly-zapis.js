@@ -1,6 +1,3 @@
-/* ksza.pl - interwały: rozpoznawanie zapisu nutowego.
-   Czysto wzrokowe ćwiczenie (bez dźwięku) - pisownia enharmoniczna zgodna z
-   zapisem (np. tercja mała od C to Es, nie Dis). */
 (() => {
     const MT = KszaMusicTheory;
 

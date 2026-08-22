@@ -1,11 +1,8 @@
-/* ksza.pl - wspólna inicjalizacja i renderowanie Verovio.
-   Używane przez każde ćwiczenie z zapisem nutowym. */
 window.KszaVerovio = (() => {
     let toolkit = null;
     let readyPromise = null;
 
-    // onRuntimeInitialized czasem nie odpala się w porę - zabezpieczenie
-    // potrójne: próba od razu, oficjalny callback, odpytywanie co 50ms.
+    // Potrójne zabezpieczenie inicjalizacji: sprawdzenie natychmiastowe, callback onRuntimeInitialized, polling co 50ms
     function ensureReady() {
         if (readyPromise) return readyPromise;
         readyPromise = new Promise((resolve, reject) => {
@@ -19,14 +16,12 @@ window.KszaVerovio = (() => {
                 if (settled) return;
                 try {
                     toolkit = new verovio.toolkit();
-                    toolkit.setOptions({ font: 'Leland' }); // domyślna czcionka Verovio to Leipzig
+                    toolkit.setOptions({ font: 'Leland' });
                     settled = true;
                     clearInterval(pollId);
                     clearTimeout(timeoutId);
                     resolve();
-                } catch (e) {
-                    /* Moduł jeszcze nie gotowy - kolejna próba nastąpi wkrótce */
-                }
+                } catch (e) {}
             };
 
             verovio.module.onRuntimeInitialized = tryInit;

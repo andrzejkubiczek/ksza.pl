@@ -1,8 +1,3 @@
-/* ksza.pl - rytmy (puzzle), ze słuchu.
-   Odwrotność dyktanda: stała wysokość dźwięku, zmienny rytm.
-   Lista rytmów: ../dyktanda/rytm/rytm.json (manifest - patrz opis.txt).
-   Zawsze ksylofon - najlepiej oddaje rytm, bez wyboru instrumentu.
-   Silnik: assets/js/puzzle-engine.js. */
 (() => {
     KszaPuzzleEngine.init({
         notation: false,

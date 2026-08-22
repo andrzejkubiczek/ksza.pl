@@ -1,8 +1,3 @@
-/* ksza.pl - pamięć melodyczna: usłysz krótką melodię, powtórz ją klikając
-   klawisze. Klawiatura pokazuje zawsze tę samą oktawę (C4-C5) - poziom
-   zmienia tylko pulę dźwięków, z której losuje się melodia, i jej długość.
-   Sprawdzanie NIE blokuje niczego - jak w dyktandzie wysokościowym, uczeń
-   czyści odpowiedź i próbuje ponownie, bez losowania nowej melodii. */
 (() => {
     const WHITE_NOTES = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'];
     const CHROMATIC_NOTES = ['C4', 'C#4', 'D4', 'D#4', 'E4', 'F4', 'F#4', 'G4', 'G#4', 'A4', 'A#4', 'B4', 'C5'];
@@ -25,8 +20,8 @@
         '5': { pool: CHROMATIC_NOTES, length: 6 }
     };
 
-    const REFERENCE_NOTE = 'A4'; // a1 = 440 Hz, dźwięk odniesienia przed KAŻDYM odtworzeniem
-    const REFERENCE_DURATION = 1.5; // cała nuta - ma pełnie wybrzmieć, bez ucinania
+    const REFERENCE_NOTE = 'A4'; // a1 = 440 Hz
+    const REFERENCE_DURATION = 1.5;
     const REFERENCE_GAP = 0.7;
     const BASE_NOTE_DURATION = 0.85;
     const CLICK_DURATION = 0.45;
@@ -57,7 +52,6 @@
     const ensureInstrumentReady = async () =>
         KszaAudio.ensureReady(document.getElementById('instrument-select'), onAudioState);
 
-    /* ---------- Klawiatura ---------- */
     function buildKeyboardHtml() {
         const totalWidth = WHITE_NOTES.length * WHITE_KEY_WIDTH;
         let whiteHtml = '';
@@ -77,7 +71,6 @@
         return `<div class="echo-keyboard" style="width:${totalWidth}px;height:${WHITE_KEY_HEIGHT}px;">${whiteHtml}${blackHtml}</div>`;
     }
 
-    /* ---------- Ślad odpowiedzi ---------- */
     function renderTrail() {
         const trail = document.getElementById('answer-trail');
         if (!trail) return;
@@ -89,7 +82,6 @@
         }
     }
 
-    /* ---------- Generowanie melodii ---------- */
     function generateSequence() {
         const level = currentLevel();
         const seq = [];
@@ -114,7 +106,6 @@
         renderTrail();
     }
 
-    /* ---------- Odtwarzanie melodii ---------- */
     function stopScheduled() {
         scheduledTimeouts.forEach((id) => clearTimeout(id));
         scheduledTimeouts = [];
@@ -139,7 +130,6 @@
         const noteDuration = BASE_NOTE_DURATION / speed;
         const melodyStart = referenceDuration + referenceGap;
 
-        // Dźwięk odniesienia gra pełną długość, bez ucinania - ma wybrzmieć
         const refId = setTimeout(() => {
             if (KszaAudio.player) KszaAudio.player.play(REFERENCE_NOTE, undefined, { duration: referenceDuration });
         }, 0);
@@ -160,7 +150,6 @@
         scheduledTimeouts.push(endId);
     }
 
-    /* ---------- Odpowiedź ucznia ---------- */
     async function handleKeyClick(note) {
         if (userSequence.length >= targetSequence.length) return;
         const ok = await ensureInstrumentReady();

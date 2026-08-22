@@ -1,6 +1,3 @@
-/* ksza.pl - rytmy (puzzle), zapis nutowy. Ta sama lista i pliki co wersja
-   "ze słuchu", dodatkowo każdy takt jest rysowany (bez klucza/tonacji, patrz
-   rhythmStaff w puzzle-engine.js). Zawsze ksylofon, bez wyboru instrumentu. */
 (() => {
     KszaPuzzleEngine.init({
         notation: true,
