@@ -384,3 +384,34 @@ input:focus-visible {
     margin-top: 4px;
     font-size: 0.85em;
 }
+
+@media (max-width: 600px) {
+    .container {
+        padding: 0 16px;
+    }
+    .hero {
+        padding: 28px 0 8px;
+    }
+    .hero .eyebrow {
+        margin-bottom: 8px;
+    }
+    .exercise-grid {
+        margin: 20px 0 32px;
+        gap: 10px;
+    }
+    .exercise-card {
+        padding: 14px 12px;
+    }
+    .exercise-page {
+        padding: 18px 0 36px;
+    }
+    .page-content {
+        padding: 20px 0 36px;
+    }
+    .page-content .card {
+        padding: 22px 18px;
+    }
+    .site-footer {
+        padding: 20px 0 18px;
+    }
+}

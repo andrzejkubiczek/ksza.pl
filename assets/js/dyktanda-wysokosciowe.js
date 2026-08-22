@@ -229,6 +229,23 @@
         setAccidental(current === 0 ? 1 : current === 1 ? -1 : 0);
     }
 
+    function getActiveInstrumentKey() {
+        const el = document.getElementById('instrument-select');
+        return el ? el.value : 'piano';
+    }
+
+    function getOctaveShift() {
+        if (!activeDictation || typeof KszaInstrumentRange === 'undefined') return 0;
+        const allTones = activeDictation.notes.map(noteToToneName);
+        return KszaInstrumentRange.fitOctaveShift(allTones, getActiveInstrumentKey());
+    }
+
+    function adaptPitch(pitch) {
+        if (!pitch || typeof KszaInstrumentRange === 'undefined') return pitch;
+        const shift = getOctaveShift();
+        return shift !== 0 ? KszaInstrumentRange.transposeNoteName(pitch, shift) : pitch;
+    }
+
     const BASE_NOTE_DURATION = 0.75;
     let scheduledTimeouts = [];
     let isPlaying = false;
@@ -254,7 +271,10 @@
         const noteDuration = BASE_NOTE_DURATION / KszaTempo.get();
         activeDictation.notes.forEach((note, i) => {
             const id = setTimeout(() => {
-                if (KszaAudio.player) KszaAudio.player.play(noteToToneName(note), undefined, { duration: noteDuration * 0.92 });
+                if (KszaAudio.player) {
+                    const adapted = adaptPitch(noteToToneName(note));
+                    KszaAudio.player.play(adapted, undefined, { duration: noteDuration * 0.92 });
+                }
             }, i * noteDuration * 1000);
             scheduledTimeouts.push(id);
         });
