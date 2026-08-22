@@ -4,4 +4,3 @@ dist/
 .astro/
 .env
 .env.*
-_legacy/

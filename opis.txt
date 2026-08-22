@@ -27,32 +27,35 @@ B. Próbki audio (assets/audio/):
    - assets/audio/bassoon/  (10 próbek MP3)
 
 C. Publikacja:
-   Wgraj całą zawartość repozytorium do katalogu głównego serwera HTTP
-   (np. Apache, Nginx, GitHub Pages, Netlify). Nie jest wymagana żadna
-   instalacja ani konfiguracja po stronie serwera.
+   Wgraj zawartość folderu "dist/" (powstałego po poleceniu npm run build)
+   do katalogu głównego serwera HTTP (np. Apache, Nginx, GitHub Pages, Netlify).
+   Nie jest wymagana żadna instalacja ani konfiguracja po stronie serwera.
 
 
 2. ARCHITEKTURA I STRUKTURA KATALOGÓW
 
-index.html, o-projekcie.html   - strony ogólne i informacyjne
-cwiczenia/*.html               - dedykowane strony dla każdego wariantu ćwiczenia
-assets/css/site.css            - globalne style, layout, motyw "Kontrastowe karty", RWD
-assets/css/widgets.css         - style widżetów ćwiczeń, notacji Verovio, klawiatur
-assets/audio/                  - lokalne próbki akustyczne orkiestry Versilian VSCO2
-assets/vendor/smplr.js         - silnik samplera Web Audio API
-assets/js/core.js              - moduł audio (KszaAudio), tempo, zakresy instrumentów
-assets/js/music-theory.js      - drabina diatoniczna, enharmonia, generator MusicXML
-assets/js/verovio-render.js    - asynchroniczny silnik renderowania nut SVG (Leland font)
-assets/js/gesture-layer.js     - obsługa gestów Pointer Events (przeciąganie/tap)
-assets/js/puzzle-engine.js     - uniwersalny silnik układanek (MusicXML, metronom, SortableJS)
-assets/js/scale-tonics.js      - toniki gam, algorytm doboru oktawy instrumentu
-assets/js/klasa-filter.js      - filtr klasowy (kolejność dydaktyczna: IV/6 - IV/4)
-assets/js/piano-keyboard.js    - statyczna klawiatura pomocnicza (białe/czarne klawisze)
-assets/js/*.js (reszta)        - kontrolery logiki poszczególnych ćwiczeń
-dyktanda/puzzle/               - manifest (puzzle.json) i pliki MusicXML dyktand-puzzle
-dyktanda/wysokosciowe/         - manifest (dyktanda.json) i pliki dyktand wysokościowych
-dyktanda/rytm/                 - manifest (rytm.json) i pliki rytmów-puzzle
-update-nav.py                  - generator menu nawigacyjnego dla wszystkich podstron
+src/layouts/Layout.astro       - główny szablon layoutu (head, fonts, motyw, RWD)
+src/components/*.astro         - komponenty (NavMenu, SubNav, Footer)
+src/pages/index.astro          - strona główna (Start)
+src/pages/o-projekcie.astro    - strona informacyjna o projekcie
+src/pages/cwiczenia/*.astro    - dedykowane strony ćwiczeń
+public/assets/css/site.css     - globalne style, layout, motyw "Kontrastowe karty", RWD
+public/assets/css/widgets.css  - style widżetów ćwiczeń, notacji Verovio, klawiatur
+public/assets/audio/           - lokalne próbki akustyczne orkiestry Versilian VSCO2
+public/assets/vendor/smplr.js  - silnik samplera Web Audio API
+public/assets/js/core.js       - moduł audio (KszaAudio), tempo, rejestry instrumentów
+public/assets/js/music-theory.js - drabina diatoniczna, enharmonia, generator MusicXML
+public/assets/js/verovio-render.js - asynchroniczny silnik renderowania nut SVG (Leland font)
+public/assets/js/gesture-layer.js - obsługa gestów Pointer Events (przeciąganie/tap)
+public/assets/js/puzzle-engine.js - uniwersalny silnik układanek (MusicXML, metronom, SortableJS)
+public/assets/js/scale-tonics.js - toniki gam, algorytm doboru oktawy instrumentu
+public/assets/js/klasa-filter.js - filtr klasowy (kolejność dydaktyczna: IV/6 - IV/4)
+public/assets/js/piano-keyboard.js - statyczna klawiatura pomocnicza (białe/czarne klawisze)
+public/assets/js/*.js (reszta) - kontrolery logiki poszczególnych ćwiczeń
+public/dyktanda/puzzle/        - manifest (puzzle.json) i pliki MusicXML dyktand-puzzle
+public/dyktanda/wysokosciowe/  - manifest (dyktanda.json) i pliki dyktand wysokościowych
+public/dyktanda/rytm/          - manifest (rytm.json) i pliki rytmów-puzzle
+dist/                          - folder wygenerowanych plików produkcyjnych (npm run build)
 
 
 3. ZASADY DZIAŁANIA POSZCZEGÓLNYCH ĆWICZEŃ
