@@ -32,21 +32,6 @@ dyktanda/wysokosciowe/          - dyktanda wysokościowe: manifest (dyktanda.jso
 dyktanda/rytm/                  - rytmy-puzzle: manifest (rytm.json) + pliki
 update-nav.py                  - generuje menu we wszystkich stronach naraz
 
-AKTUALNE USPRAWNIENIA TECHNICZNE
-
-W zmienionych stronach ćwiczeń wspólne skrypty audio, rdzeń aplikacji i
-aktualizacja roku mają atrybut defer. Dzięki temu ich pobieranie i wykonywanie
-nie blokuje początkowego renderowania dokumentu.
-
-Przyciski mobilnego menu mają jawny typ button oraz aria-label opisujący
-otwarcie menu. Jest to ważne zarówno dla poprawnego zachowania przycisku,
-jak i dla użytkowników czytników ekranu.
-
-Klawiatura w Pamięci melodycznej jest interaktywna i służy do powtarzania
-melodii. Klawiatury montowane przez piano-keyboard.js w ćwiczeniach zapisu
-nutowego i budowania interwałów/trójdźwięków pozostają wyłącznie wizualną
-pomocą do liczenia klawiszy.
-
 Dyktanda wysokościowe: cały utwór jedną wartością rytmiczną (liczy się
 tylko wysokość dźwięków). Rytm: odwrotnie - cały utwór jedną, stałą
 wysokością (liczy się tylko rytm), zawsze na ksylofonie. Zapis nutowy
@@ -64,11 +49,6 @@ klikając klawisze na klawiaturze (zawsze C4-C5, dowolny instrument z
 selektora), po dźwięku odniesienia a1 (440 Hz) granym przed każdym
 odtworzeniem. Poziom decyduje o puli dźwięków i długości melodii -
 stała LEVELS w assets/js/pamiec-melodyczna.js.
-
-Klawiatury pomocnicze montowane przez assets/js/piano-keyboard.js na
-stronach zapisu nutowego i budowania interwałów/trójdźwięków są tylko
-wizualną pomocą do liczenia całych tonów i półtonów. Nie odtwarzają
-dźwięku; interaktywna klawiatura dźwiękowa należy do Pamięci melodycznej.
 
 
 DODAWANIE NOWEGO DYKTANDA / RYTMU
