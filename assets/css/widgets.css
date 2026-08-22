@@ -858,12 +858,6 @@
         margin-bottom: 4px;
     }
     .field select {
-        padding: 8px 28px 8px 10px;
-        font-size: 0.84rem;
-        border-radius: 8px;
-    }
-    .field.tempo-field input[type="range"] {
-        height: 22px;
     }
     .player-controls {
         margin: 12px 0 14px;
