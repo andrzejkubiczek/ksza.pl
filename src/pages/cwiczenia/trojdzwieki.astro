@@ -1,0 +1,102 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SubNav from '../../components/SubNav.astro';
+
+const subNavItems = [
+  { label: 'Ze słuchu', href: 'trojdzwieki.html', active: true },
+  { label: 'Zapis nutowy', href: 'trojdzwieki-zapis.html' },
+  { label: 'Zbuduj trójdźwięk', href: 'trojdzwieki-buduj.html' },
+];
+---
+<Layout
+  title="Trójdźwięki - ksza.pl"
+  description="Ćwiczenie słuchowe: rozpoznawanie trójdźwięków w postaci zasadniczej i z przewrotami."
+  currentFamily="Trójdźwięki"
+  isRoot={false}
+  creditType="smplr"
+  includeWidgetsCss={true}
+>
+  <main>
+    <div class="container exercise-page">
+      <div class="widget">
+        <SubNav items={subNavItems} />
+        <div class="widget-header">
+          <h1>Rozpoznaj trójdźwięk</h1>
+          <p>Posłuchaj trójdźwięku i wybierz, jaki to rodzaj.<br><small>Na wyższym poziomie wskazujesz też, w jakiej jest postaci.</small></p>
+        </div>
+
+        <ul class="staff" aria-hidden="true"><li></li><li></li><li></li><li></li><li></li></ul>
+
+        <div class="controls-row">
+          <div class="field">
+            <label for="instrument-select">Instrument</label>
+            <div class="select-wrap">
+              <select id="instrument-select">
+                <option value="piano">Fortepian</option>
+                <option value="flute">Flet</option>
+                <option value="clarinet">Klarnet</option>
+                <option value="violin">Skrzypce</option>
+                <option value="xylophone">Ksylofon</option>
+                <option value="trumpet">Trąbka</option>
+                <option value="bassoon">Fagot</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="mode-select">Sposób grania</label>
+            <div class="select-wrap">
+              <select id="mode-select">
+                <option value="melodic">Melodycznie</option>
+                <option value="harmonic">Harmonicznie</option>
+                <option value="mixed">Mieszane</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="level-select">Poziom</label>
+            <div class="select-wrap">
+              <select id="level-select">
+                <option value="1">Postać zasadnicza (I-IV/6, I-II/4)</option>
+                <option value="2">Zasadnicza + przewroty (V-VI/6, III-IV/4)</option>
+              </select>
+            </div>
+          </div>
+          <div class="field tempo-field">
+            <label for="tempo-slider">Tempo <span id="tempo-value">100%</span></label>
+            <input type="range" id="tempo-slider" min="50" max="150" step="5" value="100">
+          </div>
+        </div>
+
+        <div id="status-line" class="status-line"></div>
+
+        <div class="player-controls">
+          <button id="play-btn" class="btn-primary">
+            <span class="play-icon" aria-hidden="true"></span>
+            <span>Odtwórz trójdźwięk</span>
+          </button>
+          <button id="next-btn" class="btn-dark" style="display:none;">Następny trójdźwięk →</button>
+        </div>
+
+        <div id="feedback" class="feedback-msg"></div>
+
+        <div class="intervals-grid" id="triad-grid">
+          <button class="interval-choice" data-key="durowy_z"><strong>+</strong><small>Durowy</small></button>
+          <button class="interval-choice" data-key="molowy_z"><strong>o</strong><small>Molowy</small></button>
+          <button class="interval-choice" data-key="zmniejszony"><strong>&gt;</strong><small>Zmniejszony</small></button>
+          <button class="interval-choice" data-key="zwiekszony"><strong>&lt;</strong><small>Zwiększony</small></button>
+          <button class="interval-choice level-2-only" data-key="durowy_3"><strong>+<sub>3</sub></strong><small>Durowy - I przewrót</small></button>
+          <button class="interval-choice level-2-only" data-key="durowy_5"><strong>+<sub>5</sub></strong><small>Durowy - II przewrót</small></button>
+          <button class="interval-choice level-2-only" data-key="molowy_3"><strong>o<sub>3</sub></strong><small>Molowy - I przewrót</small></button>
+          <button class="interval-choice level-2-only" data-key="molowy_5"><strong>o<sub>5</sub></strong><small>Molowy - II przewrót</small></button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Fragment slot="scripts">
+    <script is:inline src="../assets/vendor/smplr.js"></script>
+    <script is:inline src="../assets/js/core.js"></script>
+    <script is:inline src="../assets/js/trojdzwieki.js"></script>
+  </Fragment>
+</Layout>
+

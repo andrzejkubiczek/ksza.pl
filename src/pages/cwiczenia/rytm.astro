@@ -1,0 +1,88 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SubNav from '../../components/SubNav.astro';
+
+const subNavItems = [
+  { label: 'Ze słuchu', href: 'rytm.html', active: true },
+  { label: 'Zapis nutowy', href: 'rytm-zapis.html' },
+];
+---
+<Layout
+  title="Rytm - puzzle - ksza.pl"
+  description="Ćwiczenie: układanie potasowanych taktów rytmicznych we właściwej kolejności ze słuchu."
+  currentFamily="Rytm"
+  isRoot={false}
+  creditType="smplr"
+  includeWidgetsCss={true}
+>
+  <main>
+    <div class="container exercise-page">
+      <div class="widget">
+        <SubNav items={subNavItems} />
+        <div class="widget-header">
+          <h1>Rytm - puzzle</h1>
+          <p>Wysłuchaj rytmu, a potem ułóż jego potasowane fragmenty (takty) we właściwej kolejności.</p>
+        </div>
+
+        <ul class="staff" aria-hidden="true"><li></li><li></li><li></li><li></li><li></li></ul>
+
+        <div class="controls-row">
+          <div class="field">
+            <label for="klasa-select">Klasa</label>
+            <div class="select-wrap">
+              <select id="klasa-select"></select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="dictation-select">Rytm</label>
+            <div class="select-wrap">
+              <select id="dictation-select"></select>
+            </div>
+          </div>
+          <div class="field tempo-field">
+            <label for="tempo-slider">Tempo <span id="tempo-value">100%</span></label>
+            <input type="range" id="tempo-slider" min="50" max="150" step="5" value="100">
+          </div>
+        </div>
+
+        <div id="status-line" class="status-line"></div>
+
+        <div class="player-controls">
+          <button id="play-full-btn" class="btn-primary">
+            <span class="play-icon" aria-hidden="true"></span>
+            <span>Odtwórz cały rytm</span>
+          </button>
+          <button id="pause-btn" class="btn-primary" style="display:none;">
+            <span class="pause-icon" aria-hidden="true"></span>
+            <span>Pauza</span>
+          </button>
+          <button id="resume-btn" class="btn-primary" style="display:none;">
+            <span class="play-icon" aria-hidden="true"></span>
+            <span>Wznów</span>
+          </button>
+          <button id="restart-btn" class="btn-ghost" style="display:none;">Od początku</button>
+        </div>
+
+        <ul id="puzzle-list" class="puzzle-list"></ul>
+
+        <div class="puzzle-controls">
+          <button id="shuffle-btn" class="btn-ghost">Przetasuj ponownie</button>
+          <button id="listen-arrangement-btn" class="btn-ghost">Odsłuchaj mój układ</button>
+          <button id="check-btn" class="btn-dark">Sprawdź kolejność</button>
+        </div>
+
+        <div id="result-feedback" class="feedback-msg"></div>
+      </div>
+    </div>
+  </main>
+
+  <Fragment slot="scripts">
+    <script is:inline src="../assets/vendor/smplr.js"></script>
+    <script is:inline src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.7/Sortable.min.js"></script>
+    <script is:inline src="../assets/js/core.js"></script>
+    <script is:inline src="../assets/js/klasa-filter.js"></script>
+    <script is:inline src="../assets/js/puzzle-engine.js"></script>
+    <script is:inline src="../assets/js/rytm.js"></script>
+  </Fragment>
+</Layout>
+

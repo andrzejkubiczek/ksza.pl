@@ -105,11 +105,14 @@ update-nav.py                  - generator menu nawigacyjnego dla wszystkich pod
    Pusta tablica [] lub brak pola oznacza utwór ogólny (widoczny zawsze).
 
 
-5. AKTUALIZACJA MENU (update-nav.py)
+5. ZARZĄDZANIE MENU I STRONAMI W ASTRO
 
-Menu nawigacyjne witryny jest zarządzane centralnie w pliku update-nav.py.
-Aby zmienić strukturę lub nazwy zakładek w menu:
-1. Zmodyfikuj listę NAV_ITEMS lub słownik FAMILY_MAP w update-nav.py.
-2. Uruchom w terminalu:
-   python3 update-nav.py
-Skrypt automatycznie zaktualizuje blok <nav class="site-nav"> we wszystkich plikach HTML.
+Menu nawigacyjne witryny jest zarządzane centralnie w komponencie:
+src/components/NavMenu.astro
+
+Aby dodać nową zakładkę lub zmienić strukturę menu:
+1. Zmodyfikuj tablicę NAV_ITEMS w pliku src/components/NavMenu.astro.
+2. Przy kolejnym uruchomieniu `npm run dev` lub `npm run build` menu zostanie
+   automatycznie i spójnie wyrenderowane na wszystkich podstronach.
+3. Skrypt update-nav.py nie jest już wymagany w procesie budowania.
+

@@ -1,0 +1,98 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SubNav from '../../components/SubNav.astro';
+
+const subNavItems = [
+  { label: 'Ze słuchu', href: 'interwaly.html' },
+  { label: 'Zapis nutowy', href: 'interwaly-zapis.html' },
+  { label: 'Zbuduj interwał', href: 'interwaly-buduj.html', active: true },
+];
+---
+<Layout
+  title="Zbuduj interwał - ksza.pl"
+  description="Ćwiczenie: interaktywne budowanie interwałów prostych na pięciolinii w kluczu wiolinowym i basowym."
+  currentFamily="Interwały"
+  isRoot={false}
+  creditType="verovio"
+  includeWidgetsCss={true}
+>
+  <main>
+    <div class="container exercise-page">
+      <div class="widget">
+        <SubNav items={subNavItems} />
+        <div class="widget-header">
+          <h1>Zbuduj interwał</h1>
+          <p>Do podanego dźwięku dorysuj drugi, tak żeby razem utworzyły wskazany interwał.<br><small>Na wyższym poziomie także w dół i od dźwięku chromatycznego.</small></p>
+        </div>
+
+        <div class="controls-row">
+          <div class="field">
+            <label for="level-select">Poziom</label>
+            <div class="select-wrap">
+              <select id="level-select">
+                <option value="1">Poziom 1</option>
+                <option value="2">Poziom 2</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="clef-select">Klucz</label>
+            <div class="select-wrap">
+              <select id="clef-select">
+                <option value="random">Losowo</option>
+                <option value="treble">Wiolinowy</option>
+                <option value="bass">Basowy</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <p id="task-line" class="task-line"></p>
+
+        <div id="status-line" class="status-line"></div>
+
+        <div class="notation-wrap">
+          <div id="notation-container" class="notation-container" aria-live="polite"></div>
+          <div id="gesture-layer" class="gesture-layer" aria-hidden="true"></div>
+        </div>
+        <p class="gesture-hint">Można też przeciągnąć drugi dźwięk górę/dół i stuknąć, by zmienić znak.</p>
+
+        <div class="note-builder">
+          <div class="note-builder-controls">
+            <div class="note-builder-letter">
+              <button type="button" id="letter-down" class="letter-btn" aria-label="Litera niżej">▼</button>
+              <button type="button" id="letter-up" class="letter-btn" aria-label="Litera wyżej">▲</button>
+            </div>
+            <div class="accidental-group" role="group" aria-label="Znak chromatyczny">
+              <button type="button" class="accidental-btn" data-alter="-1">♭</button>
+              <button type="button" class="accidental-btn is-active" data-alter="0">♮</button>
+              <button type="button" class="accidental-btn" data-alter="1">♯</button>
+            </div>
+          </div>
+          <button type="button" id="check-btn" class="btn-primary">Sprawdź</button>
+        </div>
+
+        <div id="feedback" class="feedback-msg"></div>
+
+        <div class="puzzle-controls">
+          <button id="next-btn" class="btn-dark" style="display:none;">Następny interwał →</button>
+        </div>
+
+        <div class="piano-keyboard-wrap">
+          <div class="piano-keyboard-mount" aria-label="Klawiatura fortepianu - pomoc do liczenia interwałów"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Fragment slot="scripts">
+    <script is:inline src="https://cdn.jsdelivr.net/npm/verovio@6.2.0/dist/verovio-toolkit-wasm.js"></script>
+    <script is:inline src="../assets/js/core.js"></script>
+    <script is:inline src="../assets/js/music-theory.js"></script>
+    <script is:inline src="../assets/js/verovio-render.js"></script>
+    <script is:inline src="../assets/js/gesture-layer.js"></script>
+    <script is:inline src="../assets/js/piano-keyboard.js"></script>
+    <script is:inline src="../assets/js/interwaly-buduj.js"></script>
+  </Fragment>
+</Layout>
+

@@ -1,0 +1,100 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout
+  title="ksza.pl - ćwiczenia słuchowe z kształcenia słuchu"
+  description="Bezpłatne, interaktywne ćwiczenia z kształcenia słuchu: interwały, trójdźwięki, gamy, puzzle, dyktanda i rytm."
+  currentFamily="Start"
+  isRoot={true}
+  creditType="smplr"
+>
+  <main>
+    <section class="hero">
+      <div class="container">
+        <span class="eyebrow">Ćwiczenia słuchowe online</span>
+        <h1>Trenuj słuch.<br>Takt po takcie.</h1>
+        <p class="lead">
+          Bezpłatne, interaktywne ćwiczenia z kształcenia słuchu:
+          interwały, trójdźwięki, gamy, muzyczne puzzle, dyktanda i
+          rytm. Bez logowania, prosto w przeglądarce.
+        </p>
+      </div>
+    </section>
+
+    <section class="container">
+      <div class="exercise-grid">
+        <a class="exercise-card accent-gold" href="cwiczenia/interwaly.html">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <circle cx="11" cy="28" r="3.2"/>
+              <circle cx="29" cy="12" r="3.2"/>
+              <path d="M13.5 25.5 26.5 14.5" stroke-dasharray="1 4.2"/>
+            </svg>
+          </span>
+          <h3>Interwały</h3>
+          <p>Rozpoznawanie interwałów prostych do oktawy, granych w górę i w dół, na wielu instrumentach.</p>
+        </a>
+        <a class="exercise-card accent-indigo" href="cwiczenia/trojdzwieki.html">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <circle cx="20" cy="30" r="3.2"/>
+              <circle cx="20" cy="20" r="3.2"/>
+              <circle cx="20" cy="10" r="3.2"/>
+              <path d="M23 30V10" stroke-dasharray="1 4.2"/>
+            </svg>
+          </span>
+          <h3>Trójdźwięki</h3>
+          <p>Rozpoznawanie trójdźwięków: durowy, molowy, zmniejszony i zwiększony - w postaci zasadniczej i z przewrotami.</p>
+        </a>
+        <a class="exercise-card accent-plum" href="cwiczenia/gamy.html">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 30h5v-6h5v-6h5v-6h5v-6h6"/>
+            </svg>
+          </span>
+          <h3>Odmiany gam</h3>
+          <p>Rozpoznawanie gamy durowej i czterech odmian molowej, granych w obu kierunkach.</p>
+        </a>
+        <a class="exercise-card accent-teal" href="cwiczenia/puzzle.html">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round">
+              <path d="M9 9h9v3a2.5 2.5 0 0 0 5 0V9h9v9h-3a2.5 2.5 0 0 0 0 5h3v9h-9v-3a2.5 2.5 0 0 0-5 0v3H9v-9h3a2.5 2.5 0 0 0 0-5H9z"/>
+            </svg>
+          </span>
+          <h3>Puzzle</h3>
+          <p>Układanie potasowanych fragmentów melodii we właściwej kolejności - ze słuchu albo czytając zapis nutowy.</p>
+        </a>
+        <a class="exercise-card accent-coral" href="cwiczenia/dyktanda-wysokosciowe.html">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M6 14h28M6 20h28M6 26h28"/>
+              <circle cx="14" cy="20" r="3.2" fill="currentColor" stroke="none"/>
+              <circle cx="28" cy="14" r="3.2" stroke-dasharray="1 3"/>
+            </svg>
+          </span>
+          <h3>Dyktanda</h3>
+          <p>Uzupełnianie wysokości dźwięków w melodii ze słuchu, a także pamięć melodyczna - powtarzanie usłyszanej melodii na klawiaturze.</p>
+        </a>
+        <a class="exercise-card accent-green" href="cwiczenia/rytm.html">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 27V11M18 24V9"/>
+              <path d="M8 11l10-2"/>
+              <circle cx="8" cy="27" r="3.2" fill="currentColor" stroke="none"/>
+              <circle cx="18" cy="24" r="3.2" fill="currentColor" stroke="none"/>
+              <path d="M29 30V13"/>
+              <circle cx="29" cy="30" r="3.2" fill="currentColor" stroke="none"/>
+            </svg>
+          </span>
+          <h3>Rytm</h3>
+          <p>Układanie potasowanych fragmentów rytmicznych we właściwej kolejności - ze słuchu albo czytając zapis nutowy.</p>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <Fragment slot="scripts">
+    <script is:inline src="assets/js/core.js"></script>
+  </Fragment>
+</Layout>
+

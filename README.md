@@ -19,7 +19,8 @@ Opis idei projektu znajduje się na podstronie [O projekcie](o-projekcie.html). 
 
 ## Stos technologiczny
 
-* **Frontend:** Czysty, semantyczny HTML5, nowoczesny CSS3 (CSS Custom Properties, Grid, Flexbox, stylistyka *Kontrastowe karty*, RWD, a11y) oraz nowoczesny JavaScript (ES6+).
+* **Generator i architektura:** [Astro](https://astro.build/) (Static Site Generation, modułowe komponenty, zerowy narzut w runtime).
+* **Frontend:** Semantyczny HTML5, nowoczesny CSS3 (CSS Custom Properties, Grid, Flexbox, stylistyka *Kontrastowe karty*, RWD, a11y) oraz nowoczesny JavaScript (ES6+).
 * **Silnik audio:** [smplr](https://github.com/danigb/smplr) (Splendid Grand Piano &middot; Versilian Studios VCSL &amp; VSCO2) + natywny Web Audio API.
 * **Renderowanie nut:** [Verovio](https://www.verovio.org/) (WebAssembly/JS) generujące wektory SVG w czcionce Leland.
 * **Interakcje Drag & Drop:** [SortableJS](https://sortablejs.github.io/Sortable/).
@@ -29,38 +30,45 @@ Opis idei projektu znajduje się na podstronie [O projekcie](o-projekcie.html). 
 ## Struktura projektu
 
 ```text
-index.html, o-projekcie.html   Strony ogólne i informacyjne
-cwiczenia/*.html               Strony poszczególnych wariantów ćwiczeń
-assets/css/site.css            Główny arkusz stylów, layout, motyw, RWD
-assets/css/widgets.css         Style widżetów ćwiczeń, notacji Verovio, klawiatur
-assets/audio/                  Lokalne próbki akustyczne orkiestry Versilian VSCO2
-assets/vendor/smplr.js         Lekki silnik samplera Web Audio API
-assets/js/core.js              Moduł audio (KszaAudio), tempo, zakresy instrumentów
-assets/js/music-theory.js      Matematyczny model teorii muzyki, enharmonia, MusicXML
-assets/js/verovio-render.js    Wrapper silnika renderującego Verovio SVG
-assets/js/gesture-layer.js     Obsługa gestów wskaźnikowych i dotykowych nad notacją
-assets/js/puzzle-engine.js     Uniwersalny silnik układanek taktowych (audio timeline)
-assets/js/scale-tonics.js      Baza tonik gam i algorytmy doboru oktaw
-assets/js/klasa-filter.js      Obsługa filtrowania utworów według klas
-assets/js/piano-keyboard.js    Generator pomocniczej klawiatury fortepianu
-assets/js/*.js                 Kontrolery logiki poszczególnych ćwiczeń
-dyktanda/puzzle/               Manifest (puzzle.json) i pliki MusicXML dyktand-puzzle
-dyktanda/wysokosciowe/         Manifest (dyktanda.json) i pliki dyktand wysokościowych
-dyktanda/rytm/                 Manifest (rytm.json) i pliki rytmów-puzzle
-update-nav.py                  Skrypt automatycznie synchronizujący menu we wszystkich stronach
+src/layouts/Layout.astro       Główny szablon layoutu (head, fonts, nawigacja, stopka)
+src/components/*.astro         Reużywalne komponenty (NavMenu, SubNav, Footer)
+src/pages/index.astro          Strona główna (Start)
+src/pages/o-projekcie.astro    Strona informacyjna o projekcie
+src/pages/cwiczenia/*.astro    Podstrony poszczególnych ćwiczeń
+public/assets/css/             Arkusze stylów (site.css, widgets.css)
+public/assets/audio/           Lokalne próbki akustyczne orkiestry Versilian VSCO2
+public/assets/vendor/          Lekki silnik samplera Web Audio API (smplr.js)
+public/assets/js/              Moduły logiki, teorii muzyki, Verovio i kontrolery ćwiczeń
+public/dyktanda/               Manifesty JSON i pliki MusicXML dyktand
+dist/                          Wygenerowane statyczne pliki produkcyjne (po npm run build)
 ```
 
 ---
 
-## Uruchomienie lokalne
+## Uruchomienie i rozwój lokalny
 
-Do uruchomienia wystarczy dowolny lokalny serwer HTTP:
+Wymagane środowisko: [Node.js](https://nodejs.org/) (np. wersja LTS).
 
+1. Zainstaluj zależności:
 ```bash
-python3 -m http.server 8000
+npm install
 ```
 
-Następnie otwórz w przeglądarce adres: [http://localhost:8000](http://localhost:8000).
+2. Uruchom serwer deweloperski (z automatycznym odświeżaniem HMR):
+```bash
+npm run dev
+```
+Otwórz w przeglądarce adres: [http://localhost:4321](http://localhost:4321).
+
+3. Zbuduj zoptymalizowaną wersję produkcyjną (do folderu `dist/`):
+```bash
+npm run build
+```
+
+4. Podgląd wygenerowanej wersji produkcyjnej:
+```bash
+npm run preview
+```
 
 ---
 

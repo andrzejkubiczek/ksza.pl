@@ -1,0 +1,21 @@
+---
+export interface SubNavItem {
+  label: string;
+  href: string;
+  active?: boolean;
+}
+
+export interface Props {
+  items: SubNavItem[];
+}
+
+const { items } = Astro.props;
+---
+<nav class="subnav" aria-label="Odmiany ćwiczenia">
+  {items.map((item) => (
+    <a href={item.href} aria-current={item.active ? 'page' : undefined}>
+      {item.label}
+    </a>
+  ))}
+</nav>
+

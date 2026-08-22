@@ -1,0 +1,95 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SubNav from '../../components/SubNav.astro';
+
+const subNavItems = [
+  { label: 'Dyktando', href: 'dyktanda-wysokosciowe.html' },
+  { label: 'Pamięć melodyczna', href: 'pamiec-melodyczna.html', active: true },
+];
+---
+<Layout
+  title="Pamięć melodyczna - ksza.pl"
+  description="Ćwiczenie słuchowe: powtarzanie usłyszanej frazy melodycznej na klawiaturze po dźwięku odniesienia A=440Hz."
+  currentFamily="Dyktanda"
+  isRoot={false}
+  creditType="smplr"
+  includeWidgetsCss={true}
+>
+  <main>
+    <div class="container exercise-page">
+      <div class="widget">
+        <SubNav items={subNavItems} />
+        <div class="widget-header">
+          <h1>Pamięć melodyczna</h1>
+          <p>Posłuchaj melodii i powtórz ją, klikając klawisze fortepianu.<br><small>Na początku usłyszysz dźwięk odniesienia (a).</small></p>
+        </div>
+
+        <div class="controls-row">
+          <div class="field">
+            <label for="level-select">Poziom</label>
+            <div class="select-wrap">
+              <select id="level-select">
+                <option value="1">Poziom 1</option>
+                <option value="2">Poziom 2</option>
+                <option value="3">Poziom 3</option>
+                <option value="4">Poziom 4</option>
+                <option value="5">Poziom 5</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="instrument-select">Instrument</label>
+            <div class="select-wrap">
+              <select id="instrument-select">
+                <option value="piano">Fortepian</option>
+                <option value="flute">Flet</option>
+                <option value="clarinet">Klarnet</option>
+                <option value="violin">Skrzypce</option>
+                <option value="xylophone">Ksylofon</option>
+                <option value="trumpet">Trąbka</option>
+                <option value="bassoon">Fagot</option>
+              </select>
+            </div>
+          </div>
+          <div class="field tempo-field">
+            <label for="tempo-slider">Tempo <span id="tempo-value">100%</span></label>
+            <input type="range" id="tempo-slider" min="50" max="150" step="5" value="100">
+          </div>
+        </div>
+
+        <div id="status-line" class="status-line"></div>
+
+        <div class="player-controls">
+          <button id="play-btn" class="btn-primary">
+            <span class="play-icon" aria-hidden="true"></span>
+            <span>Odtwórz melodię</span>
+          </button>
+        </div>
+
+        <div id="answer-trail" class="answer-trail"></div>
+
+        <div class="echo-keyboard-wrap">
+          <div id="echo-keyboard-mount" aria-label="Klawiatura - klikaj dźwięki w usłyszanej kolejności"></div>
+        </div>
+
+        <div class="player-controls">
+          <button id="reset-btn" class="btn-ghost">Wyczyść odpowiedź</button>
+          <button id="check-btn" class="btn-primary" disabled>Sprawdź</button>
+        </div>
+
+        <div id="feedback" class="feedback-msg"></div>
+
+        <div class="puzzle-controls">
+          <button id="next-btn" class="btn-dark" style="display:none;">Następna melodia →</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Fragment slot="scripts">
+    <script is:inline src="../assets/vendor/smplr.js"></script>
+    <script is:inline src="../assets/js/core.js"></script>
+    <script is:inline src="../assets/js/pamiec-melodyczna.js"></script>
+  </Fragment>
+</Layout>
+

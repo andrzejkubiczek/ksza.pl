@@ -1,0 +1,98 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SubNav from '../../components/SubNav.astro';
+
+const subNavItems = [
+  { label: 'Ze słuchu', href: 'interwaly.html', active: true },
+  { label: 'Zapis nutowy', href: 'interwaly-zapis.html' },
+  { label: 'Zbuduj interwał', href: 'interwaly-buduj.html' },
+];
+---
+<Layout
+  title="Interwały - ksza.pl"
+  description="Ćwiczenie słuchowe: rozpoznawanie interwałów prostych do oktawy, granych w górę i w dół."
+  currentFamily="Interwały"
+  isRoot={false}
+  creditType="smplr"
+  includeWidgetsCss={true}
+>
+  <main>
+    <div class="container exercise-page">
+      <div class="widget">
+        <SubNav items={subNavItems} />
+        <div class="widget-header">
+          <h1>Rozpoznaj interwał</h1>
+          <p>Posłuchaj dźwięków i wskaż interwał.<br><small>Dźwięki grane są losowo: w górę albo w dół.</small></p>
+        </div>
+
+        <ul class="staff" aria-hidden="true"><li></li><li></li><li></li><li></li><li></li></ul>
+
+        <div class="controls-row">
+          <div class="field">
+            <label for="instrument-select">Instrument</label>
+            <div class="select-wrap">
+              <select id="instrument-select">
+                <option value="piano">Fortepian</option>
+                <option value="flute">Flet</option>
+                <option value="clarinet">Klarnet</option>
+                <option value="violin">Skrzypce</option>
+                <option value="xylophone">Ksylofon</option>
+                <option value="trumpet">Trąbka</option>
+                <option value="bassoon">Fagot</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="mode-select">Sposób grania</label>
+            <div class="select-wrap">
+              <select id="mode-select">
+                <option value="melodic">Melodycznie</option>
+                <option value="harmonic">Harmonicznie</option>
+                <option value="mixed">Mieszane</option>
+              </select>
+            </div>
+          </div>
+          <div class="field tempo-field">
+            <label for="tempo-slider">Tempo <span id="tempo-value">100%</span></label>
+            <input type="range" id="tempo-slider" min="50" max="150" step="5" value="100">
+          </div>
+        </div>
+
+        <div id="status-line" class="status-line"></div>
+
+        <div class="player-controls">
+          <button id="play-btn" class="btn-primary">
+            <span class="play-icon" aria-hidden="true"></span>
+            <span>Odtwórz interwał</span>
+          </button>
+          <button id="next-btn" class="btn-dark" style="display:none;">Następny interwał →</button>
+        </div>
+
+        <div id="feedback" class="feedback-msg"></div>
+
+        <div class="intervals-grid">
+          <button class="interval-choice" data-symbol="1"><strong>1</strong><small>Pryma cz.</small></button>
+          <button class="interval-choice" data-symbol="2>"><strong>2&gt;</strong><small>Sekunda m.</small></button>
+          <button class="interval-choice" data-symbol="2"><strong>2</strong><small>Sekunda w.</small></button>
+          <button class="interval-choice" data-symbol="3>"><strong>3&gt;</strong><small>Tercja m.</small></button>
+          <button class="interval-choice" data-symbol="3"><strong>3</strong><small>Tercja w.</small></button>
+          <button class="interval-choice" data-symbol="4"><strong>4</strong><small>Kwarta cz.</small></button>
+          <button class="interval-choice" data-symbol="4<"><strong>4&lt;/5&gt;</strong><small>Tryton</small></button>
+          <button class="interval-choice" data-symbol="5"><strong>5</strong><small>Kwinta cz.</small></button>
+          <button class="interval-choice" data-symbol="6>"><strong>6&gt;</strong><small>Seksta m.</small></button>
+          <button class="interval-choice" data-symbol="6"><strong>6</strong><small>Seksta w.</small></button>
+          <button class="interval-choice" data-symbol="7"><strong>7</strong><small>Septyma m.</small></button>
+          <button class="interval-choice" data-symbol="7<"><strong>7&lt;</strong><small>Septyma w.</small></button>
+          <button class="interval-choice" data-symbol="8"><strong>8</strong><small>Oktawa cz.</small></button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Fragment slot="scripts">
+    <script is:inline src="../assets/vendor/smplr.js"></script>
+    <script is:inline src="../assets/js/core.js"></script>
+    <script is:inline src="../assets/js/interwaly.js"></script>
+  </Fragment>
+</Layout>
+

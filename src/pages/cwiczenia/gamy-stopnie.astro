@@ -1,0 +1,92 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SubNav from '../../components/SubNav.astro';
+
+const subNavItems = [
+  { label: 'Odmiany gam', href: 'gamy.html' },
+  { label: 'Stopnie gamy', href: 'gamy-stopnie.html', active: true },
+];
+---
+<Layout
+  title="Stopnie gamy - ksza.pl"
+  description="Ćwiczenie słuchowe: rozpoznawanie stopni gamy w kontekście tonalnym."
+  currentFamily="Gamy"
+  isRoot={false}
+  creditType="smplr"
+  includeWidgetsCss={true}
+>
+  <main>
+    <div class="container exercise-page">
+      <div class="widget">
+        <SubNav items={subNavItems} />
+        <div class="widget-header">
+          <h1>Stopnie gamy</h1>
+          <p>Usłyszysz gamę, a potem jeden jej dźwięk. Który to stopień?</p>
+        </div>
+
+        <ul class="staff" aria-hidden="true"><li></li><li></li><li></li><li></li><li></li></ul>
+
+        <div class="controls-row">
+          <div class="field">
+            <label for="level-select">Poziom</label>
+            <div class="select-wrap">
+              <select id="level-select">
+                <option value="1">Durowa</option>
+                <option value="2">Durowa + molowa</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="instrument-select">Instrument</label>
+            <div class="select-wrap">
+              <select id="instrument-select">
+                <option value="piano">Fortepian</option>
+                <option value="flute">Flet</option>
+                <option value="clarinet">Klarnet</option>
+                <option value="violin">Skrzypce</option>
+                <option value="xylophone">Ksylofon</option>
+                <option value="trumpet">Trąbka</option>
+                <option value="bassoon">Fagot</option>
+              </select>
+            </div>
+          </div>
+          <div class="field tempo-field">
+            <label for="tempo-slider">Tempo <span id="tempo-value">100%</span></label>
+            <input type="range" id="tempo-slider" min="50" max="150" step="5" value="100">
+          </div>
+        </div>
+
+        <div id="status-line" class="status-line"></div>
+
+        <div class="player-controls">
+          <button id="play-btn" class="btn-primary">
+            <span class="play-icon" aria-hidden="true"></span>
+            <span>Odtwórz</span>
+          </button>
+          <button id="next-btn" class="btn-dark" style="display:none;">Następne →</button>
+        </div>
+
+        <div id="feedback" class="feedback-msg"></div>
+
+        <div class="intervals-grid">
+          <button class="interval-choice" data-key="1"><strong>I</strong></button>
+          <button class="interval-choice" data-key="2"><strong>II</strong></button>
+          <button class="interval-choice" data-key="3"><strong>III</strong></button>
+          <button class="interval-choice" data-key="4"><strong>IV</strong></button>
+          <button class="interval-choice" data-key="5"><strong>V</strong></button>
+          <button class="interval-choice" data-key="6"><strong>VI</strong></button>
+          <button class="interval-choice" data-key="7"><strong>VII</strong></button>
+          <button class="interval-choice" data-key="8"><strong>VIII</strong></button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Fragment slot="scripts">
+    <script is:inline src="../assets/vendor/smplr.js"></script>
+    <script is:inline src="../assets/js/core.js"></script>
+    <script is:inline src="../assets/js/scale-tonics.js"></script>
+    <script is:inline src="../assets/js/gamy-stopnie.js"></script>
+  </Fragment>
+</Layout>
+

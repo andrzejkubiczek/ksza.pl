@@ -1,0 +1,80 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SubNav from '../../components/SubNav.astro';
+
+const subNavItems = [
+  { label: 'Odmiany gam', href: 'gamy.html', active: true },
+  { label: 'Stopnie gamy', href: 'gamy-stopnie.html' },
+];
+---
+<Layout
+  title="Gamy - ksza.pl"
+  description="Ćwiczenie słuchowe: rozpoznawanie odmian gam (durowa, eolska, harmoniczna, dorycka, melodyczna)."
+  currentFamily="Gamy"
+  isRoot={false}
+  creditType="smplr"
+  includeWidgetsCss={true}
+>
+  <main>
+    <div class="container exercise-page">
+      <div class="widget">
+        <SubNav items={subNavItems} />
+        <div class="widget-header">
+          <h1>Rozpoznaj gamę</h1>
+          <p>Posłuchaj gamy i wskaż, jaka to odmiana.<br><small>Gama gra się losowo: od toniki w górę i z powrotem, albo od góry w dół i z powrotem.</small></p>
+        </div>
+
+        <ul class="staff" aria-hidden="true"><li></li><li></li><li></li><li></li><li></li></ul>
+
+        <div class="controls-row">
+          <div class="field">
+            <label for="instrument-select">Instrument</label>
+            <div class="select-wrap">
+              <select id="instrument-select">
+                <option value="piano">Fortepian</option>
+                <option value="flute">Flet</option>
+                <option value="clarinet">Klarnet</option>
+                <option value="violin">Skrzypce</option>
+                <option value="xylophone">Ksylofon</option>
+                <option value="trumpet">Trąbka</option>
+                <option value="bassoon">Fagot</option>
+              </select>
+            </div>
+          </div>
+          <div class="field tempo-field">
+            <label for="tempo-slider">Tempo <span id="tempo-value">100%</span></label>
+            <input type="range" id="tempo-slider" min="50" max="150" step="5" value="100">
+          </div>
+        </div>
+
+        <div id="status-line" class="status-line"></div>
+
+        <div class="player-controls">
+          <button id="play-btn" class="btn-primary">
+            <span class="play-icon" aria-hidden="true"></span>
+            <span>Odtwórz gamę</span>
+          </button>
+          <button id="next-btn" class="btn-dark" style="display:none;">Następna gama →</button>
+        </div>
+
+        <div id="feedback" class="feedback-msg"></div>
+
+        <div class="scale-choices">
+          <button class="scale-choice" data-key="durowa">Durowa</button>
+          <button class="scale-choice" data-key="eolska">Molowa eolska</button>
+          <button class="scale-choice" data-key="harmoniczna">Molowa harmoniczna</button>
+          <button class="scale-choice" data-key="dorycka">Molowa dorycka</button>
+          <button class="scale-choice" data-key="melodyczna">Molowa melodyczna</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Fragment slot="scripts">
+    <script is:inline src="../assets/vendor/smplr.js"></script>
+    <script is:inline src="../assets/js/core.js"></script>
+    <script is:inline src="../assets/js/scale-tonics.js"></script>
+    <script is:inline src="../assets/js/gamy.js"></script>
+  </Fragment>
+</Layout>
+

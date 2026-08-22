@@ -1,0 +1,89 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SubNav from '../../components/SubNav.astro';
+
+const subNavItems = [
+  { label: 'Ze słuchu', href: 'trojdzwieki.html' },
+  { label: 'Zapis nutowy', href: 'trojdzwieki-zapis.html', active: true },
+  { label: 'Zbuduj trójdźwięk', href: 'trojdzwieki-buduj.html' },
+];
+---
+<Layout
+  title="Trójdźwięki - zapis nutowy - ksza.pl"
+  description="Ćwiczenie: rozpoznawanie zapisu nutowego trójdźwięków w kluczu wiolinowym i basowym."
+  currentFamily="Trójdźwięki"
+  isRoot={false}
+  creditType="verovio"
+  includeWidgetsCss={true}
+>
+  <main>
+    <div class="container exercise-page">
+      <div class="widget">
+        <SubNav items={subNavItems} />
+        <div class="widget-header">
+          <h1>Trójdźwięki - zapis nutowy</h1>
+          <p>Odczytaj trójdźwięk zapisany na pięciolinii i wskaż jego rodzaj.</p>
+        </div>
+
+        <ul class="staff" aria-hidden="true"><li></li><li></li><li></li><li></li><li></li></ul>
+
+        <div class="controls-row">
+          <div class="field">
+            <label for="clef-select">Klucz</label>
+            <div class="select-wrap">
+              <select id="clef-select">
+                <option value="random">Losowo</option>
+                <option value="treble">Wiolinowy</option>
+                <option value="bass">Basowy</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="level-select">Poziom</label>
+            <div class="select-wrap">
+              <select id="level-select">
+                <option value="1">Postać zasadnicza (I-IV/6, I-II/4)</option>
+                <option value="2">Zasadnicza + przewroty (V-VI/6, III-IV/4)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div id="status-line" class="status-line"></div>
+
+        <div id="notation-container" class="notation-container" aria-live="polite"></div>
+
+        <div id="feedback" class="feedback-msg"></div>
+
+        <div class="intervals-grid" id="triad-grid">
+          <button class="interval-choice" data-key="durowy_z"><strong>+</strong><small>Durowy</small></button>
+          <button class="interval-choice" data-key="molowy_z"><strong>o</strong><small>Molowy</small></button>
+          <button class="interval-choice" data-key="zmniejszony"><strong>&gt;</strong><small>Zmniejszony</small></button>
+          <button class="interval-choice" data-key="zwiekszony"><strong>&lt;</strong><small>Zwiększony</small></button>
+          <button class="interval-choice level-2-only" data-key="durowy_3"><strong>+<sub>3</sub></strong><small>Durowy - I przewrót</small></button>
+          <button class="interval-choice level-2-only" data-key="durowy_5"><strong>+<sub>5</sub></strong><small>Durowy - II przewrót</small></button>
+          <button class="interval-choice level-2-only" data-key="molowy_3"><strong>o<sub>3</sub></strong><small>Molowy - I przewrót</small></button>
+          <button class="interval-choice level-2-only" data-key="molowy_5"><strong>o<sub>5</sub></strong><small>Molowy - II przewrót</small></button>
+        </div>
+
+        <div class="puzzle-controls">
+          <button id="next-btn" class="btn-dark" style="display:none;">Następny trójdźwięk →</button>
+        </div>
+
+        <div class="piano-keyboard-wrap">
+          <div class="piano-keyboard-mount" aria-label="Klawiatura fortepianu - pomoc do liczenia trójdźwięków"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Fragment slot="scripts">
+    <script is:inline src="https://cdn.jsdelivr.net/npm/verovio@6.2.0/dist/verovio-toolkit-wasm.js"></script>
+    <script is:inline src="../assets/js/core.js"></script>
+    <script is:inline src="../assets/js/music-theory.js"></script>
+    <script is:inline src="../assets/js/verovio-render.js"></script>
+    <script is:inline src="../assets/js/piano-keyboard.js"></script>
+    <script is:inline src="../assets/js/trojdzwieki-zapis.js"></script>
+  </Fragment>
+</Layout>
+

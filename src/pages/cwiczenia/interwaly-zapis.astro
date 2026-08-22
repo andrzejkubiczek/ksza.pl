@@ -1,0 +1,85 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SubNav from '../../components/SubNav.astro';
+
+const subNavItems = [
+  { label: 'Ze słuchu', href: 'interwaly.html' },
+  { label: 'Zapis nutowy', href: 'interwaly-zapis.html', active: true },
+  { label: 'Zbuduj interwał', href: 'interwaly-buduj.html' },
+];
+---
+<Layout
+  title="Interwały - zapis nutowy - ksza.pl"
+  description="Ćwiczenie: rozpoznawanie zapisu nutowego interwałów w kluczu wiolinowym i basowym."
+  currentFamily="Interwały"
+  isRoot={false}
+  creditType="verovio"
+  includeWidgetsCss={true}
+>
+  <main>
+    <div class="container exercise-page">
+      <div class="widget">
+        <SubNav items={subNavItems} />
+        <div class="widget-header">
+          <h1>Interwały - zapis nutowy</h1>
+          <p>Odczytaj interwał zapisany na pięciolinii i wskaż jego nazwę.</p>
+        </div>
+
+        <ul class="staff" aria-hidden="true"><li></li><li></li><li></li><li></li><li></li></ul>
+
+        <div class="controls-row">
+          <div class="field">
+            <label for="clef-select">Klucz</label>
+            <div class="select-wrap">
+              <select id="clef-select">
+                <option value="random">Losowo</option>
+                <option value="treble">Wiolinowy</option>
+                <option value="bass">Basowy</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div id="status-line" class="status-line"></div>
+
+        <div id="notation-container" class="notation-container" aria-live="polite"></div>
+
+        <div id="feedback" class="feedback-msg"></div>
+
+        <div class="intervals-grid">
+          <button class="interval-choice" data-symbol="1"><strong>1</strong><small>Pryma cz.</small></button>
+          <button class="interval-choice" data-symbol="2>"><strong>2&gt;</strong><small>Sekunda m.</small></button>
+          <button class="interval-choice" data-symbol="2"><strong>2</strong><small>Sekunda w.</small></button>
+          <button class="interval-choice" data-symbol="3>"><strong>3&gt;</strong><small>Tercja m.</small></button>
+          <button class="interval-choice" data-symbol="3"><strong>3</strong><small>Tercja w.</small></button>
+          <button class="interval-choice" data-symbol="4"><strong>4</strong><small>Kwarta cz.</small></button>
+          <button class="interval-choice" data-symbol="4<"><strong>4&lt;/5&gt;</strong><small>Tryton</small></button>
+          <button class="interval-choice" data-symbol="5"><strong>5</strong><small>Kwinta cz.</small></button>
+          <button class="interval-choice" data-symbol="6>"><strong>6&gt;</strong><small>Seksta m.</small></button>
+          <button class="interval-choice" data-symbol="6"><strong>6</strong><small>Seksta w.</small></button>
+          <button class="interval-choice" data-symbol="7"><strong>7</strong><small>Septyma m.</small></button>
+          <button class="interval-choice" data-symbol="7<"><strong>7&lt;</strong><small>Septyma w.</small></button>
+          <button class="interval-choice" data-symbol="8"><strong>8</strong><small>Oktawa cz.</small></button>
+        </div>
+
+        <div class="puzzle-controls">
+          <button id="next-btn" class="btn-dark" style="display:none;">Następny interwał →</button>
+        </div>
+
+        <div class="piano-keyboard-wrap">
+          <div class="piano-keyboard-mount" aria-label="Klawiatura fortepianu - pomoc do liczenia interwałów"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Fragment slot="scripts">
+    <script is:inline src="https://cdn.jsdelivr.net/npm/verovio@6.2.0/dist/verovio-toolkit-wasm.js"></script>
+    <script is:inline src="../assets/js/core.js"></script>
+    <script is:inline src="../assets/js/music-theory.js"></script>
+    <script is:inline src="../assets/js/verovio-render.js"></script>
+    <script is:inline src="../assets/js/piano-keyboard.js"></script>
+    <script is:inline src="../assets/js/interwaly-zapis.js"></script>
+  </Fragment>
+</Layout>
+

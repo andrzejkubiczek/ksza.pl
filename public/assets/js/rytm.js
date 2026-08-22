@@ -1,0 +1,17 @@
+(() => {
+    KszaPuzzleEngine.init({
+        notation: false,
+        manifestUrl: '../dyktanda/rytm/rytm.json',
+        fileBaseUrl: '../dyktanda/rytm/',
+        fixedInstrument: 'xylophone',
+        labels: {
+            minFragments: 'Rytm musi mieć co najmniej 2 takty, żeby dało się ułożyć puzzle.',
+            manifestWarn: 'Nie udało się wczytać listy rytmów (rytm.json):',
+            emptyOption: 'Brak dostępnych rytmów',
+            emptyHint: 'Nie dodano jeszcze żadnego rytmu - patrz dyktanda/rytm/rytm.json.',
+            loading: 'Wczytywanie rytmu...',
+            loadErrorConsole: 'Błąd wczytywania rytmu:',
+            loadErrorPrefix: 'Błąd wczytywania rytmu: '
+        }
+    });
+})();

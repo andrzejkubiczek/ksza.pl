@@ -1,0 +1,41 @@
+---
+export interface Props {
+  currentFamily?: string;
+  isRoot?: boolean;
+}
+
+const { currentFamily, isRoot = false } = Astro.props;
+
+const NAV_ITEMS = [
+  { label: 'Start', url: 'index.html', isRoot: true, family: 'Start' },
+  { label: 'Interwały', url: 'interwaly.html', isRoot: false, family: 'Interwały' },
+  { label: 'Trójdźwięki', url: 'trojdzwieki.html', isRoot: false, family: 'Trójdźwięki' },
+  { label: 'Gamy', url: 'gamy.html', isRoot: false, family: 'Gamy' },
+  { label: 'Puzzle', url: 'puzzle.html', isRoot: false, family: 'Puzzle' },
+  { label: 'Dyktanda', url: 'dyktanda-wysokosciowe.html', isRoot: false, family: 'Dyktanda' },
+  { label: 'Rytm', url: 'rytm.html', isRoot: false, family: 'Rytm' },
+  { label: 'O projekcie', url: 'o-projekcie.html', isRoot: true, family: 'O projekcie' },
+];
+
+function getHref(item: typeof NAV_ITEMS[0]) {
+  if (item.isRoot) {
+    return isRoot ? item.url : `../${item.url}`;
+  }
+  return isRoot ? `cwiczenia/${item.url}` : item.url;
+}
+---
+<nav class="site-nav" id="site-menu" aria-label="Menu główne">
+  <ul>
+    {NAV_ITEMS.map((item) => (
+      <li>
+        <a
+          href={getHref(item)}
+          aria-current={currentFamily === item.family ? 'page' : undefined}
+        >
+          {item.label}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
+

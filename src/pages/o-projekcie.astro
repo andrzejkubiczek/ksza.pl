@@ -1,0 +1,65 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout
+  title="O projekcie - ksza.pl"
+  description="ksza.pl - bezpłatne ćwiczenia wspierające naukę kształcenia słuchu, prosto w przeglądarce."
+  currentFamily="O projekcie"
+  isRoot={true}
+  creditType="smplr"
+>
+  <main>
+    <div class="container page-content">
+      <div class="card">
+        <h1>O projekcie</h1>
+        <p>
+          Kształcenie słuchu to jeden z trudniejszych przedmiotów w szkole
+          muzycznej. Nie da się go nauczyć na pamięć - ucho trzeba trenować,
+          krok po kroku, tak jak palce przy instrumencie.
+        </p>
+        <p>
+          Właśnie po to powstało ksza.pl - żeby można było poćwiczyć samemu,
+          kiedy jest chwila: między lekcjami, w drodze do domu, wieczorem
+          przy telefonie.
+        </p>
+        <p>
+          Wszystko działa od razu w przeglądarce. Bez logowania i bez
+          instalowania czegokolwiek - na komputerze, tablecie czy telefonie.
+        </p>
+        <p>Na razie jest tu sześć ćwiczeń:</p>
+        <ul class="plain-list">
+          <li><strong>Interwały</strong> - rozpoznawanie interwałów prostych do oktawy, granych w górę, w dół, melodycznie, harmonicznie albo w obu wariantach naraz.</li>
+          <li><strong>Trójdźwięki</strong> - durowy, molowy, zmniejszony i zwiększony; w postaci zasadniczej, a na wyższym poziomie także z przewrotami.</li>
+          <li><strong>Gamy</strong> - durowa i cztery odmiany molowej: eolska, harmoniczna, dorycka i melodyczna, a także rozpoznawanie stopni gamy.</li>
+          <li><strong>Puzzle</strong> - układanie fragmentów melodii we właściwej kolejności, ze słuchu albo czytając zapis nutowy.</li>
+          <li><strong>Dyktanda</strong> - dyktando wysokościowe (klucz, tonacja i pierwszy dźwięk są dane, resztę wysokości uzupełnia się ze słuchu) oraz pamięć melodyczna (usłysz krótką melodię i powtórz ją, klikając klawisze fortepianu).</li>
+          <li><strong>Rytm</strong> - układanie fragmentów rytmicznych we właściwej kolejności, ze słuchu albo czytając zapis nutowy.</li>
+        </ul>
+        <p>
+          Interwały i trójdźwięki można ćwiczyć na kilka sposobów: ze
+          słuchu, czytając gotowy zapis na pięciolinii (w kluczu
+          wiolinowym lub basowym), a także samemu układając nuty na
+          pięciolinii - strzałkami albo przeciągnięciem palcem czy
+          myszką. Wystarczy przełączyć zakładkę nad ćwiczeniem.
+        </p>
+        <p>
+          Każde ćwiczenie można też przesłuchać na innym instrumencie -
+          fortepianie, flecie, klarnecie, skrzypcach, ksylofonie, trąbce
+          albo fagocie. Ten sam dźwięk brzmi za każdym razem inaczej, a
+          rozpoznawanie go w różnych barwach to ważna część treningu.
+        </p>
+        <ul class="staff" aria-hidden="true"><li></li><li></li><li></li><li></li><li></li></ul>
+        <p>
+          Strona wciąż rośnie - kolejne ćwiczenia będą się tu pojawiać.
+          Masz pomysł albo znalazłeś błąd? Napisz:
+          <a href="mailto:a.kubiczek@psmprudnik.edu.pl">a.kubiczek@psmprudnik.edu.pl</a>.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <Fragment slot="scripts">
+    <script is:inline src="assets/js/core.js"></script>
+  </Fragment>
+</Layout>
+
