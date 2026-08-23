@@ -16,9 +16,12 @@ window.KszaPitchDetector = (() => {
     const POLISH_NOTE_NAMES = ['C', 'Cis', 'D', 'Dis', 'E', 'F', 'Fis', 'G', 'Gis', 'A', 'Ais', 'H'];
     const SOLMIZATION = ['do', 'cis', 're', 'dis', 'mi', 'fa', 'fis', 'sol', 'gis', 'la', 'ais', 'si'];
 
-    // Bufor próbek
+    // Bufor próbek i pre-alokowane tablice robocze algorytmu YIN (zero garbage collection)
     const BUFFER_SIZE = 2048;
     const buffer = new Float32Array(BUFFER_SIZE);
+    const halfLen = BUFFER_SIZE / 2;
+    const diff = new Float32Array(halfLen);
+    const cmndf = new Float32Array(halfLen);
 
     /**
      * Sprawdza dostępność mikrofonu w przeglądarce
@@ -45,9 +48,7 @@ window.KszaPitchDetector = (() => {
         const threshold = 0.20; // próg błędu YIN
         const minPeriod = Math.floor(sampleRate / 1200); // max 1200 Hz (sopran D6)
         const maxPeriod = Math.floor(sampleRate / 65);   // min 65 Hz (bas C2)
-        const halfLen = Math.floor(buf.length / 2);
 
-        const diff = new Float32Array(halfLen);
         diff[0] = 1;
 
         // Krok 1: Funkcja różnicowa (Difference Function)
@@ -61,7 +62,6 @@ window.KszaPitchDetector = (() => {
         }
 
         // Krok 2: Skumulowana normalizowana średnia różnicowa (CMNDF)
-        const cmndf = new Float32Array(halfLen);
         cmndf[0] = 1;
         let runningSum = 0;
         for (let tau = 1; tau < halfLen; tau++) {
@@ -149,8 +149,8 @@ window.KszaPitchDetector = (() => {
         analyserNode.getFloatTimeDomainData(buffer);
         const rms = getRMS(buffer);
 
-        // Próg głośności (0.005) dla czułego odbioru naturalnego śpiewu
-        if (rms < 0.005) {
+        // Próg głośności (0.010) odcinający szum tła i ciche odgłosy z otoczenia
+        if (rms < 0.010) {
             if (callback) {
                 callback({
                     isSilent: true,
@@ -160,7 +160,7 @@ window.KszaPitchDetector = (() => {
             }
         } else {
             const result = detectPitchYIN(buffer, audioCtx.sampleRate);
-            if (result && result.confidence > 0.45 && result.frequency >= 65 && result.frequency <= 1200) {
+            if (result && result.confidence >= 0.68 && result.frequency >= 65 && result.frequency <= 1200) {
                 const noteInfo = frequencyToNote(result.frequency);
                 if (callback) {
                     callback({

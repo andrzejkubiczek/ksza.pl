@@ -44,6 +44,7 @@ public/assets/css/widgets.css  - style widżetów ćwiczeń, notacji Verovio, kl
 public/assets/audio/           - lokalne próbki akustyczne orkiestry Versilian VSCO2
 public/assets/vendor/smplr.js  - silnik samplera Web Audio API
 public/assets/js/core.js       - moduł audio (KszaAudio), tempo, rejestry instrumentów
+public/assets/js/pitch-detector.js - detektor wysokości głosu (YIN, autokorelacja, Web Audio)
 public/assets/js/music-theory.js - drabina diatoniczna, enharmonia, generator MusicXML
 public/assets/js/verovio-render.js - asynchroniczny silnik renderowania nut SVG (Leland font)
 public/assets/js/gesture-layer.js - obsługa gestów Pointer Events (przeciąganie/tap)
@@ -60,9 +61,10 @@ dist/                          - folder wygenerowanych plików produkcyjnych (np
 
 3. ZASADY DZIAŁANIA POSZCZEGÓLNYCH ĆWICZEŃ
 
-- Interwały (interwaly.html, interwaly-zapis.html, interwaly-buduj.html):
+- Interwały (interwaly.html, interwaly-zapis.html, interwaly-buduj.html, interwaly-spiewaj.html):
   Rozpoznawanie ze słuchu (melodycznie, harmonicznie, mieszanie), rozpoznawanie
-  zapisu nutowego w kluczu wiolinowym/basowym oraz interaktywne budowanie interwałów.
+  zapisu nutowego w kluczu wiolinowym/basowym, interaktywne budowanie interwałów
+  oraz śpiewanie interwałów do mikrofonu (intonacja dwuetapowa z tunerem na żywo).
   Dźwięki są automatycznie transponowane w oktawach, aby mieściły się w skali instrumentu.
 
 - Trójdźwięki (trojdzwieki.html, trojdzwieki-zapis.html, trojdzwieki-buduj.html):

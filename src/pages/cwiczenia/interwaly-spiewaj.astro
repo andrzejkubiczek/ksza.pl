@@ -23,8 +23,8 @@ const subNavItems = [
         <div class="widget-header">
           <h1>Zaśpiewaj interwał</h1>
           <p>
-            Posłuchaj dźwięku wyjściowego, usłysz interwał w wyobraźni i zaśpiewaj dźwięk docelowy do mikrofonu.<br>
-            <small>Aplikacja ocenia intonację na żywo i wskazuje czystość wykonania.</small>
+            Posłuchaj dźwięku wyjściowego, powtórz go głosem i zaśpiewaj dźwięk docelowy do mikrofonu.<br>
+            <small>Aplikacja ocenia czystość intonacji obu dźwięków interwału na żywo.</small>
           </p>
         </div>
 
@@ -52,20 +52,6 @@ const subNavItems = [
               </select>
             </div>
           </div>
-          <div class="field">
-            <label for="instrument-select">Instrument wzorcowy</label>
-            <div class="select-wrap">
-              <select id="instrument-select">
-                <option value="piano">Fortepian</option>
-                <option value="flute">Flet</option>
-                <option value="clarinet">Klarnet</option>
-                <option value="violin">Skrzypce</option>
-                <option value="xylophone">Ksylofon</option>
-                <option value="trumpet">Trąbka</option>
-                <option value="bassoon">Fagot</option>
-              </select>
-            </div>
-          </div>
         </div>
 
         <!-- Wyraźna karta zadania -->
@@ -73,8 +59,10 @@ const subNavItems = [
           <div class="sing-task-badge" id="task-badge">1</div>
           <div class="sing-task-body">
             <div class="sing-task-meta">
+              <span id="task-attempt-tag" class="sing-tag tag-attempt">Próba 1/3</span>
+              <span id="task-step-tag" class="sing-tag tag-step">Krok 1/2: Dźwięk wyjściowy</span>
               <span id="task-direction-tag" class="sing-tag tag-direction-up">w górę ↑</span>
-              <span id="task-root-tag" class="sing-tag tag-root">od dźwięku: <strong>C4</strong></span>
+              <span id="task-root-tag" class="sing-tag tag-root">od: <strong>C4</strong></span>
             </div>
             <div class="sing-task-title" id="task-title">
               Zaśpiewaj: <strong>Pryma czysta</strong>
@@ -85,14 +73,14 @@ const subNavItems = [
         <div id="status-line" class="status-line"></div>
 
         <div class="player-controls">
-          <button type="button" id="ref-pitch-btn" class="btn-ghost" title="Zagraj dźwięk wyjściowy">
+          <button type="button" id="ref-pitch-btn" class="btn-ghost" title="Zagraj dźwięk wyjściowy na fortepianie">
             <span>🔔 Dźwięk wyjściowy</span>
           </button>
           <button type="button" id="sing-btn" class="btn-primary">
             <span class="mic-icon" aria-hidden="true">🎤</span>
             <span id="sing-btn-text">Zaśpiewaj interwał</span>
           </button>
-          <button type="button" id="play-model-btn" class="btn-dark" title="Odsłuchaj pełny interwał na instrumencie">
+          <button type="button" id="play-model-btn" class="btn-dark" title="Odsłuchaj pełny interwał na fortepianie">
             <span>Posłuchaj wzorca</span>
           </button>
           <button type="button" id="next-btn" class="btn-dark" style="display:none;">
@@ -142,4 +130,3 @@ const subNavItems = [
     <script is:inline src="/assets/js/interwaly-spiewaj.js"></script>
   </Fragment>
 </Layout>
-

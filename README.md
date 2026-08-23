@@ -8,7 +8,7 @@ Opis idei projektu znajduje się na podstronie [O projekcie](o-projekcie.html). 
 
 ## Moduły i ćwiczenia
 
-* **Interwały** – rozpoznawanie ze słuchu (tryb melodyczny w górę/dół, harmoniczny oraz mieszany), czytanie zapisu nutowego (klucz wiolinowy i basowy) oraz interaktywne budowanie interwałów.
+* **Interwały** – rozpoznawanie ze słuchu (tryb melodyczny w górę/dół, harmoniczny oraz mieszany), czytanie zapisu nutowego (klucz wiolinowy i basowy), interaktywne budowanie interwałów na pięciolinii oraz śpiewanie interwałów do mikrofonu z natychmiastową oceną intonacji głosu.
 * **Trójdźwięki** – durowy, molowy, zmniejszony i zwiększony w postaci zasadniczej oraz z przewrotami (sekstowy, kwartsekstowy); warianty: ze słuchu, zapis nutowy, budowanie na pięciolinii.
 * **Gamy i stopnie** – rozpoznawanie gamy durowej oraz 4 odmian molowej (eolska, harmoniczna, dorycka, melodyczna) granych w obu kierunkach; osobny trening rozpoznawania stopni gamy (solmizacja I–VIII) w kontekście tonalnym.
 * **Puzzle melodyczne** – układanie potasowanych fragmentów melodii we właściwej kolejności (ze słuchu lub z zapisu nutowego); pełny odsłuch poprzedzony jest odliczeniem jednego taktu metronomem w zadanym tempie.

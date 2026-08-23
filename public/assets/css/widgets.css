@@ -893,6 +893,287 @@
 .answer-slot.is-correct { border-color: var(--green); background: var(--green-soft); }
 .answer-slot.is-wrong   { border-color: var(--coral); background: rgba(192, 57, 43, 0.08); }
 
+/* -------------------------------------------------------------
+   MODUŁ ŚPIEWU / SOLFEŻ / PITCH TRACKER
+------------------------------------------------------------- */
+.mic-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    border-radius: var(--radius-pill);
+    font-size: 0.76rem;
+    font-weight: 600;
+    background: var(--surface-subtle);
+    color: var(--muted);
+    border: 1px solid var(--border);
+    margin-bottom: 12px;
+    transition: all 0.2s ease;
+}
+
+.mic-status-badge.is-active {
+    background: var(--green-soft);
+    color: var(--green);
+    border-color: var(--green);
+    box-shadow: 0 0 0 1px var(--green);
+}
+
+.tuner-card {
+    background: var(--surface-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    margin: 14px 0 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.tuner-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 380px;
+}
+
+.tuner-note {
+    font-size: 1.85rem;
+    font-weight: 800;
+    font-family: var(--font-display);
+    color: var(--ink);
+    line-height: 1;
+}
+
+.tuner-solfege {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--muted);
+    font-style: italic;
+}
+
+.tuner-status {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--muted);
+    transition: color 0.15s ease;
+}
+
+.tuner-status.is-in-tune {
+    color: var(--green);
+}
+
+.tuner-status.is-flat, .tuner-status.is-sharp {
+    color: var(--gold);
+}
+
+.tuner-meter {
+    position: relative;
+    width: 100%;
+    max-width: 380px;
+    height: 10px;
+    background: #e2dfd5;
+    border-radius: 5px;
+    overflow: visible;
+}
+
+.tuner-sweet-spot {
+    position: absolute;
+    top: 0;
+    left: 35%;
+    width: 30%;
+    height: 100%;
+    background: rgba(46, 125, 50, 0.25);
+    border-radius: 4px;
+}
+
+.tuner-center-mark {
+    position: absolute;
+    top: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 18px;
+    background: var(--green);
+    border-radius: 1px;
+    z-index: 2;
+}
+
+.tuner-indicator {
+    position: absolute;
+    top: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: 2.5px solid #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    transition: left 0.08s ease-out;
+    z-index: 3;
+}
+
+.btn-primary.btn-active {
+    background: var(--coral) !important;
+    color: #ffffff !important;
+    box-shadow: 0 8px 20px -6px rgba(204, 60, 48, 0.6) !important;
+}
+
+/* Karta zadania wokalnego */
+.sing-task-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--surface);
+    border: 2px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    padding: 14px 20px;
+    margin: 10px auto 16px;
+    max-width: 540px;
+    box-shadow: var(--shadow-subtle);
+    text-align: left;
+}
+
+.sing-task-badge {
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    background: var(--gold-soft);
+    color: var(--gold);
+    border: 1.5px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 1.65rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.sing-task-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sing-task-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.sing-tag {
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: var(--radius-pill);
+    letter-spacing: 0.02em;
+}
+
+.sing-tag.tag-step {
+    background: var(--gold-soft);
+    color: var(--gold);
+    border: 1px solid var(--gold);
+}
+
+.sing-tag.tag-attempt {
+    background: var(--plum-soft);
+    color: var(--plum);
+    border: 1px solid var(--plum);
+}
+
+.sing-tag.tag-direction-up {
+    background: var(--teal-soft);
+    color: var(--teal);
+}
+
+.sing-tag.tag-direction-down {
+    background: var(--indigo-soft);
+    color: var(--indigo);
+}
+
+.sing-tag.tag-root {
+    background: var(--surface-subtle);
+    color: var(--ink);
+    border: 1px solid var(--border);
+}
+
+.sing-task-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.25;
+}
+
+.sing-task-title strong {
+    color: var(--gold);
+    font-weight: 800;
+}
+
+/* Podświetlenie aktywnej nuty docelowej w Verovio SVG */
+.notation-container g.note.note-current-target * {
+    fill: var(--gold) !important;
+    stroke: var(--gold) !important;
+}
+
+.notation-container g.note.note-feedback-correct * {
+    fill: var(--green) !important;
+    stroke: var(--green) !important;
+}
+
+.notation-container g.note.note-feedback-warn * {
+    fill: var(--gold) !important;
+    stroke: var(--gold) !important;
+    opacity: 0.95;
+}
+
+.notation-container g.note.note-feedback-wrong * {
+    fill: var(--coral) !important;
+    stroke: var(--coral) !important;
+}
+
+.feedback-legend {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.legend-dot.dot-correct {
+    background: var(--green);
+}
+
+.legend-dot.dot-warn {
+    background: var(--gold);
+}
+
+.legend-dot.dot-wrong {
+    background: var(--coral);
+}
+
 @media (max-width: 600px) {
     .widget {
         padding: 20px 14px 18px;
@@ -975,5 +1256,25 @@
     }
     .piano-keyboard-wrap {
         margin: 10px 0 14px;
+    }
+    .sing-task-card {
+        padding: 10px 14px;
+        gap: 12px;
+    }
+    .sing-task-badge {
+        width: 44px;
+        height: 44px;
+        font-size: 1.35rem;
+        border-radius: 10px;
+    }
+    .sing-task-title {
+        font-size: 1.02rem;
+    }
+    .tuner-card {
+        padding: 12px 14px;
+        margin: 10px 0 14px;
+    }
+    .tuner-note {
+        font-size: 1.5rem;
     }
 }
