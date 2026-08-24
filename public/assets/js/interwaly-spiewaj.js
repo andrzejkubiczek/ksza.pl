@@ -21,15 +21,7 @@
     const LEVEL_1_SYMBOLS = ['1', '2>', '2', '3>', '3', '4', '5', '8'];
     const LEVEL_2_SYMBOLS = ['1', '2>', '2', '3>', '3', '4', '4<', '5', '6>', '6', '7', '7<', '8'];
 
-    const SOLMIZATION = {
-        'C': 'do', 'C#': 'cis', 'Db': 'des',
-        'D': 're', 'D#': 'dis', 'Eb': 'es',
-        'E': 'mi',
-        'F': 'fa', 'F#': 'fis', 'Gb': 'ges',
-        'G': 'sol', 'G#': 'gis', 'Ab': 'as',
-        'A': 'la', 'A#': 'ais', 'Bb': 'b',
-        'B': 'si'
-    };
+    const SOLMIZATION = MT.SOLMIZATION;
 
     const SEMITONES_TO_INTERVAL_NAME = {
         0: 'Pryma czysta',
@@ -77,8 +69,7 @@
     let wrongNoteHoldMs = 0;
 
     // Filtr medianowy wygładzający wibrato i mikrofluktuacje:
-    const pitchHistory = [];
-    const HISTORY_SIZE = 5;
+    const pitchFilter = new KszaUI.PitchMedianFilter(5);
 
     // Kontrola nowego ataku i okna ochronnego dla Kroku 2:
     let sungRootMidi = null;
@@ -88,13 +79,7 @@
 
     const currentLevel = () => document.getElementById('level-select')?.value || '1';
 
-    function setStatus(message, type) {
-        const el = document.getElementById('status-line');
-        if (el) {
-            el.textContent = message || '';
-            el.className = `status-line${type ? ` status-${type}` : ''}`;
-        }
-    }
+    const setStatus = (msg, type) => KszaUI.setStatus(msg, type);
 
     function onAudioState(state, message) {
         const playBtn = document.getElementById('play-model-btn');
@@ -107,28 +92,7 @@
         else setStatus('', null);
     }
 
-    /**
-     * Krótki, przyjemny dźwięk potwierdzenia zaliczenia 1. dźwięku (chime)
-     */
-    function playSuccessChime() {
-        try {
-            const ctx = KszaAudio.context;
-            if (!ctx) return;
-            if (ctx.state === 'suspended') ctx.resume();
-            const t = ctx.currentTime;
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(880, t); // A5
-            osc.frequency.exponentialRampToValueAtTime(1320, t + 0.10); // E6
-            gain.gain.setValueAtTime(0.12, t);
-            gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start(t);
-            osc.stop(t + 0.17);
-        } catch (e) {}
-    }
+    const playSuccessChime = () => KszaUI.playSuccessChime();
 
     function noteToToneName(note) {
         const accidental = note.alter === 1 ? '#' : note.alter === -1 ? 'b' : note.alter === 2 ? '##' : note.alter === -2 ? 'bb' : '';
@@ -341,7 +305,7 @@
         lastFrameTime = null;
         lastHeardSemitone = null;
         wrongNoteHoldMs = 0;
-        pitchHistory.length = 0;
+        pitchFilter.reset();
         sungRootMidi = null;
         step1CooldownUntil = 0;
         waitingForStep1Onset = false;
@@ -375,7 +339,7 @@
         lastFrameTime = null;
         lastHeardSemitone = null;
         wrongNoteHoldMs = 0;
-        pitchHistory.length = 0;
+        pitchFilter.reset();
         sungRootMidi = null;
         step1CooldownUntil = 0;
         waitingForStep1Onset = false;
@@ -578,7 +542,7 @@
         lastFrameTime = null;
         lastHeardSemitone = null;
         wrongNoteHoldMs = 0;
-        pitchHistory.length = 0;
+        pitchFilter.reset();
         sungRootMidi = null;
         step1CooldownUntil = 0;
         waitingForStep1Onset = false;
@@ -651,22 +615,7 @@
         }
     }
 
-    /**
-     * Oblicza wygładzoną medianę wysokości z ostatnich klatek
-     */
-    function getFilteredPitch(pitch) {
-        pitchHistory.push(pitch);
-        if (pitchHistory.length > HISTORY_SIZE) {
-            pitchHistory.shift();
-        }
-
-        if (pitchHistory.length === 1) return pitch;
-
-        // Mediana według numeru MIDI
-        const sorted = [...pitchHistory].sort((a, b) => a.midi - b.midi);
-        const mid = Math.floor(sorted.length / 2);
-        return sorted[mid];
-    }
+    const getFilteredPitch = (pitch) => pitchFilter.push(pitch);
 
     function onPitchDetected(data) {
         const now = performance.now();
@@ -724,7 +673,7 @@
                     holdDurationMs = 0;
                     wrongNoteHoldMs = 0;
                     lastHeardSemitone = null;
-                    pitchHistory.length = 0;
+                    pitchFilter.reset();
 
                     updateHoldProgressBar(0);
                     playSuccessChime();
@@ -850,7 +799,7 @@
             sungRootMidi = null;
             waitingForStep1Onset = false;
             hasDetectedSilenceBeforeStep1 = false;
-            pitchHistory.length = 0;
+            pitchFilter.reset();
 
             updateHoldProgressBar(0);
             updateTaskStepUI(0);

@@ -1,13 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import SubNav from '../../components/SubNav.astro';
-
-const subNavItems = [
-  { label: 'Ze słuchu', href: '/cwiczenia/trojdzwieki' },
-  { label: 'Zapis nutowy', href: '/cwiczenia/trojdzwieki-zapis' },
-  { label: 'Zbuduj trójdźwięk', href: '/cwiczenia/trojdzwieki-buduj' },
-  { label: 'Zaśpiewaj', href: '/cwiczenia/trojdzwieki-spiewaj', active: true },
-];
 ---
 <Layout
   title="Zaśpiewaj trójdźwięk - ksza.pl"
@@ -19,7 +12,7 @@ const subNavItems = [
   <main>
     <div class="container exercise-page">
       <div class="widget">
-        <SubNav items={subNavItems} />
+        <SubNav group="trojdzwieki" />
         <div class="widget-header">
           <h1>Zaśpiewaj trójdźwięk</h1>
           <p>
@@ -113,7 +106,7 @@ const subNavItems = [
         </div>
 
         <!-- Informacje zwrotne -->
-        <div id="feedback" class="feedback-msg"></div>
+        <div id="feedback" class="feedback-msg" aria-live="polite" role="status"></div>
         <div id="feedback-legend" class="feedback-legend" style="display: none;">
           <span class="legend-item"><span class="legend-dot dot-correct"></span> Czysty atak</span>
           <span class="legend-item"><span class="legend-dot dot-warn"></span> Dociągany / niepewny</span>

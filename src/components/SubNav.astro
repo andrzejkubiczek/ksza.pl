@@ -5,17 +5,61 @@ export interface SubNavItem {
   active?: boolean;
 }
 
+export type ExerciseGroup = 'interwaly' | 'trojdzwieki' | 'gamy' | 'puzzle' | 'dyktanda' | 'rytm';
+
 export interface Props {
-  items: SubNavItem[];
+  group?: ExerciseGroup;
+  items?: SubNavItem[];
 }
 
-const { items } = Astro.props;
+const GROUPS: Record<ExerciseGroup, SubNavItem[]> = {
+  interwaly: [
+    { label: 'Ze słuchu', href: '/cwiczenia/interwaly' },
+    { label: 'Zapis nutowy', href: '/cwiczenia/interwaly-zapis' },
+    { label: 'Zbuduj interwał', href: '/cwiczenia/interwaly-buduj' },
+    { label: 'Zaśpiewaj', href: '/cwiczenia/interwaly-spiewaj' },
+  ],
+  trojdzwieki: [
+    { label: 'Ze słuchu', href: '/cwiczenia/trojdzwieki' },
+    { label: 'Zapis nutowy', href: '/cwiczenia/trojdzwieki-zapis' },
+    { label: 'Zbuduj trójdźwięk', href: '/cwiczenia/trojdzwieki-buduj' },
+    { label: 'Zaśpiewaj', href: '/cwiczenia/trojdzwieki-spiewaj' },
+  ],
+  gamy: [
+    { label: 'Odmiany gam', href: '/cwiczenia/gamy' },
+    { label: 'Stopnie gamy', href: '/cwiczenia/gamy-stopnie' },
+    { label: 'Zaśpiewaj', href: '/cwiczenia/gamy-spiewaj' },
+  ],
+  puzzle: [
+    { label: 'Ze słuchu', href: '/cwiczenia/puzzle' },
+    { label: 'Zapis nutowy', href: '/cwiczenia/puzzle-zapis' },
+  ],
+  dyktanda: [
+    { label: 'Dyktando', href: '/cwiczenia/dyktanda-wysokosciowe' },
+    { label: 'Pamięć melodyczna', href: '/cwiczenia/pamiec-melodyczna' },
+  ],
+  rytm: [
+    { label: 'Ze słuchu', href: '/cwiczenia/rytm' },
+    { label: 'Zapis nutowy', href: '/cwiczenia/rytm-zapis' },
+  ]
+};
+
+const { group, items } = Astro.props;
+const navItems = items || (group ? GROUPS[group] : []);
+
+const normalizePath = (path: string) => path.replace(/\.html$/, '').replace(/\/$/, '') || '/';
+const currentPath = normalizePath(Astro.url.pathname);
 ---
 <nav class="subnav" aria-label="Odmiany ćwiczenia">
-  {items.map((item) => (
-    <a href={item.href} aria-current={item.active ? 'page' : undefined}>
-      {item.label}
-    </a>
-  ))}
+  {navItems.map((item) => {
+    const isActive = item.active !== undefined
+      ? item.active
+      : normalizePath(item.href) === currentPath;
+    return (
+      <a href={item.href} aria-current={isActive ? 'page' : undefined}>
+        {item.label}
+      </a>
+    );
+  })}
 </nav>
 

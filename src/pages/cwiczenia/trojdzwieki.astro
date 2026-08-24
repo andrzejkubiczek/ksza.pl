@@ -1,13 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import SubNav from '../../components/SubNav.astro';
-
-const subNavItems = [
-  { label: 'Ze słuchu', href: '/cwiczenia/trojdzwieki', active: true },
-  { label: 'Zapis nutowy', href: '/cwiczenia/trojdzwieki-zapis' },
-  { label: 'Zbuduj trójdźwięk', href: '/cwiczenia/trojdzwieki-buduj' },
-  { label: 'Zaśpiewaj', href: '/cwiczenia/trojdzwieki-spiewaj' },
-];
 ---
 <Layout
   title="Trójdźwięki - ksza.pl"
@@ -19,7 +12,7 @@ const subNavItems = [
   <main>
     <div class="container exercise-page">
       <div class="widget">
-        <SubNav items={subNavItems} />
+        <SubNav group="trojdzwieki" />
         <div class="widget-header">
           <h1>Rozpoznaj trójdźwięk</h1>
           <p>Posłuchaj trójdźwięku i wybierz, jaki to rodzaj.<br><small>Na wyższym poziomie wskazujesz też, w jakiej jest postaci.</small></p>
@@ -77,7 +70,7 @@ const subNavItems = [
           <button id="next-btn" class="btn-dark" style="display:none;">Następny trójdźwięk →</button>
         </div>
 
-        <div id="feedback" class="feedback-msg"></div>
+        <div id="feedback" class="feedback-msg" aria-live="polite" role="status"></div>
 
         <div class="intervals-grid" id="triad-grid">
           <button class="interval-choice" data-key="durowy_z"><strong>+</strong><small>Durowy</small></button>

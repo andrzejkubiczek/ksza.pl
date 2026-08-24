@@ -1,11 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import SubNav from '../../components/SubNav.astro';
-
-const subNavItems = [
-  { label: 'Ze słuchu', href: '/cwiczenia/puzzle' },
-  { label: 'Zapis nutowy', href: '/cwiczenia/puzzle-zapis', active: true },
-];
 ---
 <Layout
   title="Dyktando muzyczne - puzzle (zapis nutowy) - ksza.pl"
@@ -17,7 +12,7 @@ const subNavItems = [
   <main>
     <div class="container exercise-page">
       <div class="widget">
-        <SubNav items={subNavItems} />
+        <SubNav group="puzzle" />
         <div class="widget-header">
           <h1>Dyktando muzyczne - puzzle (zapis nutowy)</h1>
           <p>Wysłuchaj dyktanda, przeczytaj zapis nutowy fragmentów, a następnie ułóż potasowane takty we właściwej kolejności.</p>
@@ -82,7 +77,7 @@ const subNavItems = [
           <button id="check-btn" class="btn-dark">Sprawdź kolejność</button>
         </div>
 
-        <div id="result-feedback" class="feedback-msg"></div>
+        <div id="result-feedback" class="feedback-msg" aria-live="polite" role="status"></div>
       </div>
     </div>
   </main>

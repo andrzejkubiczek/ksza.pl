@@ -332,6 +332,72 @@ window.KszaInstrumentRange = (() => {
     };
 })();
 
+window.KszaUI = (() => {
+    function setStatus(message, type = null) {
+        const el = document.getElementById('status-line');
+        if (el) {
+            el.textContent = message || '';
+            el.className = `status-line${type ? ` status-${type}` : ''}`;
+        }
+    }
+
+    function createAudioStateHandler(playButtonId = 'play-btn') {
+        return (state, message) => {
+            const playBtn = document.getElementById(playButtonId);
+            if (playBtn) playBtn.disabled = (state === 'loading');
+
+            if (state === 'error') setStatus(message, 'error');
+            else if (state === 'loading') setStatus(message, null);
+            else setStatus('', null);
+        };
+    }
+
+    function playSuccessChime() {
+        try {
+            const ctx = KszaAudio.context;
+            if (!ctx) return;
+            if (ctx.state === 'suspended') ctx.resume();
+            const t = ctx.currentTime;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, t);
+            osc.frequency.exponentialRampToValueAtTime(1320, t + 0.10);
+            gain.gain.setValueAtTime(0.12, t);
+            gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(t);
+            osc.stop(t + 0.17);
+        } catch (e) {}
+    }
+
+    class PitchMedianFilter {
+        constructor(size = 5) {
+            this.size = size;
+            this.history = [];
+        }
+        push(pitch) {
+            this.history.push(pitch);
+            if (this.history.length > this.size) this.history.shift();
+            if (this.history.length === 1) return pitch;
+
+            const sorted = [...this.history].sort((a, b) => a.midi - b.midi);
+            return sorted[Math.floor(sorted.length / 2)];
+        }
+        reset() {
+            this.history.length = 0;
+        }
+    }
+
+    return {
+        setStatus,
+        createAudioStateHandler,
+        playSuccessChime,
+        PitchMedianFilter
+    };
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
     const footerYear = document.getElementById('footer-year');
     if (footerYear) {

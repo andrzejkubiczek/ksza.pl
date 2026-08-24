@@ -42,21 +42,8 @@
         return minIdx + Math.floor(Math.random() * (maxIdx - minIdx + 1));
     }
 
-    function setStatus(message, type) {
-        const el = document.getElementById('status-line');
-        if (el) {
-            el.textContent = message || '';
-            el.className = `status-line${type ? ` status-${type}` : ''}`;
-        }
-    }
-
-    function onAudioState(state, message) {
-        const playBtn = document.getElementById('play-btn');
-        if (playBtn) playBtn.disabled = state === 'loading';
-        if (state === 'error') setStatus(message, 'error');
-        else if (state === 'loading') setStatus(message, null);
-        else setStatus('', null);
-    }
+    const setStatus = (msg, type) => KszaUI.setStatus(msg, type);
+    const onAudioState = KszaUI.createAudioStateHandler('play-btn');
 
     function stopScheduledInterval() {
         scheduledIntervalTimeouts.forEach((id) => clearTimeout(id));

@@ -1,13 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import SubNav from '../../components/SubNav.astro';
-
-const subNavItems = [
-  { label: 'Ze słuchu', href: '/cwiczenia/interwaly' },
-  { label: 'Zapis nutowy', href: '/cwiczenia/interwaly-zapis' },
-  { label: 'Zbuduj interwał', href: '/cwiczenia/interwaly-buduj', active: true },
-  { label: 'Zaśpiewaj', href: '/cwiczenia/interwaly-spiewaj' },
-];
 ---
 <Layout
   title="Zbuduj interwał - ksza.pl"
@@ -19,7 +12,7 @@ const subNavItems = [
   <main>
     <div class="container exercise-page">
       <div class="widget">
-        <SubNav items={subNavItems} />
+        <SubNav group="interwaly" />
         <div class="widget-header">
           <h1>Zbuduj interwał</h1>
           <p>Do podanego dźwięku dorysuj drugi, tak żeby razem utworzyły wskazany interwał.<br><small>Na wyższym poziomie także w dół i od dźwięku chromatycznego.</small></p>
@@ -72,7 +65,7 @@ const subNavItems = [
           <button type="button" id="check-btn" class="btn-primary">Sprawdź</button>
         </div>
 
-        <div id="feedback" class="feedback-msg"></div>
+        <div id="feedback" class="feedback-msg" aria-live="polite" role="status"></div>
 
         <div class="puzzle-controls">
           <button id="next-btn" class="btn-dark" style="display:none;">Następny interwał →</button>

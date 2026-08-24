@@ -1,13 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import SubNav from '../../components/SubNav.astro';
-
-const subNavItems = [
-  { label: 'Ze słuchu', href: '/cwiczenia/trojdzwieki' },
-  { label: 'Zapis nutowy', href: '/cwiczenia/trojdzwieki-zapis' },
-  { label: 'Zbuduj trójdźwięk', href: '/cwiczenia/trojdzwieki-buduj', active: true },
-  { label: 'Zaśpiewaj', href: '/cwiczenia/trojdzwieki-spiewaj' },
-];
 ---
 <Layout
   title="Zbuduj trójdźwięk - ksza.pl"
@@ -19,7 +12,7 @@ const subNavItems = [
   <main>
     <div class="container exercise-page">
       <div class="widget">
-        <SubNav items={subNavItems} />
+        <SubNav group="trojdzwieki" />
         <div class="widget-header">
           <h1>Zbuduj trójdźwięk</h1>
           <p>Od podanego dźwięku w basie zbuduj pozostałe dwa - strzałkami wybierz, którą ustawiasz, a jej wysokość strzałką góra/dół i znakiem chromatycznym.</p>
@@ -77,7 +70,7 @@ const subNavItems = [
           <button type="button" id="check-btn" class="btn-primary">Sprawdź</button>
         </div>
 
-        <div id="feedback" class="feedback-msg"></div>
+        <div id="feedback" class="feedback-msg" aria-live="polite" role="status"></div>
 
         <div class="puzzle-controls">
           <button id="next-btn" class="btn-dark" style="display:none;">Następny trójdźwięk →</button>

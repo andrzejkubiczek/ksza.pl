@@ -26,6 +26,7 @@ const {
   <title>{title}</title>
   <meta name="description" content={description}>
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/site.css">
   {includeWidgetsCss && <link rel="stylesheet" href="/assets/css/widgets.css">}
@@ -38,7 +39,7 @@ const {
       <span class="brand-title">ksza.pl<span class="brand-dot" aria-hidden="true"></span></span>
       <small>kształcenie słuchu</small>
     </a>
-    <button class="nav-toggle" aria-controls="site-menu" aria-expanded="false">Menu</button>
+    <button class="nav-toggle" aria-controls="site-menu" aria-expanded="false" aria-label="Przełącz menu główne">Menu</button>
     <NavMenu currentFamily={currentFamily} />
   </div>
 </header>

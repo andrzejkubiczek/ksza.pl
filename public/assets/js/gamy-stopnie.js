@@ -24,21 +24,8 @@
     const currentInstrument = () => document.getElementById('instrument-select').value;
     const currentLevel = () => document.getElementById('level-select').value;
 
-    function setStatus(message, type) {
-        const el = document.getElementById('status-line');
-        if (el) {
-            el.textContent = message || '';
-            el.className = `status-line${type ? ` status-${type}` : ''}`;
-        }
-    }
-
-    function onAudioState(state, message) {
-        const playBtn = document.getElementById('play-btn');
-        if (playBtn) playBtn.disabled = state === 'loading';
-        if (state === 'error') setStatus(message, 'error');
-        else if (state === 'loading') setStatus(message, null);
-        else setStatus('', null);
-    }
+    const setStatus = (msg, type) => KszaUI.setStatus(msg, type);
+    const onAudioState = KszaUI.createAudioStateHandler('play-btn');
 
     function stopPlayback() {
         scheduledTimeouts.forEach((id) => clearTimeout(id));

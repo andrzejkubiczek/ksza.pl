@@ -72,19 +72,51 @@ window.KszaMusicTheory = (() => {
         return notes.every(isCleanNote);
     }
 
+    const SOLMIZATION = {
+        'C': 'do', 'C#': 'cis', 'Db': 'des',
+        'D': 're', 'D#': 'dis', 'Eb': 'es',
+        'E': 'mi',
+        'F': 'fa', 'F#': 'fis', 'Gb': 'ges',
+        'G': 'sol', 'G#': 'gis', 'Ab': 'as',
+        'A': 'la', 'A#': 'ais', 'Bb': 'b',
+        'B': 'si'
+    };
+
+    function noteSolfege(note) {
+        if (!note || !note.letter) return '';
+        const accidental = note.alter === 1 ? '#' : note.alter === -1 ? 'b' : '';
+        return SOLMIZATION[note.letter + accidental] || SOLMIZATION[note.letter] || '';
+    }
+
+    function buildSingleMeasureScoreXml({ clef = 'treble', notes = [], timeBeats = 4, beatType = 4, partTitle = 'Ćwiczenie' }) {
+        const clefTag = clef === 'bass'
+            ? '<clef><sign>F</sign><line>4</line></clef>'
+            : '<clef><sign>G</sign><line>2</line></clef>';
+
+        const notesXml = notes.map((n) => {
+            if (n.isRest) return `<note><rest/><duration>2</duration><type>half</type></note>`;
+            return `<note>${noteToPitchXml(n)}<duration>2</duration><type>half</type>${accidentalTag(n)}</note>`;
+        }).join('');
+
+        return `<?xml version="1.0" encoding="UTF-8"?><score-partwise version="4.0"><part-list><score-part id="P1"><part-name print-object="no">${partTitle}</part-name></score-part></part-list><part id="P1"><measure number="1"><attributes><divisions>1</divisions><key><fifths>0</fifths></key><time><beats>${timeBeats}</beats><beat-type>${beatType}</beat-type></time>${clefTag}</attributes>${notesXml}</measure></part></score-partwise>`;
+    }
+
     return {
         LETTERS,
         LETTER_NATURAL_OFFSET,
         ACCIDENTAL_NAMES,
+        SOLMIZATION,
         TRIAD_SHAPES,
         ladderEntry,
         diatonicIndexOf,
         absoluteSemitone,
         spellByShape,
         noteLabel,
+        noteSolfege,
         noteToPitchXml,
         accidentalTag,
         buildTriadNotes,
+        buildSingleMeasureScoreXml,
         isCleanNote,
         isCleanTriad
     };

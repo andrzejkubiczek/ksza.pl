@@ -1,13 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import SubNav from '../../components/SubNav.astro';
-
-const subNavItems = [
-  { label: 'Ze słuchu', href: '/cwiczenia/trojdzwieki' },
-  { label: 'Zapis nutowy', href: '/cwiczenia/trojdzwieki-zapis', active: true },
-  { label: 'Zbuduj trójdźwięk', href: '/cwiczenia/trojdzwieki-buduj' },
-  { label: 'Zaśpiewaj', href: '/cwiczenia/trojdzwieki-spiewaj' },
-];
 ---
 <Layout
   title="Trójdźwięki - zapis nutowy - ksza.pl"
@@ -19,7 +12,7 @@ const subNavItems = [
   <main>
     <div class="container exercise-page">
       <div class="widget">
-        <SubNav items={subNavItems} />
+        <SubNav group="trojdzwieki" />
         <div class="widget-header">
           <h1>Trójdźwięki - zapis nutowy</h1>
           <p>Odczytaj trójdźwięk zapisany na pięciolinii i wskaż jego rodzaj.</p>
@@ -53,7 +46,7 @@ const subNavItems = [
 
         <div id="notation-container" class="notation-container" aria-live="polite"></div>
 
-        <div id="feedback" class="feedback-msg"></div>
+        <div id="feedback" class="feedback-msg" aria-live="polite" role="status"></div>
 
         <div class="intervals-grid" id="triad-grid">
           <button class="interval-choice" data-key="durowy_z"><strong>+</strong><small>Durowy</small></button>

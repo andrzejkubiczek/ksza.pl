@@ -1,12 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import SubNav from '../../components/SubNav.astro';
-
-const subNavItems = [
-  { label: 'Rozpoznaj gamę', href: '/cwiczenia/gamy' },
-  { label: 'Rozpoznaj stopień', href: '/cwiczenia/gamy-stopnie' },
-  { label: 'Zaśpiewaj gamę', href: '/cwiczenia/gamy-spiewaj', active: true },
-];
 ---
 <Layout
   title="Zaśpiewaj gamę - ksza.pl"
@@ -18,7 +12,7 @@ const subNavItems = [
   <main>
     <div class="container exercise-page">
       <div class="widget">
-        <SubNav items={subNavItems} />
+        <SubNav group="gamy" />
         <div class="widget-header">
           <h1>Zaśpiewaj gamę</h1>
           <p>
@@ -123,7 +117,7 @@ const subNavItems = [
         </div>
 
         <!-- Informacje zwrotne -->
-        <div id="feedback" class="feedback-msg"></div>
+        <div id="feedback" class="feedback-msg" aria-live="polite" role="status"></div>
         <div id="feedback-legend" class="feedback-legend" style="display: none;">
           <span class="legend-item"><span class="legend-dot dot-correct"></span> Czysty atak</span>
           <span class="legend-item"><span class="legend-dot dot-warn"></span> Dociągany / niepewny</span>

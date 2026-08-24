@@ -1,12 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import SubNav from '../../components/SubNav.astro';
-
-const subNavItems = [
-  { label: 'Odmiany gam', href: '/cwiczenia/gamy', active: true },
-  { label: 'Stopnie gamy', href: '/cwiczenia/gamy-stopnie' },
-  { label: 'Zaśpiewaj', href: '/cwiczenia/gamy-spiewaj' },
-];
 ---
 <Layout
   title="Gamy - ksza.pl"
@@ -18,7 +12,7 @@ const subNavItems = [
   <main>
     <div class="container exercise-page">
       <div class="widget">
-        <SubNav items={subNavItems} />
+        <SubNav group="gamy" />
         <div class="widget-header">
           <h1>Rozpoznaj gamę</h1>
           <p>Posłuchaj gamy i wskaż, jaka to odmiana.<br><small>Gama gra się losowo: od toniki w górę i z powrotem, albo od góry w dół i z powrotem.</small></p>
@@ -57,7 +51,7 @@ const subNavItems = [
           <button id="next-btn" class="btn-dark" style="display:none;">Następna gama →</button>
         </div>
 
-        <div id="feedback" class="feedback-msg"></div>
+        <div id="feedback" class="feedback-msg" aria-live="polite" role="status"></div>
 
         <div class="scale-choices">
           <button class="scale-choice" data-key="durowa">Durowa</button>

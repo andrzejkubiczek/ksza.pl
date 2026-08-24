@@ -52,13 +52,7 @@
         return selected;
     }
 
-    function setStatus(message, type) {
-        const el = document.getElementById('status-line');
-        if (el) {
-            el.textContent = message || '';
-            el.className = `status-line${type ? ` status-${type}` : ''}`;
-        }
-    }
+    const setStatus = (msg, type) => KszaUI.setStatus(msg, type);
 
     async function generateNewQuestion() {
         hasAnswered = false;

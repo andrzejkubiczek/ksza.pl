@@ -54,13 +54,7 @@
         return selected;
     }
 
-    function setStatus(message, type) {
-        const el = document.getElementById('status-line');
-        if (el) {
-            el.textContent = message || '';
-            el.className = `status-line${type ? ` status-${type}` : ''}`;
-        }
-    }
+    const setStatus = (msg, type) => KszaUI.setStatus(msg, type);
 
     function pickRootLetter(shapeName) {
         const pool = shapeName === 'zwiekszony' ? MT.LETTERS.filter((l) => l !== 'B') : MT.LETTERS;

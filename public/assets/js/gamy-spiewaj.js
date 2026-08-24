@@ -77,15 +77,7 @@
         { name: 'f-moll', letter: 'F', alter: 0, fifths: -4 }
     ];
 
-    const SOLMIZATION = {
-        'C': 'do', 'C#': 'cis', 'Db': 'des',
-        'D': 're', 'D#': 'dis', 'Eb': 'es',
-        'E': 'mi',
-        'F': 'fa', 'F#': 'fis', 'Gb': 'ges',
-        'G': 'sol', 'G#': 'gis', 'Ab': 'as',
-        'A': 'la', 'A#': 'ais', 'Bb': 'b',
-        'B': 'si'
-    };
+    const SOLMIZATION = MT.SOLMIZATION;
 
     const DEGREE_ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
 
@@ -121,8 +113,7 @@
     let wrongNoteHoldMs = 0;
 
     // Filtr medianowy:
-    const pitchHistory = [];
-    const HISTORY_SIZE = 5;
+    const pitchFilter = new KszaUI.PitchMedianFilter(5);
 
     // Kontrola nowego ataku i okna ochronnego:
     let lastSungMidi = null;
@@ -132,13 +123,7 @@
 
     const currentLevel = () => document.getElementById('level-select')?.value || '1';
 
-    function setStatus(message, type) {
-        const el = document.getElementById('status-line');
-        if (el) {
-            el.textContent = message || '';
-            el.className = `status-line${type ? ` status-${type}` : ''}`;
-        }
-    }
+    const setStatus = (msg, type) => KszaUI.setStatus(msg, type);
 
     function onAudioState(state, message) {
         const playBtn = document.getElementById('play-model-btn');
@@ -432,7 +417,7 @@
         lastFrameTime = null;
         lastHeardSemitone = null;
         wrongNoteHoldMs = 0;
-        pitchHistory.length = 0;
+        pitchFilter.reset();
         lastSungMidi = null;
         stepCooldownUntil = 0;
         waitingForStepOnset = false;
@@ -465,7 +450,7 @@
         lastFrameTime = null;
         lastHeardSemitone = null;
         wrongNoteHoldMs = 0;
-        pitchHistory.length = 0;
+        pitchFilter.reset();
         lastSungMidi = null;
         stepCooldownUntil = 0;
         waitingForStepOnset = false;
@@ -650,7 +635,7 @@
         lastFrameTime = null;
         lastHeardSemitone = null;
         wrongNoteHoldMs = 0;
-        pitchHistory.length = 0;
+        pitchFilter.reset();
         lastSungMidi = null;
         stepCooldownUntil = 0;
         waitingForStepOnset = false;
@@ -723,17 +708,7 @@
         }
     }
 
-    function getFilteredPitch(pitch) {
-        pitchHistory.push(pitch);
-        if (pitchHistory.length > HISTORY_SIZE) {
-            pitchHistory.shift();
-        }
-        if (pitchHistory.length === 1) return pitch;
-
-        const sorted = [...pitchHistory].sort((a, b) => a.midi - b.midi);
-        const mid = Math.floor(sorted.length / 2);
-        return sorted[mid];
-    }
+    const getFilteredPitch = (pitch) => pitchFilter.push(pitch);
 
     function onPitchDetected(data) {
         const now = performance.now();
@@ -807,7 +782,7 @@
                     holdDurationMs = 0;
                     wrongNoteHoldMs = 0;
                     lastHeardSemitone = null;
-                    pitchHistory.length = 0;
+                    pitchFilter.reset();
 
                     updateHoldProgressBar(0);
                     updateTaskStepUI(currentStep);
@@ -874,7 +849,7 @@
             lastSungMidi = null;
             waitingForStepOnset = false;
             hasDetectedSilenceBeforeStep = false;
-            pitchHistory.length = 0;
+            pitchFilter.reset();
 
             updateHoldProgressBar(0);
             updateTaskStepUI(0);

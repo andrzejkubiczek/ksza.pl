@@ -54,13 +54,7 @@
     const currentLevel = () => document.getElementById('level-select').value;
     const stepBounds = () => (direction === 1 ? { min: 0, max: 7 } : { min: -7, max: 0 });
 
-    function setStatus(message, type) {
-        const el = document.getElementById('status-line');
-        if (el) {
-            el.textContent = message || '';
-            el.className = `status-line${type ? ` status-${type}` : ''}`;
-        }
-    }
+    const setStatus = (msg, type) => KszaUI.setStatus(msg, type);
 
     function candidateNote() {
         const startIdx = MT.diatonicIndexOf(rootNote.letter, rootNote.octave);

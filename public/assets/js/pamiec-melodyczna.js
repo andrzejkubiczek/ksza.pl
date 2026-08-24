@@ -33,21 +33,8 @@
 
     const currentLevel = () => LEVELS[document.getElementById('level-select').value];
 
-    function setStatus(message, type) {
-        const el = document.getElementById('status-line');
-        if (el) {
-            el.textContent = message || '';
-            el.className = `status-line${type ? ` status-${type}` : ''}`;
-        }
-    }
-
-    function onAudioState(state, message) {
-        const playBtn = document.getElementById('play-btn');
-        if (playBtn) playBtn.disabled = state === 'loading';
-        if (state === 'error') setStatus(message, 'error');
-        else if (state === 'loading') setStatus(message, null);
-        else setStatus('', null);
-    }
+    const setStatus = (msg, type) => KszaUI.setStatus(msg, type);
+    const onAudioState = KszaUI.createAudioStateHandler('play-btn');
 
     const ensureInstrumentReady = async () =>
         KszaAudio.ensureReady(document.getElementById('instrument-select'), onAudioState);

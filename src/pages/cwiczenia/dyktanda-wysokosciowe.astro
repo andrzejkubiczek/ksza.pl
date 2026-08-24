@@ -1,11 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import SubNav from '../../components/SubNav.astro';
-
-const subNavItems = [
-  { label: 'Dyktando', href: '/cwiczenia/dyktanda-wysokosciowe', active: true },
-  { label: 'Pamięć melodyczna', href: '/cwiczenia/pamiec-melodyczna' },
-];
 ---
 <Layout
   title="Dyktanda wysokościowe - ksza.pl"
@@ -17,7 +12,7 @@ const subNavItems = [
   <main>
     <div class="container exercise-page">
       <div class="widget">
-        <SubNav items={subNavItems} />
+        <SubNav group="dyktanda" />
         <div class="widget-header">
           <h1>Dyktando</h1>
           <p>Posłuchaj melodii i dorysuj resztę nut - liczy się tylko to, jak wysoko je postawisz.<br><small>Pierwszy dźwięk jest już poprawny.</small></p>
@@ -91,7 +86,7 @@ const subNavItems = [
           <button type="button" id="check-btn" class="btn-primary">Sprawdź</button>
         </div>
 
-        <div id="feedback" class="feedback-msg"></div>
+        <div id="feedback" class="feedback-msg" aria-live="polite" role="status"></div>
       </div>
     </div>
   </main>

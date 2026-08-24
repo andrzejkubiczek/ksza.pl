@@ -1,11 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import SubNav from '../../components/SubNav.astro';
-
-const subNavItems = [
-  { label: 'Ze słuchu', href: '/cwiczenia/rytm' },
-  { label: 'Zapis nutowy', href: '/cwiczenia/rytm-zapis', active: true },
-];
 ---
 <Layout
   title="Rytm - puzzle (zapis nutowy) - ksza.pl"
@@ -17,7 +12,7 @@ const subNavItems = [
   <main>
     <div class="container exercise-page">
       <div class="widget">
-        <SubNav items={subNavItems} />
+        <SubNav group="rytm" />
         <div class="widget-header">
           <h1>Rytm - puzzle (zapis nutowy)</h1>
           <p>Wysłuchaj rytmu, przeczytaj zapis nutowy fragmentów, a następnie ułóż potasowane takty we właściwej kolejności.</p>
@@ -68,7 +63,7 @@ const subNavItems = [
           <button id="check-btn" class="btn-dark">Sprawdź kolejność</button>
         </div>
 
-        <div id="result-feedback" class="feedback-msg"></div>
+        <div id="result-feedback" class="feedback-msg" aria-live="polite" role="status"></div>
       </div>
     </div>
   </main>
