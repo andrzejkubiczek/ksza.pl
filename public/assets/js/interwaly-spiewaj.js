@@ -16,7 +16,10 @@
         '7<': { steps: 6, semitones: 11, label: 'Septyma wielka' },
         '8':  { steps: 7, semitones: 12, label: 'Oktawa czysta' }
     };
-    const SYMBOLS = Object.keys(INTERVAL_DEFS);
+
+    // Zbiory interwałów dla poziomów:
+    const LEVEL_1_SYMBOLS = ['1', '2>', '2', '3>', '3', '4', '5', '8'];
+    const LEVEL_2_SYMBOLS = ['1', '2>', '2', '3>', '3', '4', '4<', '5', '6>', '6', '7', '7<', '8'];
 
     const SOLMIZATION = {
         'C': 'do', 'C#': 'cis', 'Db': 'des',
@@ -46,8 +49,8 @@
 
     const TREBLE_ROOT_OCTAVE = 4;
     const BASS_ROOT_OCTAVE = 2;
-    const TOLERANCE_CENTS = 40; // Spójna tolerancja intonacji
     const MAX_ATTEMPTS = 3;
+    const REQUIRED_HOLD_MS = 220; // Wymagany czas stabilnego podtrzymania dźwięku
 
     let currentSymbol = null;
     let direction = 1;
@@ -67,9 +70,15 @@
     let hasAnswered = false;
 
     let voiceOnsetMs = null;
-    let targetMatchCount = 0;
+    let holdDurationMs = 0;
+    let lastFrameTime = null;
+
     let lastHeardSemitone = null;
-    let wrongNoteHoldCount = 0;
+    let wrongNoteHoldMs = 0;
+
+    // Filtr medianowy wygładzający wibrato i mikrofluktuacje:
+    const pitchHistory = [];
+    const HISTORY_SIZE = 5;
 
     // Kontrola nowego ataku i okna ochronnego dla Kroku 2:
     let sungRootMidi = null;
@@ -148,7 +157,6 @@
             ? '<clef><sign>F</sign><line>4</line></clef>'
             : '<clef><sign>G</sign><line>2</line></clef>';
         
-        // W kroku 0 drugi dźwięk jest pauzą; w kroku 1 lub po zakończeniu oba dźwięki są widoczne
         const note2Xml = (step >= 1 || answered)
             ? buildNoteXml(note2, false)
             : buildNoteXml(note2, true);
@@ -194,7 +202,14 @@
         }
     }
 
-    function updateTunerUI(data) {
+    function updateHoldProgressBar(progressPct) {
+        const bar = document.getElementById('tuner-hold-progress');
+        if (bar) {
+            bar.style.width = `${Math.max(0, Math.min(100, progressPct))}%`;
+        }
+    }
+
+    function updateTunerUI(data, isMatchingTarget = false) {
         const tunerNote = document.getElementById('tuner-note');
         const tunerSolfege = document.getElementById('tuner-solfege');
         const tunerStatus = document.getElementById('tuner-status');
@@ -208,6 +223,7 @@
                 tunerStatus.className = 'tuner-status';
             }
             if (tunerIndicator) tunerIndicator.style.left = '50%';
+            updateHoldProgressBar(0);
             return;
         }
 
@@ -219,10 +235,13 @@
 
         const cents = p.cents;
         if (tunerStatus) {
-            if (Math.abs(cents) <= 20) {
+            if (isMatchingTarget) {
+                tunerStatus.textContent = 'Trzymaj dźwięk... 🎯';
+                tunerStatus.className = 'tuner-status is-holding';
+            } else if (Math.abs(cents) <= 22) {
                 tunerStatus.textContent = 'W punkt! 🎯';
                 tunerStatus.className = 'tuner-status is-in-tune';
-            } else if (cents < -20) {
+            } else if (cents < -22) {
                 tunerStatus.textContent = 'Podciągnij wyżej 🔼';
                 tunerStatus.className = 'tuner-status is-flat';
             } else {
@@ -239,7 +258,6 @@
         const playBtn = document.getElementById('play-model-btn');
         if (!playBtn) return;
         
-        // Wzorzec odblokowuje się dopiero przed 3. próbą (po 2 błędnych) lub po zakończeniu zadania
         if (attemptCount >= 3 || hasAnswered) {
             playBtn.disabled = false;
             playBtn.title = 'Odsłuchaj pełny interwał na fortepianie';
@@ -253,6 +271,18 @@
         const selected = document.getElementById('clef-select')?.value || 'random';
         if (selected === 'random') return Math.random() < 0.5 ? 'treble' : 'bass';
         return selected;
+    }
+
+    /**
+     * Sprawdza, czy nuta nie jest egzotyczną enharmonią (Fes, Ces, His, Eis)
+     */
+    function isSimpleNote(note) {
+        if (!note || Math.abs(note.alter) > 1) return false;
+        if (note.letter === 'F' && note.alter === -1) return false; // Fes
+        if (note.letter === 'C' && note.alter === -1) return false; // Ces
+        if (note.letter === 'B' && note.alter === 1) return false;  // His
+        if (note.letter === 'E' && note.alter === 1) return false;  // Eis
+        return true;
     }
 
     function pickRootAlter(letter, symbol, dir) {
@@ -307,9 +337,11 @@
         currentStep = 0;
         noteResults = [null, null];
         voiceOnsetMs = null;
-        targetMatchCount = 0;
+        holdDurationMs = 0;
+        lastFrameTime = null;
         lastHeardSemitone = null;
-        wrongNoteHoldCount = 0;
+        wrongNoteHoldMs = 0;
+        pitchHistory.length = 0;
         sungRootMidi = null;
         step1CooldownUntil = 0;
         waitingForStep1Onset = false;
@@ -326,6 +358,7 @@
         const nextBtn = document.getElementById('next-btn');
         if (nextBtn) nextBtn.style.display = 'none';
 
+        updateHoldProgressBar(0);
         updateModelButtonState();
         updateTaskStepUI(0);
         renderScore(0);
@@ -338,9 +371,11 @@
         currentStep = 0;
         noteResults = [null, null];
         voiceOnsetMs = null;
-        targetMatchCount = 0;
+        holdDurationMs = 0;
+        lastFrameTime = null;
         lastHeardSemitone = null;
-        wrongNoteHoldCount = 0;
+        wrongNoteHoldMs = 0;
+        pitchHistory.length = 0;
         sungRootMidi = null;
         step1CooldownUntil = 0;
         waitingForStep1Onset = false;
@@ -368,13 +403,40 @@
         clef = pickClef();
         const level = currentLevel();
         const rootOctave = clef === 'bass' ? BASS_ROOT_OCTAVE : TREBLE_ROOT_OCTAVE;
-        const rootLetter = MT.LETTERS[Math.floor(Math.random() * MT.LETTERS.length)];
-        currentSymbol = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-        direction = level === '2' && Math.random() < 0.5 ? -1 : 1;
-        const rootAlter = level === '2' ? pickRootAlter(rootLetter, currentSymbol, direction) : 0;
 
-        rootNote = { letter: rootLetter, alter: rootAlter, octave: rootOctave };
-        targetNote = MT.spellByShape(rootNote, INTERVAL_DEFS[currentSymbol], direction);
+        if (level === '1') {
+            // Poziom 1: Podstawowe interwały, naturalne dźwięki, bez skomplikowanych znaków
+            const pool = LEVEL_1_SYMBOLS;
+            let found = false;
+            let candRoot, candTarget, candSymbol, candDir;
+
+            for (let i = 0; i < 50; i++) {
+                const rootLetter = MT.LETTERS[Math.floor(Math.random() * MT.LETTERS.length)];
+                candSymbol = pool[Math.floor(Math.random() * pool.length)];
+                candDir = Math.random() < 0.5 ? 1 : -1;
+                candRoot = { letter: rootLetter, alter: 0, octave: rootOctave };
+                candTarget = MT.spellByShape(candRoot, INTERVAL_DEFS[candSymbol], candDir);
+
+                if (isSimpleNote(candTarget)) {
+                    found = true;
+                    break;
+                }
+            }
+
+            currentSymbol = candSymbol;
+            direction = candDir;
+            rootNote = candRoot;
+            targetNote = candTarget;
+        } else {
+            // Poziom 2: Wszystkie interwały, chromatyka w obu kierunkach
+            const rootLetter = MT.LETTERS[Math.floor(Math.random() * MT.LETTERS.length)];
+            currentSymbol = LEVEL_2_SYMBOLS[Math.floor(Math.random() * LEVEL_2_SYMBOLS.length)];
+            direction = Math.random() < 0.5 ? -1 : 1;
+            const rootAlter = pickRootAlter(rootLetter, currentSymbol, direction);
+
+            rootNote = { letter: rootLetter, alter: rootAlter, octave: rootOctave };
+            targetNote = MT.spellByShape(rootNote, INTERVAL_DEFS[currentSymbol], direction);
+        }
 
         rootSemitoneClass = ((MT.LETTER_NATURAL_OFFSET[rootNote.letter] + rootNote.alter) % 12 + 12) % 12;
         targetSemitoneClass = ((MT.LETTER_NATURAL_OFFSET[targetNote.letter] + targetNote.alter) % 12 + 12) % 12;
@@ -408,6 +470,7 @@
             titleEl.innerHTML = `Zaśpiewaj: <strong>${INTERVAL_DEFS[currentSymbol].label}</strong>`;
         }
 
+        updateHoldProgressBar(0);
         updateModelButtonState();
         updateTaskStepUI(0);
 
@@ -453,7 +516,6 @@
             const adaptedRoot = adaptPitch(rootTone, shift);
             const adaptedTarget = adaptPitch(targetTone, shift);
 
-            // Podświetl 1. nutę i zagraj
             renderScore(1);
             const noteEls = document.querySelectorAll('#notation-container g.note');
             if (noteEls.length >= 1) {
@@ -462,7 +524,6 @@
             KszaAudio.player.play(adaptedRoot, undefined, { duration: 0.8 });
 
             setTimeout(() => {
-                // Podświetl 2. nutę i zagraj
                 if (noteEls.length >= 2) {
                     noteEls.forEach((g, i) => g.classList.toggle('note-current-target', i === 1));
                 }
@@ -491,9 +552,11 @@
         }
 
         voiceOnsetMs = null;
-        targetMatchCount = 0;
+        holdDurationMs = 0;
+        lastFrameTime = null;
         lastHeardSemitone = null;
-        wrongNoteHoldCount = 0;
+        wrongNoteHoldMs = 0;
+        pitchHistory.length = 0;
         sungRootMidi = null;
         step1CooldownUntil = 0;
         waitingForStep1Onset = false;
@@ -518,6 +581,7 @@
                 singText.textContent = 'Zatrzymaj mikrofon';
             }
 
+            updateHoldProgressBar(0);
             updateTaskStepUI(currentStep);
             renderScore(currentStep);
         } catch (e) {
@@ -552,6 +616,7 @@
             }
         }
 
+        updateHoldProgressBar(0);
         updateTunerUI(null);
         renderScore(currentStep);
     }
@@ -564,22 +629,43 @@
         }
     }
 
+    /**
+     * Oblicza wygładzoną medianę wysokości z ostatnich klatek
+     */
+    function getFilteredPitch(pitch) {
+        pitchHistory.push(pitch);
+        if (pitchHistory.length > HISTORY_SIZE) {
+            pitchHistory.shift();
+        }
+
+        if (pitchHistory.length === 1) return pitch;
+
+        // Mediana według numeru MIDI
+        const sorted = [...pitchHistory].sort((a, b) => a.midi - b.midi);
+        const mid = Math.floor(sorted.length / 2);
+        return sorted[mid];
+    }
+
     function onPitchDetected(data) {
-        updateTunerUI(data);
+        const now = performance.now();
+        const deltaMs = lastFrameTime ? Math.min(100, now - lastFrameTime) : 16;
+        lastFrameTime = now;
 
         if (!isSinging || hasAnswered) return;
 
         // Śledzenie ciszy/przerwy oddechu
         if (!data || data.isSilent || !data.pitch || data.rms < 0.008) {
-            targetMatchCount = 0;
+            holdDurationMs = Math.max(0, holdDurationMs - deltaMs * 2);
+            updateHoldProgressBar((holdDurationMs / REQUIRED_HOLD_MS) * 100);
+            updateTunerUI(null);
+
             if (currentStep === 1 && waitingForStep1Onset) {
                 hasDetectedSilenceBeforeStep1 = true;
             }
             return;
         }
 
-        const pitch = data.pitch;
-        const now = performance.now();
+        const filteredPitch = getFilteredPitch(data.pitch);
 
         // -------------------------------------------------------------
         // KROK 1: Dźwięk wyjściowy (Pryma / Podstawa)
@@ -589,37 +675,43 @@
                 voiceOnsetMs = now;
             }
 
-            const isMatch = (pitch.semitoneClass === rootSemitoneClass) && (Math.abs(pitch.cents) <= TOLERANCE_CENTS);
+            // Klasyfikacja półtonowa (Semitone bucket)
+            const isMatch = (filteredPitch.semitoneClass === rootSemitoneClass);
+            updateTunerUI(data, isMatch);
 
             if (isMatch) {
-                targetMatchCount++;
-                wrongNoteHoldCount = 0;
+                holdDurationMs += deltaMs;
+                wrongNoteHoldMs = 0;
+                const progressPct = Math.min(100, (holdDurationMs / REQUIRED_HOLD_MS) * 100);
+                updateHoldProgressBar(progressPct);
 
-                // Wymóg 5 stabilnych klatek (~90-120 ms)
-                if (targetMatchCount >= 5) {
+                if (holdDurationMs >= REQUIRED_HOLD_MS) {
                     const timeToHit = now - voiceOnsetMs;
-                    const isClean = timeToHit <= 700;
+                    const isClean = timeToHit <= 750;
                     const quality = isClean ? 'clean' : 'adjusted';
 
                     noteResults[0] = quality;
-                    sungRootMidi = pitch.midi; // Zapamiętaj fizyczną wysokość MIDI (dla weryfikacji oktawy)
+                    sungRootMidi = filteredPitch.midi;
                     currentStep = 1;
                     
                     // Aktywacja okna ochronnego i wymogu nowego ataku:
-                    step1CooldownUntil = now + 320; // 320ms ignorowania starego dźwięku
+                    step1CooldownUntil = now + 300;
                     waitingForStep1Onset = true;
                     hasDetectedSilenceBeforeStep1 = false;
                     voiceOnsetMs = null;
-                    targetMatchCount = 0;
-                    wrongNoteHoldCount = 0;
+                    holdDurationMs = 0;
+                    wrongNoteHoldMs = 0;
                     lastHeardSemitone = null;
+                    pitchHistory.length = 0;
 
-                    playSuccessChime(); // Sygnał dźwiękowy zaliczenia kroku 1
+                    updateHoldProgressBar(0);
+                    playSuccessChime();
                     updateTaskStepUI(1);
                     renderScore(1);
                 }
             } else {
-                targetMatchCount = 0;
+                holdDurationMs = Math.max(0, holdDurationMs - deltaMs * 1.5);
+                updateHoldProgressBar((holdDurationMs / REQUIRED_HOLD_MS) * 100);
             }
             return;
         }
@@ -628,19 +720,19 @@
         // KROK 2: Dźwięk docelowy (Skok interwałowy)
         // -------------------------------------------------------------
         if (currentStep === 1) {
-            // W oknie ochronnym (320ms po kroku 1) ignorujemy sygnał
             if (now < step1CooldownUntil) {
+                updateTunerUI(data, false);
                 return;
             }
 
-            // Wymóg rozdzielenia dźwięków: uczeń musi przerwać głos lub zmienić wysokość
+            // Wymóg rozdzielenia dźwięków oddechem lub zmianą wysokości
             if (waitingForStep1Onset) {
-                const isDifferentPitch = sungRootMidi && Math.abs(pitch.midi - sungRootMidi) >= 1;
+                const isDifferentPitch = sungRootMidi && Math.abs(filteredPitch.midi - sungRootMidi) >= 1;
                 if (hasDetectedSilenceBeforeStep1 || isDifferentPitch) {
                     waitingForStep1Onset = false;
                     voiceOnsetMs = now;
                 } else {
-                    // Nadal trzymany ten sam dźwięk z kroku 1 bez wzięcia oddechu
+                    updateTunerUI(data, false);
                     return;
                 }
             }
@@ -649,60 +741,57 @@
                 voiceOnsetMs = now;
             }
 
-            // Weryfikacja wysokości:
-            // 1. Zgodność klasy wysokości (mod 12)
-            const isSemitoneMatch = (pitch.semitoneClass === targetSemitoneClass) && (Math.abs(pitch.cents) <= TOLERANCE_CENTS);
+            // 1. Klasyfikacja półtonowa dźwięku docelowego
+            const isSemitoneMatch = (filteredPitch.semitoneClass === targetSemitoneClass);
 
-            // 2. Weryfikacja kierunku skoku (ochrona przed odwróceniem interwału):
+            // 2. Weryfikacja kierunku rejestru (ochrona przed odwróceniem interwału)
             let isIntervalDirectionMatch = true;
             if (sungRootMidi) {
                 if (currentSymbol === '8') {
-                    if (direction === 1) {
-                        isIntervalDirectionMatch = (pitch.midi >= sungRootMidi + 10);
-                    } else {
-                        isIntervalDirectionMatch = (pitch.midi <= sungRootMidi - 10);
-                    }
+                    isIntervalDirectionMatch = (direction === 1)
+                        ? (filteredPitch.midi >= sungRootMidi + 10)
+                        : (filteredPitch.midi <= sungRootMidi - 10);
                 } else if (currentSymbol !== '1') {
-                    if (direction === 1) {
-                        isIntervalDirectionMatch = (pitch.midi >= sungRootMidi - 1);
-                    } else {
-                        isIntervalDirectionMatch = (pitch.midi <= sungRootMidi + 1);
-                    }
+                    isIntervalDirectionMatch = (direction === 1)
+                        ? (filteredPitch.midi >= sungRootMidi - 1)
+                        : (filteredPitch.midi <= sungRootMidi + 1);
                 }
             }
 
             const isTargetMatch = isSemitoneMatch && isIntervalDirectionMatch;
+            updateTunerUI(data, isTargetMatch);
 
             if (isTargetMatch) {
-                targetMatchCount++;
-                wrongNoteHoldCount = 0;
+                holdDurationMs += deltaMs;
+                wrongNoteHoldMs = 0;
+                const progressPct = Math.min(100, (holdDurationMs / REQUIRED_HOLD_MS) * 100);
+                updateHoldProgressBar(progressPct);
 
-                // Wymóg 5 stabilnych klatek (~90-120 ms)
-                if (targetMatchCount >= 5) {
+                if (holdDurationMs >= REQUIRED_HOLD_MS) {
                     const timeToHit = now - voiceOnsetMs;
-                    const isClean = timeToHit <= 700;
+                    const isClean = timeToHit <= 750;
                     const quality = isClean ? 'clean' : 'adjusted';
 
                     noteResults[1] = quality;
                     hasAnswered = true;
                     stopSinging();
+                    updateHoldProgressBar(100);
                     updateModelButtonState();
                     handleSuccess();
                 }
             } else {
-                targetMatchCount = 0;
+                holdDurationMs = Math.max(0, holdDurationMs - deltaMs * 1.5);
+                updateHoldProgressBar((holdDurationMs / REQUIRED_HOLD_MS) * 100);
 
-                if (pitch.semitoneClass === lastHeardSemitone) {
-                    wrongNoteHoldCount++;
-                    
-                    // Jeśli uczeń stabilnie intonuje niepoprawny dźwięk (min. 14 klatek ≈ 230 ms)
-                    if (wrongNoteHoldCount >= 14 && pitch.semitoneClass !== rootSemitoneClass) {
-                        handleStep2Mistake(pitch);
-                        wrongNoteHoldCount = 0;
+                if (filteredPitch.semitoneClass === lastHeardSemitone) {
+                    wrongNoteHoldMs += deltaMs;
+                    if (wrongNoteHoldMs >= 320 && filteredPitch.semitoneClass !== rootSemitoneClass) {
+                        handleStep2Mistake(filteredPitch);
+                        wrongNoteHoldMs = 0;
                     }
                 } else {
-                    lastHeardSemitone = pitch.semitoneClass;
-                    wrongNoteHoldCount = 1;
+                    lastHeardSemitone = filteredPitch.semitoneClass;
+                    wrongNoteHoldMs = deltaMs;
                 }
             }
         }
@@ -726,7 +815,6 @@
         }
 
         if (attemptCount < MAX_ATTEMPTS) {
-            // Przejście do kolejnej próby -> wyłączamy mikrofon, uczeń sam wznawia
             attemptCount++;
             stopSinging();
             updateModelButtonState();
@@ -734,13 +822,15 @@
             currentStep = 0;
             noteResults = [null, null];
             voiceOnsetMs = null;
-            targetMatchCount = 0;
-            wrongNoteHoldCount = 0;
+            holdDurationMs = 0;
             lastHeardSemitone = null;
+            wrongNoteHoldMs = 0;
             sungRootMidi = null;
             waitingForStep1Onset = false;
             hasDetectedSilenceBeforeStep1 = false;
+            pitchHistory.length = 0;
 
+            updateHoldProgressBar(0);
             updateTaskStepUI(0);
             renderScore(0);
 
@@ -767,10 +857,10 @@
             }
 
         } else {
-            // Wyczerpano 3 próby
             hasAnswered = true;
             noteResults[1] = 'wrong';
             stopSinging();
+            updateHoldProgressBar(0);
             updateModelButtonState();
             handleMaxAttemptsFailed(pitch, heardName);
         }

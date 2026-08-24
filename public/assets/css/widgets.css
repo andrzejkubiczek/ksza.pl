@@ -1015,6 +1015,29 @@
     z-index: 3;
 }
 
+.tuner-hold-track {
+    width: 100%;
+    max-width: 380px;
+    height: 5px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 2px;
+}
+
+.tuner-hold-progress {
+    height: 100%;
+    width: 0%;
+    background: var(--green);
+    border-radius: 3px;
+    transition: width 0.05s linear;
+}
+
+.tuner-status.is-holding {
+    color: var(--green);
+    font-weight: 800;
+}
+
 .btn-primary.btn-active {
     background: var(--coral) !important;
     color: #ffffff !important;
