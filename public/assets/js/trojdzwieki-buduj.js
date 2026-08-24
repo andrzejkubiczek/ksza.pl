@@ -126,15 +126,31 @@
 
         const level = currentLevel();
         const pool = Object.keys(TRIAD_TYPES).filter((k) => level === '2' || TRIAD_TYPES[k].level === 1);
-        const currentKey = pool[Math.floor(Math.random() * pool.length)];
-        const type = TRIAD_TYPES[currentKey];
-
         clef = pickClef();
         const rootOctave = clef === 'bass' ? BASS_ROOT_OCTAVE : TREBLE_ROOT_OCTAVE;
-        const rootLetter = pickRootLetter(type.shape);
-        const rootNote = { letter: rootLetter, alter: 0, octave: rootOctave };
 
-        expectedNotes = MT.buildTriadNotes(rootNote, type.shape, type.inversion);
+        let type = null;
+        let rootNote = null;
+        for (let i = 0; i < 100; i++) {
+            const currentKey = pool[Math.floor(Math.random() * pool.length)];
+            const candType = TRIAD_TYPES[currentKey];
+            const rootLetter = MT.LETTERS[Math.floor(Math.random() * MT.LETTERS.length)];
+            const candRoot = { letter: rootLetter, alter: 0, octave: rootOctave };
+            const candidateNotes = MT.buildTriadNotes(candRoot, candType.shape, candType.inversion);
+            if (MT.isCleanTriad(candidateNotes)) {
+                type = candType;
+                rootNote = candRoot;
+                expectedNotes = candidateNotes;
+                break;
+            }
+        }
+
+        if (!type) {
+            type = TRIAD_TYPES['durowy_z'];
+            rootNote = { letter: 'C', alter: 0, octave: rootOctave };
+            expectedNotes = MT.buildTriadNotes(rootNote, type.shape, 0);
+        }
+
         bassNote = expectedNotes[0];
 
         editableState = { 1: { step: 0, alter: 0 }, 2: { step: 0, alter: 0 } };

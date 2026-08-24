@@ -58,6 +58,20 @@ window.KszaMusicTheory = (() => {
         return notes;
     }
 
+    function isCleanNote(note) {
+        if (!note || typeof note.alter !== 'number' || Math.abs(note.alter) > 1) return false;
+        if (note.letter === 'F' && note.alter === -1) return false; // Fes
+        if (note.letter === 'C' && note.alter === -1) return false; // Ces
+        if (note.letter === 'B' && note.alter === 1) return false;  // His
+        if (note.letter === 'E' && note.alter === 1) return false;  // Eis
+        return true;
+    }
+
+    function isCleanTriad(notes) {
+        if (!notes || notes.length !== 3) return false;
+        return notes.every(isCleanNote);
+    }
+
     return {
         LETTERS,
         LETTER_NATURAL_OFFSET,
@@ -70,6 +84,8 @@ window.KszaMusicTheory = (() => {
         noteLabel,
         noteToPitchXml,
         accidentalTag,
-        buildTriadNotes
+        buildTriadNotes,
+        isCleanNote,
+        isCleanTriad
     };
 })();

@@ -1,0 +1,136 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SubNav from '../../components/SubNav.astro';
+
+const subNavItems = [
+  { label: 'Ze słuchu', href: '/cwiczenia/trojdzwieki' },
+  { label: 'Zapis nutowy', href: '/cwiczenia/trojdzwieki-zapis' },
+  { label: 'Zbuduj trójdźwięk', href: '/cwiczenia/trojdzwieki-buduj' },
+  { label: 'Zaśpiewaj', href: '/cwiczenia/trojdzwieki-spiewaj', active: true },
+];
+---
+<Layout
+  title="Zaśpiewaj trójdźwięk - ksza.pl"
+  description="Interaktywne ćwiczenie wokalne: usłysz dźwięk bazowy, wyobraź sobie trójdźwięk i zaśpiewaj po kolei jego 3 składniki do mikrofonu."
+  currentFamily="Trójdźwięki"
+  creditType="both"
+  includeWidgetsCss={true}
+>
+  <main>
+    <div class="container exercise-page">
+      <div class="widget">
+        <SubNav items={subNavItems} />
+        <div class="widget-header">
+          <h1>Zaśpiewaj trójdźwięk</h1>
+          <p>
+            Posłuchaj dźwięku wyjściowego, wyobraź sobie akord i zaśpiewaj po kolei jego 3 składniki do mikrofonu.<br>
+            <small>Aplikacja weryfikuje czystość kolejnych dźwięków na żywo.</small>
+          </p>
+        </div>
+
+        <div style="margin: 8px 0 10px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
+          <span id="mic-status-badge" class="mic-status-badge">○ Mikrofon wyłączony</span>
+        </div>
+
+        <div class="controls-row">
+          <div class="field">
+            <label for="level-select">Poziom</label>
+            <div class="select-wrap">
+              <select id="level-select">
+                <option value="1">Poziom 1 (Postać zasadnicza • dźwięki naturalne)</option>
+                <option value="2">Poziom 2 (Z przewrotami • chromatyka)</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="clef-select">Klucz</label>
+            <div class="select-wrap">
+              <select id="clef-select">
+                <option value="random">Losowo</option>
+                <option value="treble">Wiolinowy</option>
+                <option value="bass">Basowy</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wyraźna karta zadania -->
+        <div class="sing-task-card" aria-live="polite">
+          <div class="sing-task-badge" id="task-badge">+</div>
+          <div class="sing-task-body">
+            <div class="sing-task-meta">
+              <span id="task-attempt-tag" class="sing-tag tag-attempt">Próba 1/3</span>
+              <span id="task-step-tag" class="sing-tag tag-step">Krok 1/3: Dźwięk wyjściowy</span>
+              <span id="task-inversion-tag" class="sing-tag tag-direction-up">Postać zasadnicza</span>
+              <span id="task-root-tag" class="sing-tag tag-root">od: <strong>C4</strong></span>
+            </div>
+            <div class="sing-task-title" id="task-title">
+              Zaśpiewaj: <strong>Trójdźwięk durowy</strong>
+            </div>
+          </div>
+        </div>
+
+        <div id="status-line" class="status-line"></div>
+
+        <div class="player-controls">
+          <button type="button" id="ref-pitch-btn" class="btn-ghost" title="Zagraj dźwięk wyjściowy na fortepianie">
+            <span>🔔 Dźwięk wyjściowy</span>
+          </button>
+          <button type="button" id="sing-btn" class="btn-primary">
+            <span class="mic-icon" aria-hidden="true">🎤</span>
+            <span id="sing-btn-text">Zaśpiewaj trójdźwięk</span>
+          </button>
+          <button type="button" id="play-model-btn" class="btn-dark" title="Odsłuchaj pełny trójdźwięk na fortepianie">
+            <span>Posłuchaj wzorca</span>
+          </button>
+          <button type="button" id="next-btn" class="btn-dark" style="display:none;">
+            <span>Następny trójdźwięk →</span>
+          </button>
+        </div>
+
+        <!-- Wskaźnik intonacji / Tuner -->
+        <div id="tuner-card" class="tuner-card">
+          <div class="tuner-header">
+            <div style="display: flex; align-items: baseline; gap: 6px;">
+              <span id="tuner-note" class="tuner-note">—</span>
+              <span id="tuner-solfege" class="tuner-solfege"></span>
+            </div>
+            <span id="tuner-status" class="tuner-status">Mikrofon wyłączony</span>
+          </div>
+          <div class="tuner-meter">
+            <div class="tuner-sweet-spot" title="Strefa czystego dźwięku"></div>
+            <div class="tuner-center-mark" title="Idealna intonacja"></div>
+            <div id="tuner-indicator" class="tuner-indicator"></div>
+          </div>
+          <div class="tuner-hold-track" title="Wskaźnik podtrzymania dźwięku">
+            <div id="tuner-hold-progress" class="tuner-hold-progress"></div>
+          </div>
+        </div>
+
+        <!-- Pięciolinia z nutami Verovio -->
+        <div class="notation-wrap">
+          <div id="notation-container" class="notation-container" aria-live="polite"></div>
+        </div>
+
+        <!-- Informacje zwrotne -->
+        <div id="feedback" class="feedback-msg"></div>
+        <div id="feedback-legend" class="feedback-legend" style="display: none;">
+          <span class="legend-item"><span class="legend-dot dot-correct"></span> Czysty atak</span>
+          <span class="legend-item"><span class="legend-dot dot-warn"></span> Dociągany / niepewny</span>
+          <span class="legend-item"><span class="legend-dot dot-wrong"></span> Błędny dźwięk</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Fragment slot="scripts">
+    <script is:inline src="/assets/vendor/smplr.js"></script>
+    <script is:inline src="https://cdn.jsdelivr.net/npm/verovio@6.2.0/dist/verovio-toolkit-wasm.js"></script>
+    <script is:inline src="/assets/js/core.js"></script>
+    <script is:inline src="/assets/js/music-theory.js"></script>
+    <script is:inline src="/assets/js/verovio-render.js"></script>
+    <script is:inline src="/assets/js/pitch-detector.js"></script>
+    <script is:inline src="/assets/js/trojdzwieki-spiewaj.js"></script>
+  </Fragment>
+</Layout>
+

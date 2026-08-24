@@ -67,10 +67,10 @@ dist/                          - folder wygenerowanych plików produkcyjnych (np
   oraz śpiewanie interwałów do mikrofonu (intonacja dwuetapowa z tunerem na żywo).
   Dźwięki są automatycznie transponowane w oktawach, aby mieściły się w skali instrumentu.
 
-- Trójdźwięki (trojdzwieki.html, trojdzwieki-zapis.html, trojdzwieki-buduj.html):
+- Trójdźwięki (trojdzwieki.html, trojdzwieki-zapis.html, trojdzwieki-buduj.html, trojdzwieki-spiewaj.html):
   Durowy (+), molowy (o), zmniejszony (>), zwiększony (<) oraz przewroty
-  sekstowe (+₃, o₃) i kwartsekstowe (+₅, o₅). Tryb budowania pozwala na
-  niezależną edycję składników akordu za pomocą kursorów i znaków chromatycznych.
+  sekstowe (+₃, o₃) i kwartsekstowe (+₅, o₅). Warianty: ze słuchu, zapis nutowy,
+  budowanie na pięciolinii oraz śpiewanie składników akordu do mikrofonu (3-etapowe).
 
 - Gamy i stopnie (gamy.html, gamy-stopnie.html):
   Gama durowa i cztery odmiany molowej (eolska, harmoniczna, dorycka, melodyczna).

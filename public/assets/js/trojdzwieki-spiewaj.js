@@ -1,25 +1,22 @@
 (() => {
     const MT = KszaMusicTheory;
 
-    const INTERVAL_DEFS = {
-        '1':  { steps: 0, semitones: 0,  label: 'Pryma czysta' },
-        '2>': { steps: 1, semitones: 1,  label: 'Sekunda mała' },
-        '2':  { steps: 1, semitones: 2,  label: 'Sekunda wielka' },
-        '3>': { steps: 2, semitones: 3,  label: 'Tercja mała' },
-        '3':  { steps: 2, semitones: 4,  label: 'Tercja wielka' },
-        '4':  { steps: 3, semitones: 5,  label: 'Kwarta czysta' },
-        '4<': { steps: 3, semitones: 6,  label: 'Tryton' },
-        '5':  { steps: 4, semitones: 7,  label: 'Kwinta czysta' },
-        '6>': { steps: 5, semitones: 8,  label: 'Seksta mała' },
-        '6':  { steps: 5, semitones: 9,  label: 'Seksta wielka' },
-        '7':  { steps: 6, semitones: 10, label: 'Septyma mała' },
-        '7<': { steps: 6, semitones: 11, label: 'Septyma wielka' },
-        '8':  { steps: 7, semitones: 12, label: 'Oktawa czysta' }
+    const TRIAD_TYPES = {
+        'durowy_z':    { shape: 'durowy',      inversion: 0, level: 1, label: 'Trójdźwięk durowy',                 symbol: '+' },
+        'molowy_z':    { shape: 'molowy',      inversion: 0, level: 1, label: 'Trójdźwięk molowy',                 symbol: 'o' },
+        'zmniejszony': { shape: 'zmniejszony', inversion: 0, level: 1, label: 'Trójdźwięk zmniejszony',             symbol: '>' },
+        'zwiekszony':  { shape: 'zwiekszony',  inversion: 0, level: 1, label: 'Trójdźwięk zwiększony',              symbol: '<' },
+        'durowy_3':    { shape: 'durowy',      inversion: 1, level: 2, label: 'Trójdźwięk durowy – sekstowy',     symbol: '+₃' },
+        'durowy_5':    { shape: 'durowy',      inversion: 2, level: 2, label: 'Trójdźwięk durowy – kwartsekstowy', symbol: '+₅' },
+        'molowy_3':    { shape: 'molowy',      inversion: 1, level: 2, label: 'Trójdźwięk molowy – sekstowy',     symbol: 'o₃' },
+        'molowy_5':    { shape: 'molowy',      inversion: 2, level: 2, label: 'Trójdźwięk molowy – kwartsekstowy', symbol: 'o₅' }
     };
 
-    // Zbiory interwałów dla poziomów:
-    const LEVEL_1_SYMBOLS = ['1', '2>', '2', '3>', '3', '4', '5', '8'];
-    const LEVEL_2_SYMBOLS = ['1', '2>', '2', '3>', '3', '4', '4<', '5', '6>', '6', '7', '7<', '8'];
+    const INVERSION_NAMES = {
+        0: 'Postać zasadnicza',
+        1: 'I przewrót (sekstowy)',
+        2: 'II przewrót (kwartsekstowy)'
+    };
 
     const SOLMIZATION = {
         'C': 'do', 'C#': 'cis', 'Db': 'des',
@@ -31,39 +28,21 @@
         'B': 'si'
     };
 
-    const SEMITONES_TO_INTERVAL_NAME = {
-        0: 'Pryma czysta',
-        1: 'Sekunda mała',
-        2: 'Sekunda wielka',
-        3: 'Tercja mała',
-        4: 'Tercja wielka',
-        5: 'Kwarta czysta',
-        6: 'Tryton',
-        7: 'Kwinta czysta',
-        8: 'Seksta mała',
-        9: 'Seksta wielka',
-        10: 'Septyma mała',
-        11: 'Septyma wielka',
-        12: 'Oktawa czysta'
-    };
-
     const TREBLE_ROOT_OCTAVE = 4;
     const BASS_ROOT_OCTAVE = 2;
     const MAX_ATTEMPTS = 3;
-    const REQUIRED_HOLD_MS = 220; // Wymagany czas stabilnego podtrzymania dźwięku
+    const REQUIRED_HOLD_MS = 220; // Czas stabilnego podtrzymania dźwięku
 
-    let currentSymbol = null;
-    let direction = 1;
-    let rootNote = null;
-    let targetNote = null;
-    let targetSemitoneClass = 0;
-    let rootSemitoneClass = 0;
+    let currentShape = 'durowy';
+    let currentInversion = 0;
+    let triadNotes = []; // 3 obiekty nut: [n0, n1, n2]
+    let triadSemitoneClasses = []; // [c0, c1, c2]
     let clef = 'treble';
 
-    // Stan prób i dwuetapowego śpiewania:
+    // Stan prób i 3-etapowego śpiewania składników trójdźwięku:
     let attemptCount = 1; // 1..3
-    let currentStep = 0;   // 0 (baza) -> 1 (skok)
-    let noteResults = [null, null]; // 'clean' | 'adjusted' | 'wrong'
+    let currentStep = 0;   // 0 (składnik 1) -> 1 (składnik 2) -> 2 (składnik 3)
+    let noteResults = [null, null, null]; // 'clean' | 'adjusted' | 'wrong'
 
     let isSinging = false;
     let isPlayingModel = false;
@@ -76,15 +55,15 @@
     let lastHeardSemitone = null;
     let wrongNoteHoldMs = 0;
 
-    // Filtr medianowy wygładzający wibrato i mikrofluktuacje:
+    // Filtr medianowy:
     const pitchHistory = [];
     const HISTORY_SIZE = 5;
 
-    // Kontrola nowego ataku i okna ochronnego dla Kroku 2:
-    let sungRootMidi = null;
-    let step1CooldownUntil = 0;
-    let waitingForStep1Onset = false;
-    let hasDetectedSilenceBeforeStep1 = false;
+    // Kontrola nowego ataku i okna ochronnego:
+    let sungMidis = [null, null, null];
+    let stepCooldownUntil = 0;
+    let waitingForStepOnset = false;
+    let hasDetectedSilenceBeforeStep = false;
 
     const currentLevel = () => document.getElementById('level-select')?.value || '1';
 
@@ -107,9 +86,6 @@
         else setStatus('', null);
     }
 
-    /**
-     * Krótki, przyjemny dźwięk potwierdzenia zaliczenia 1. dźwięku (chime)
-     */
     function playSuccessChime() {
         try {
             const ctx = KszaAudio.context;
@@ -152,21 +128,22 @@
         return `<note>${MT.noteToPitchXml(note)}<duration>2</duration><type>half</type>${MT.accidentalTag(note)}</note>`;
     }
 
-    function buildMeasureMusicXML(clefType, note1, note2, step, answered) {
+    function buildMeasureMusicXML(clefType, notes, step, answered) {
         const clefTag = clefType === 'bass'
             ? '<clef><sign>F</sign><line>4</line></clef>'
             : '<clef><sign>G</sign><line>2</line></clef>';
-        
-        const note2Xml = (step >= 1 || answered)
-            ? buildNoteXml(note2, false)
-            : buildNoteXml(note2, true);
 
-        return `<?xml version="1.0" encoding="UTF-8"?><score-partwise version="4.0"><part-list><score-part id="P1"><part-name print-object="no">Interwał</part-name></score-part></part-list><part id="P1"><measure number="1"><attributes><divisions>1</divisions><key><fifths>0</fifths></key><time><beats>4</beats><beat-type>4</beat-type></time>${clefTag}</attributes>${buildNoteXml(note1, false)}${note2Xml}</measure></part></score-partwise>`;
+        const n0 = buildNoteXml(notes[0], false);
+        const n1 = (step >= 1 || answered) ? buildNoteXml(notes[1], false) : buildNoteXml(notes[1], true);
+        const n2 = (step >= 2 || answered) ? buildNoteXml(notes[2], false) : buildNoteXml(notes[2], true);
+
+        return `<?xml version="1.0" encoding="UTF-8"?><score-partwise version="4.0"><part-list><score-part id="P1"><part-name print-object="no">Trójdźwięk</part-name></score-part></part-list><part id="P1"><measure number="1"><attributes><divisions>1</divisions><key><fifths>0</fifths></key><time><beats>3</beats><beat-type>2</beat-type></time>${clefTag}</attributes>${n0}${n1}${n2}</measure></part></score-partwise>`;
     }
 
     function renderScore(step = currentStep) {
+        if (!triadNotes || triadNotes.length < 3) return;
         try {
-            const svg = KszaVerovio.render(buildMeasureMusicXML(clef, rootNote, targetNote, step, hasAnswered), {
+            const svg = KszaVerovio.render(buildMeasureMusicXML(clef, triadNotes, step, hasAnswered), {
                 pageWidth: 900,
                 pageHeight: 260,
                 scale: 60,
@@ -178,22 +155,13 @@
                 container.innerHTML = svg;
                 const noteEls = container.querySelectorAll('g.note');
 
-                if (noteEls.length >= 1) {
-                    const el0 = noteEls[0];
-                    el0.classList.remove('note-current-target', 'note-feedback-correct', 'note-feedback-warn', 'note-feedback-wrong');
-                    if (noteResults[0] === 'clean') el0.classList.add('note-feedback-correct');
-                    else if (noteResults[0] === 'adjusted') el0.classList.add('note-feedback-warn');
-                    else if (step === 0 && isSinging) el0.classList.add('note-current-target');
-                }
-
-                if (noteEls.length >= 2) {
-                    const el1 = noteEls[1];
-                    el1.classList.remove('note-current-target', 'note-feedback-correct', 'note-feedback-warn', 'note-feedback-wrong');
-                    if (noteResults[1] === 'clean') el1.classList.add('note-feedback-correct');
-                    else if (noteResults[1] === 'adjusted') el1.classList.add('note-feedback-warn');
-                    else if (noteResults[1] === 'wrong') el1.classList.add('note-feedback-wrong');
-                    else if (step === 1 && isSinging) el1.classList.add('note-current-target');
-                }
+                noteEls.forEach((el, idx) => {
+                    el.classList.remove('note-current-target', 'note-feedback-correct', 'note-feedback-warn', 'note-feedback-wrong');
+                    if (noteResults[idx] === 'clean') el.classList.add('note-feedback-correct');
+                    else if (noteResults[idx] === 'adjusted') el.classList.add('note-feedback-warn');
+                    else if (noteResults[idx] === 'wrong') el.classList.add('note-feedback-wrong');
+                    else if (idx === step && isSinging) el.classList.add('note-current-target');
+                });
             }
             setStatus('', null);
         } catch (e) {
@@ -260,7 +228,7 @@
         
         if (attemptCount >= 3 || hasAnswered) {
             playBtn.disabled = false;
-            playBtn.title = 'Odsłuchaj pełny interwał na fortepianie';
+            playBtn.title = 'Odsłuchaj pełny trójdźwięk na fortepianie';
         } else {
             playBtn.disabled = true;
             playBtn.title = 'Wzorzec odblokuje się przed 3. próbą lub po zakończeniu zadania';
@@ -273,9 +241,6 @@
         return selected;
     }
 
-    /**
-     * Sprawdza, czy nuta nie jest egzotyczną enharmonią (Fes, Ces, His, Eis)
-     */
     function isSimpleNote(note) {
         if (!note || Math.abs(note.alter) > 1) return false;
         if (note.letter === 'F' && note.alter === -1) return false; // Fes
@@ -285,46 +250,34 @@
         return true;
     }
 
-    function pickRootAlter(letter, symbol, dir) {
-        const safeAlters = [-1, 0, 1].filter((alter) => {
-            const probe = { letter, alter, octave: TREBLE_ROOT_OCTAVE };
-            const result = MT.spellByShape(probe, INTERVAL_DEFS[symbol], dir);
-            return Math.abs(result.alter) <= 1;
-        });
-        return safeAlters.length ? safeAlters[Math.floor(Math.random() * safeAlters.length)] : 0;
-    }
-
     function updateTaskStepUI(step) {
         const stepTag = document.getElementById('task-step-tag');
         const attemptTag = document.getElementById('task-attempt-tag');
         const feedback = document.getElementById('feedback');
 
-        const rootAccidental = rootNote.alter === 1 ? '#' : rootNote.alter === -1 ? 'b' : '';
-        const rootSolf = SOLMIZATION[rootNote.letter + rootAccidental] || SOLMIZATION[rootNote.letter] || '';
-        const rootLabelText = `${MT.noteLabel(rootNote)}${rootNote.octave}`;
-
-        const targetAccidental = targetNote.alter === 1 ? '#' : targetNote.alter === -1 ? 'b' : '';
-        const targetSolf = SOLMIZATION[targetNote.letter + targetAccidental] || SOLMIZATION[targetNote.letter] || '';
-        const targetLabelText = `${MT.noteLabel(targetNote)}${targetNote.octave}`;
-
         if (attemptTag) {
             attemptTag.textContent = `Próba ${attemptCount}/${MAX_ATTEMPTS}`;
         }
 
-        if (stepTag) {
-            if (step === 0) {
-                stepTag.textContent = `Krok 1/2: Dźwięk wyjściowy (${rootLabelText})`;
-            } else {
-                stepTag.textContent = `Krok 2/2: Weź oddech i skocz na dźwięk docelowy (${targetLabelText})`;
-            }
+        if (stepTag && triadNotes.length >= 3) {
+            const targetNote = triadNotes[step];
+            const targetLabel = `${MT.noteLabel(targetNote)}${targetNote.octave}`;
+            stepTag.textContent = `Krok ${step + 1}/3: Dźwięk ${step + 1} (${targetLabel})`;
         }
 
-        if (feedback && !hasAnswered) {
+        if (feedback && !hasAnswered && triadNotes.length >= 3) {
+            const targetNote = triadNotes[step];
+            const targetAccidental = targetNote.alter === 1 ? '#' : targetNote.alter === -1 ? 'b' : '';
+            const targetSolf = SOLMIZATION[targetNote.letter + targetAccidental] || SOLMIZATION[targetNote.letter] || '';
+            const targetLabel = `${MT.noteLabel(targetNote)}${targetNote.octave}`;
+
             if (isSinging) {
                 if (step === 0) {
-                    feedback.innerHTML = `Śpiewaj 1. dźwięk: <strong>${rootLabelText} ${rootSolf ? `(${rootSolf})` : ''}</strong>...`;
+                    feedback.innerHTML = `Śpiewaj 1. dźwięk: <strong>${targetLabel} ${targetSolf ? `(${targetSolf})` : ''}</strong>...`;
+                } else if (step === 1) {
+                    feedback.innerHTML = `🎯 Dźwięk 1 zaliczony! Weź oddech i zaśpiewaj 2. składnik: <strong>${targetLabel} ${targetSolf ? `(${targetSolf})` : ''}</strong>...`;
                 } else {
-                    feedback.innerHTML = `🎯 Dźwięk 1 zaliczony! Weź oddech i skocz na dźwięk docelowy: <strong>${targetLabelText} ${targetSolf ? `(${targetSolf})` : ''}</strong>...`;
+                    feedback.innerHTML = `🎯 Dźwięk 2 zaliczony! Weź oddech i zaśpiewaj 3. składnik (górę): <strong>${targetLabel} ${targetSolf ? `(${targetSolf})` : ''}</strong>...`;
                 }
                 feedback.className = 'feedback-msg';
             }
@@ -335,17 +288,17 @@
         hasAnswered = false;
         attemptCount = 1;
         currentStep = 0;
-        noteResults = [null, null];
+        noteResults = [null, null, null];
         voiceOnsetMs = null;
         holdDurationMs = 0;
         lastFrameTime = null;
         lastHeardSemitone = null;
         wrongNoteHoldMs = 0;
         pitchHistory.length = 0;
-        sungRootMidi = null;
-        step1CooldownUntil = 0;
-        waitingForStep1Onset = false;
-        hasDetectedSilenceBeforeStep1 = false;
+        sungMidis = [null, null, null];
+        stepCooldownUntil = 0;
+        waitingForStepOnset = false;
+        hasDetectedSilenceBeforeStep = false;
 
         const feedback = document.getElementById('feedback');
         if (feedback) {
@@ -369,17 +322,17 @@
         hasAnswered = false;
         attemptCount = 1;
         currentStep = 0;
-        noteResults = [null, null];
+        noteResults = [null, null, null];
         voiceOnsetMs = null;
         holdDurationMs = 0;
         lastFrameTime = null;
         lastHeardSemitone = null;
         wrongNoteHoldMs = 0;
         pitchHistory.length = 0;
-        sungRootMidi = null;
-        step1CooldownUntil = 0;
-        waitingForStep1Onset = false;
-        hasDetectedSilenceBeforeStep1 = false;
+        sungMidis = [null, null, null];
+        stepCooldownUntil = 0;
+        waitingForStepOnset = false;
+        hasDetectedSilenceBeforeStep = false;
 
         const feedback = document.getElementById('feedback');
         if (feedback) {
@@ -398,98 +351,62 @@
             singBtn.classList.remove('btn-active');
         }
         const singText = document.getElementById('sing-btn-text');
-        if (singText) singText.textContent = 'Zaśpiewaj interwał';
+        if (singText) singText.textContent = 'Zaśpiewaj trójdźwięk';
 
         clef = pickClef();
         const level = currentLevel();
         const rootOctave = clef === 'bass' ? BASS_ROOT_OCTAVE : TREBLE_ROOT_OCTAVE;
+        const pool = Object.keys(TRIAD_TYPES).filter((k) => level === '2' || TRIAD_TYPES[k].level === 1);
+        const safeAlters = level === '1' ? [0] : [-1, 0, 1];
 
-        if (level === '1') {
-            // Poziom 1: Podstawowe interwały, naturalne dźwięki, bez skomplikowanych znaków
-            const pool = LEVEL_1_SYMBOLS;
-            let found = false;
-            let candRoot, candTarget, candSymbol, candDir;
+        let selectedType = null;
+        for (let i = 0; i < 100; i++) {
+            const candKey = pool[Math.floor(Math.random() * pool.length)];
+            const candType = TRIAD_TYPES[candKey];
+            const rootLetter = MT.LETTERS[Math.floor(Math.random() * MT.LETTERS.length)];
+            const rootAlter = safeAlters[Math.floor(Math.random() * safeAlters.length)];
+            const candRoot = { letter: rootLetter, alter: rootAlter, octave: rootOctave };
 
-            for (let i = 0; i < 50; i++) {
-                const rootLetter = MT.LETTERS[Math.floor(Math.random() * MT.LETTERS.length)];
-                candSymbol = pool[Math.floor(Math.random() * pool.length)];
-                candDir = Math.random() < 0.5 ? 1 : -1;
-                candRoot = { letter: rootLetter, alter: 0, octave: rootOctave };
-                candTarget = MT.spellByShape(candRoot, INTERVAL_DEFS[candSymbol], candDir);
+            if (!MT.isCleanNote(candRoot)) continue;
 
-                if (isSimpleNote(candTarget)) {
-                    found = true;
-                    break;
-                }
-            }
-
-            currentSymbol = candSymbol;
-            direction = candDir;
-            rootNote = candRoot;
-            targetNote = candTarget;
-        } else {
-            // Poziom 2: Wszystkie interwały, chromatyka w obu kierunkach (wyłącznie czyste nuty)
-            let found = false;
-            const safeAlters = [-1, 0, 1];
-
-            for (let i = 0; i < 100; i++) {
-                const rootLetter = MT.LETTERS[Math.floor(Math.random() * MT.LETTERS.length)];
-                const candSymbol = LEVEL_2_SYMBOLS[Math.floor(Math.random() * LEVEL_2_SYMBOLS.length)];
-                const candDir = Math.random() < 0.5 ? -1 : 1;
-                const rootAlter = safeAlters[Math.floor(Math.random() * safeAlters.length)];
-                const candRoot = { letter: rootLetter, alter: rootAlter, octave: rootOctave };
-
-                if (!MT.isCleanNote(candRoot)) continue;
-
-                const candTarget = MT.spellByShape(candRoot, INTERVAL_DEFS[candSymbol], candDir);
-                if (MT.isCleanNote(candTarget)) {
-                    currentSymbol = candSymbol;
-                    direction = candDir;
-                    rootNote = candRoot;
-                    targetNote = candTarget;
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found) {
-                currentSymbol = '1';
-                direction = 1;
-                rootNote = { letter: 'C', alter: 0, octave: rootOctave };
-                targetNote = { letter: 'C', alter: 0, octave: rootOctave };
+            const candidateNotes = MT.buildTriadNotes(candRoot, candType.shape, candType.inversion);
+            if (MT.isCleanTriad(candidateNotes)) {
+                selectedType = candType;
+                triadNotes = candidateNotes;
+                break;
             }
         }
 
-        rootSemitoneClass = ((MT.LETTER_NATURAL_OFFSET[rootNote.letter] + rootNote.alter) % 12 + 12) % 12;
-        targetSemitoneClass = ((MT.LETTER_NATURAL_OFFSET[targetNote.letter] + targetNote.alter) % 12 + 12) % 12;
+        if (!selectedType) {
+            selectedType = TRIAD_TYPES['durowy_z'];
+            triadNotes = MT.buildTriadNotes({ letter: 'C', alter: 0, octave: rootOctave }, 'durowy', 0);
+        }
 
-        const rootAccidental = rootNote.alter === 1 ? '#' : rootNote.alter === -1 ? 'b' : '';
-        const rootSolf = SOLMIZATION[rootNote.letter + rootAccidental] || SOLMIZATION[rootNote.letter] || '';
-        const rootLabelText = `${MT.noteLabel(rootNote)}${rootNote.octave}`;
+        currentShape = selectedType.shape;
+        currentInversion = selectedType.inversion;
 
-        // Karta zadania
+        triadSemitoneClasses = triadNotes.map(n => ((MT.LETTER_NATURAL_OFFSET[n.letter] + n.alter) % 12 + 12) % 12);
+
+        const baseNote = triadNotes[0];
+        const baseAccidental = baseNote.alter === 1 ? '#' : baseNote.alter === -1 ? 'b' : '';
+        const baseSolf = SOLMIZATION[baseNote.letter + baseAccidental] || SOLMIZATION[baseNote.letter] || '';
+        const baseLabelText = `${MT.noteLabel(baseNote)}${baseNote.octave}`;
+
+        // Aktualizacja karty zadania
         const badgeEl = document.getElementById('task-badge');
-        if (badgeEl) badgeEl.textContent = currentSymbol;
+        if (badgeEl) badgeEl.textContent = selectedType.symbol;
 
-        const dirTag = document.getElementById('task-direction-tag');
-        if (dirTag) {
-            if (direction === 1) {
-                dirTag.className = 'sing-tag tag-direction-up';
-                dirTag.textContent = 'w górę ↑';
-            } else {
-                dirTag.className = 'sing-tag tag-direction-down';
-                dirTag.textContent = 'w dół ↓';
-            }
-        }
+        const invTag = document.getElementById('task-inversion-tag');
+        if (invTag) invTag.textContent = INVERSION_NAMES[currentInversion];
 
         const rootTag = document.getElementById('task-root-tag');
         if (rootTag) {
-            rootTag.innerHTML = `od: <strong>${rootLabelText} ${rootSolf ? `(${rootSolf})` : ''}</strong>`;
+            rootTag.innerHTML = `od: <strong>${baseLabelText} ${baseSolf ? `(${baseSolf})` : ''}</strong>`;
         }
 
         const titleEl = document.getElementById('task-title');
         if (titleEl) {
-            titleEl.innerHTML = `Zaśpiewaj: <strong>${INTERVAL_DEFS[currentSymbol].label}</strong>`;
+            titleEl.innerHTML = `Zaśpiewaj: <strong>${selectedType.label}</strong>`;
         }
 
         updateHoldProgressBar(0);
@@ -506,14 +423,14 @@
     }
 
     async function playRootPitch() {
-        if (!rootNote) return;
+        if (!triadNotes || triadNotes.length === 0) return;
         try {
             const ok = await KszaAudio.ensureReady({ value: 'piano' }, onAudioState);
             if (!ok || !KszaAudio.player) return;
 
-            const tone = noteToToneName(rootNote);
-            const shift = getOctaveShift([tone, noteToToneName(targetNote)]);
-            const adapted = adaptPitch(tone, shift);
+            const tones = triadNotes.map(noteToToneName);
+            const shift = getOctaveShift(tones);
+            const adapted = adaptPitch(tones[0], shift);
             KszaAudio.player.play(adapted, undefined, { duration: 1.2 });
         } catch (e) {
             console.error('Błąd odtwarzania dźwięku:', e);
@@ -522,7 +439,7 @@
     }
 
     async function playModel() {
-        if (!rootNote || !targetNote || isPlayingModel) return;
+        if (!triadNotes || triadNotes.length < 3 || isPlayingModel) return;
         const ok = await KszaAudio.ensureReady({ value: 'piano' }, onAudioState);
         if (!ok || !KszaAudio.player) return;
 
@@ -531,34 +448,34 @@
         if (playBtn) playBtn.disabled = true;
 
         try {
-            const rootTone = noteToToneName(rootNote);
-            const targetTone = noteToToneName(targetNote);
-            const shift = getOctaveShift([rootTone, targetTone]);
+            const tones = triadNotes.map(noteToToneName);
+            const shift = getOctaveShift(tones);
+            const adapted = tones.map(t => adaptPitch(t, shift));
 
-            const adaptedRoot = adaptPitch(rootTone, shift);
-            const adaptedTarget = adaptPitch(targetTone, shift);
-
-            renderScore(1);
+            renderScore(2);
             const noteEls = document.querySelectorAll('#notation-container g.note');
-            if (noteEls.length >= 1) {
-                noteEls.forEach((g, i) => g.classList.toggle('note-current-target', i === 0));
-            }
-            KszaAudio.player.play(adaptedRoot, undefined, { duration: 0.8 });
+
+            // Nuta 1
+            if (noteEls[0]) noteEls.forEach((g, i) => g.classList.toggle('note-current-target', i === 0));
+            KszaAudio.player.play(adapted[0], undefined, { duration: 0.6 });
 
             setTimeout(() => {
-                if (noteEls.length >= 2) {
-                    noteEls.forEach((g, i) => g.classList.toggle('note-current-target', i === 1));
-                }
-                if (KszaAudio.player) {
-                    KszaAudio.player.play(adaptedTarget, undefined, { duration: 1.2 });
-                }
+                // Nuta 2
+                if (noteEls[1]) noteEls.forEach((g, i) => g.classList.toggle('note-current-target', i === 1));
+                if (KszaAudio.player) KszaAudio.player.play(adapted[1], undefined, { duration: 0.6 });
 
                 setTimeout(() => {
-                    isPlayingModel = false;
-                    if (playBtn && (attemptCount >= 3 || hasAnswered)) playBtn.disabled = false;
-                    renderScore(currentStep);
-                }, 1300);
-            }, 850);
+                    // Nuta 3
+                    if (noteEls[2]) noteEls.forEach((g, i) => g.classList.toggle('note-current-target', i === 2));
+                    if (KszaAudio.player) KszaAudio.player.play(adapted[2], undefined, { duration: 1.2 });
+
+                    setTimeout(() => {
+                        isPlayingModel = false;
+                        if (playBtn && (attemptCount >= 3 || hasAnswered)) playBtn.disabled = false;
+                        renderScore(currentStep);
+                    }, 1200);
+                }, 650);
+            }, 650);
         } catch (e) {
             console.error('Błąd odtwarzania wzorca:', e);
             setStatus(`Błąd audio: ${e.message}`, 'error');
@@ -579,10 +496,10 @@
         lastHeardSemitone = null;
         wrongNoteHoldMs = 0;
         pitchHistory.length = 0;
-        sungRootMidi = null;
-        step1CooldownUntil = 0;
-        waitingForStep1Onset = false;
-        hasDetectedSilenceBeforeStep1 = false;
+        sungMidis = [null, null, null];
+        stepCooldownUntil = 0;
+        waitingForStepOnset = false;
+        hasDetectedSilenceBeforeStep = false;
 
         const micBadge = document.getElementById('mic-status-badge');
         const singBtn = document.getElementById('sing-btn');
@@ -634,7 +551,7 @@
             } else if (attemptCount > 1) {
                 singText.textContent = `Rozpocznij próbę ${attemptCount} z ${MAX_ATTEMPTS}`;
             } else {
-                singText.textContent = 'Zaśpiewaj interwał';
+                singText.textContent = 'Zaśpiewaj trójdźwięk';
             }
         }
 
@@ -651,18 +568,13 @@
         }
     }
 
-    /**
-     * Oblicza wygładzoną medianę wysokości z ostatnich klatek
-     */
     function getFilteredPitch(pitch) {
         pitchHistory.push(pitch);
         if (pitchHistory.length > HISTORY_SIZE) {
             pitchHistory.shift();
         }
-
         if (pitchHistory.length === 1) return pitch;
 
-        // Mediana według numeru MIDI
         const sorted = [...pitchHistory].sort((a, b) => a.midi - b.midi);
         const mid = Math.floor(sorted.length / 2);
         return sorted[mid];
@@ -675,30 +587,30 @@
 
         if (!isSinging || hasAnswered) return;
 
-        // Śledzenie ciszy/przerwy oddechu
+        // Śledzenie ciszy/oddechu
         if (!data || data.isSilent || !data.pitch || data.rms < 0.008) {
             holdDurationMs = Math.max(0, holdDurationMs - deltaMs * 2);
             updateHoldProgressBar((holdDurationMs / REQUIRED_HOLD_MS) * 100);
             updateTunerUI(null);
 
-            if (currentStep === 1 && waitingForStep1Onset) {
-                hasDetectedSilenceBeforeStep1 = true;
+            if (currentStep > 0 && waitingForStepOnset) {
+                hasDetectedSilenceBeforeStep = true;
             }
             return;
         }
 
         const filteredPitch = getFilteredPitch(data.pitch);
+        const targetClass = triadSemitoneClasses[currentStep];
 
         // -------------------------------------------------------------
-        // KROK 1: Dźwięk wyjściowy (Pryma / Podstawa)
+        // KROK 1/3 (Dźwięk wyjściowy / podstawa)
         // -------------------------------------------------------------
         if (currentStep === 0) {
             if (!voiceOnsetMs) {
                 voiceOnsetMs = now;
             }
 
-            // Klasyfikacja półtonowa (Semitone bucket)
-            const isMatch = (filteredPitch.semitoneClass === rootSemitoneClass);
+            const isMatch = (filteredPitch.semitoneClass === targetClass);
             updateTunerUI(data, isMatch);
 
             if (isMatch) {
@@ -710,16 +622,13 @@
                 if (holdDurationMs >= REQUIRED_HOLD_MS) {
                     const timeToHit = now - voiceOnsetMs;
                     const isClean = timeToHit <= 750;
-                    const quality = isClean ? 'clean' : 'adjusted';
+                    noteResults[0] = isClean ? 'clean' : 'adjusted';
+                    sungMidis[0] = filteredPitch.midi;
 
-                    noteResults[0] = quality;
-                    sungRootMidi = filteredPitch.midi;
                     currentStep = 1;
-                    
-                    // Aktywacja okna ochronnego i wymogu nowego ataku:
-                    step1CooldownUntil = now + 300;
-                    waitingForStep1Onset = true;
-                    hasDetectedSilenceBeforeStep1 = false;
+                    stepCooldownUntil = now + 300;
+                    waitingForStepOnset = true;
+                    hasDetectedSilenceBeforeStep = false;
                     voiceOnsetMs = null;
                     holdDurationMs = 0;
                     wrongNoteHoldMs = 0;
@@ -739,19 +648,21 @@
         }
 
         // -------------------------------------------------------------
-        // KROK 2: Dźwięk docelowy (Skok interwałowy)
+        // KROK 2/3 i 3/3 (Kolejne składniki trójdźwięku)
         // -------------------------------------------------------------
-        if (currentStep === 1) {
-            if (now < step1CooldownUntil) {
+        if (currentStep === 1 || currentStep === 2) {
+            if (now < stepCooldownUntil) {
                 updateTunerUI(data, false);
                 return;
             }
 
+            const prevSungMidi = sungMidis[currentStep - 1];
+
             // Wymóg rozdzielenia dźwięków oddechem lub zmianą wysokości
-            if (waitingForStep1Onset) {
-                const isDifferentPitch = sungRootMidi && Math.abs(filteredPitch.midi - sungRootMidi) >= 1;
-                if (hasDetectedSilenceBeforeStep1 || isDifferentPitch) {
-                    waitingForStep1Onset = false;
+            if (waitingForStepOnset) {
+                const isDifferentPitch = prevSungMidi && Math.abs(filteredPitch.midi - prevSungMidi) >= 1;
+                if (hasDetectedSilenceBeforeStep || isDifferentPitch) {
+                    waitingForStepOnset = false;
                     voiceOnsetMs = now;
                 } else {
                     updateTunerUI(data, false);
@@ -763,24 +674,13 @@
                 voiceOnsetMs = now;
             }
 
-            // 1. Klasyfikacja półtonowa dźwięku docelowego
-            const isSemitoneMatch = (filteredPitch.semitoneClass === targetSemitoneClass);
+            // 1. Zgodność klasy półtonowej
+            const isSemitoneMatch = (filteredPitch.semitoneClass === targetClass);
 
-            // 2. Weryfikacja kierunku rejestru (ochrona przed odwróceniem interwału)
-            let isIntervalDirectionMatch = true;
-            if (sungRootMidi) {
-                if (currentSymbol === '8') {
-                    isIntervalDirectionMatch = (direction === 1)
-                        ? (filteredPitch.midi >= sungRootMidi + 10)
-                        : (filteredPitch.midi <= sungRootMidi - 10);
-                } else if (currentSymbol !== '1') {
-                    isIntervalDirectionMatch = (direction === 1)
-                        ? (filteredPitch.midi >= sungRootMidi - 1)
-                        : (filteredPitch.midi <= sungRootMidi + 1);
-                }
-            }
+            // 2. Weryfikacja rejestru (kolejne składniki w górę)
+            const isRegisterMatch = prevSungMidi ? (filteredPitch.midi >= prevSungMidi - 1) : true;
 
-            const isTargetMatch = isSemitoneMatch && isIntervalDirectionMatch;
+            const isTargetMatch = isSemitoneMatch && isRegisterMatch;
             updateTunerUI(data, isTargetMatch);
 
             if (isTargetMatch) {
@@ -792,14 +692,33 @@
                 if (holdDurationMs >= REQUIRED_HOLD_MS) {
                     const timeToHit = now - voiceOnsetMs;
                     const isClean = timeToHit <= 750;
-                    const quality = isClean ? 'clean' : 'adjusted';
+                    noteResults[currentStep] = isClean ? 'clean' : 'adjusted';
+                    sungMidis[currentStep] = filteredPitch.midi;
 
-                    noteResults[1] = quality;
-                    hasAnswered = true;
-                    stopSinging();
-                    updateHoldProgressBar(100);
-                    updateModelButtonState();
-                    handleSuccess();
+                    if (currentStep === 1) {
+                        // Przejście do kroku 3/3
+                        currentStep = 2;
+                        stepCooldownUntil = now + 300;
+                        waitingForStepOnset = true;
+                        hasDetectedSilenceBeforeStep = false;
+                        voiceOnsetMs = null;
+                        holdDurationMs = 0;
+                        wrongNoteHoldMs = 0;
+                        lastHeardSemitone = null;
+                        pitchHistory.length = 0;
+
+                        updateHoldProgressBar(0);
+                        playSuccessChime();
+                        updateTaskStepUI(2);
+                        renderScore(2);
+                    } else if (currentStep === 2) {
+                        // Sukces całego trójdźwięku!
+                        hasAnswered = true;
+                        stopSinging();
+                        updateHoldProgressBar(100);
+                        updateModelButtonState();
+                        handleSuccess();
+                    }
                 }
             } else {
                 holdDurationMs = Math.max(0, holdDurationMs - deltaMs * 1.5);
@@ -807,8 +726,9 @@
 
                 if (filteredPitch.semitoneClass === lastHeardSemitone) {
                     wrongNoteHoldMs += deltaMs;
-                    if (wrongNoteHoldMs >= 320 && filteredPitch.semitoneClass !== rootSemitoneClass) {
-                        handleStep2Mistake(filteredPitch);
+                    // Błąd przy stabilnym śpiewaniu innego dźwięku (min. 320 ms)
+                    if (wrongNoteHoldMs >= 320 && filteredPitch.semitoneClass !== triadSemitoneClasses[0]) {
+                        handleMistake(filteredPitch, currentStep);
                         wrongNoteHoldMs = 0;
                     }
                 } else {
@@ -819,22 +739,16 @@
         }
     }
 
-    function handleStep2Mistake(pitch) {
+    function handleMistake(pitch, step) {
         if (hasAnswered) return;
 
-        const semitoneDiff = direction === 1
-            ? ((pitch.semitoneClass - rootSemitoneClass) % 12 + 12) % 12
-            : ((rootSemitoneClass - pitch.semitoneClass) % 12 + 12) % 12;
+        const expectedNote = triadNotes[step];
+        const expectedAcc = expectedNote.alter === 1 ? '#' : expectedNote.alter === -1 ? 'b' : '';
+        const expectedSolf = SOLMIZATION[expectedNote.letter + expectedAcc] || SOLMIZATION[expectedNote.letter] || '';
+        const expectedLabel = `${MT.noteLabel(expectedNote)}${expectedNote.octave}`;
 
-        const heardName = SEMITONES_TO_INTERVAL_NAME[semitoneDiff] || 'Inny dźwięk';
-        const targetSemitoneDiff = INTERVAL_DEFS[currentSymbol].semitones;
-
-        let hintDir = '';
-        if (direction === 1) {
-            hintDir = semitoneDiff < targetSemitoneDiff ? 'zaśpiewaj wyżej 🔼' : 'zaśpiewaj niżej 🔽';
-        } else {
-            hintDir = semitoneDiff < targetSemitoneDiff ? 'zaśpiewaj niżej 🔽' : 'zaśpiewaj wyżej 🔼';
-        }
+        const heardName = pitch.polishNoteName || pitch.noteName;
+        const heardSolf = SOLMIZATION[pitch.noteName] ? `(${SOLMIZATION[pitch.noteName]})` : '';
 
         if (attemptCount < MAX_ATTEMPTS) {
             attemptCount++;
@@ -842,14 +756,14 @@
             updateModelButtonState();
 
             currentStep = 0;
-            noteResults = [null, null];
+            noteResults = [null, null, null];
             voiceOnsetMs = null;
             holdDurationMs = 0;
             lastHeardSemitone = null;
             wrongNoteHoldMs = 0;
-            sungRootMidi = null;
-            waitingForStep1Onset = false;
-            hasDetectedSilenceBeforeStep1 = false;
+            sungMidis = [null, null, null];
+            waitingForStepOnset = false;
+            hasDetectedSilenceBeforeStep = false;
             pitchHistory.length = 0;
 
             updateHoldProgressBar(0);
@@ -861,13 +775,13 @@
                 feedback.className = 'feedback-msg feedback-warn';
                 if (attemptCount === 3) {
                     feedback.innerHTML = `
-                        Słyszę: <strong>${pitch.polishNoteName || pitch.noteName}</strong> (${heardName}) zamiast ${INTERVAL_DEFS[currentSymbol].label}. <strong>${hintDir}</strong>!<br>
+                        Słyszę: <strong>${heardName} ${heardSolf}</strong> zamiast składnika <strong>${expectedLabel} ${expectedSolf ? `(${expectedSolf})` : ''}</strong> w trójdźwięku.<br>
                         <span style="color: var(--ink); font-weight: 600;">💡 Przed ostatnią (3.) próbą możesz kliknąć <strong>„Posłuchaj wzorca”</strong> na fortepianie!</span><br>
                         <small>Gdy będziesz gotowy, kliknij <em>„Rozpocznij próbę 3 z ${MAX_ATTEMPTS}”</em> lub wciśnij spację.</small>
                     `;
                 } else {
                     feedback.innerHTML = `
-                        Słyszę: <strong>${pitch.polishNoteName || pitch.noteName}</strong> (${heardName}) zamiast ${INTERVAL_DEFS[currentSymbol].label}. <strong>${hintDir}</strong>!<br>
+                        Słyszę: <strong>${heardName} ${heardSolf}</strong> zamiast składnika <strong>${expectedLabel} ${expectedSolf ? `(${expectedSolf})` : ''}</strong>.<br>
                         <small>Kliknij <em>„Rozpocznij próbę ${attemptCount} z ${MAX_ATTEMPTS}”</em> lub wciśnij spację, gdy będziesz gotowy.</small>
                     `;
                 }
@@ -880,16 +794,16 @@
 
         } else {
             hasAnswered = true;
-            noteResults[1] = 'wrong';
+            noteResults[step] = 'wrong';
             stopSinging();
             updateHoldProgressBar(0);
             updateModelButtonState();
-            handleMaxAttemptsFailed(pitch, heardName);
+            handleMaxAttemptsFailed();
         }
     }
 
     function handleSuccess() {
-        renderScore(1);
+        renderScore(2);
 
         const feedback = document.getElementById('feedback');
         const legend = document.getElementById('feedback-legend');
@@ -906,30 +820,27 @@
             singText.textContent = 'Zaśpiewaj ponownie';
         }
 
-        const rootAccidental = rootNote.alter === 1 ? '#' : rootNote.alter === -1 ? 'b' : '';
-        const rootSolf = SOLMIZATION[rootNote.letter + rootAccidental] || SOLMIZATION[rootNote.letter] || '';
-        const rootLabelStr = `${MT.noteLabel(rootNote)}${rootNote.octave}`;
+        const labels = triadNotes.map(n => {
+            const acc = n.alter === 1 ? '#' : n.alter === -1 ? 'b' : '';
+            const solf = SOLMIZATION[n.letter + acc] || SOLMIZATION[n.letter] || '';
+            return `<strong>${MT.noteLabel(n)}${n.octave}</strong> ${solf ? `(${solf})` : ''}`;
+        });
 
-        const targetAccidental = targetNote.alter === 1 ? '#' : targetNote.alter === -1 ? 'b' : '';
-        const targetSolf = SOLMIZATION[targetNote.letter + targetAccidental] || SOLMIZATION[targetNote.letter] || '';
-        const targetLabelStr = `${MT.noteLabel(targetNote)}${targetNote.octave}`;
-
-        const isBothClean = noteResults[0] === 'clean' && noteResults[1] === 'clean';
-
+        const isAllClean = noteResults.every(r => r === 'clean');
         let headline = '';
         let headlineClass = 'var(--green)';
 
         if (attemptCount === 1) {
-            if (isBothClean) {
-                headline = '🎯 Perfekcyjny słuch wewnętrzny! Czysty atak obu dźwięków za 1. razem.';
+            if (isAllClean) {
+                headline = `🎯 Perfekcyjny słuch! Czyste wykonanie trójdźwięku za 1. razem.`;
             } else {
-                headline = '⭐ Bardzo ładne wykonanie interwału za 1. razem (dźwięk dociągany).';
+                headline = `⭐ Bardzo ładne wykonanie trójdźwięku za 1. razem.`;
                 headlineClass = 'var(--gold)';
             }
         } else if (attemptCount === 2) {
-            headline = '👍 Świetna autokorekta! Właściwy interwał odnaleziony w 2. próbie.';
+            headline = `👍 Świetna autokorekta! Trójdźwięk poprawnie zaśpiewany w 2. próbie.`;
         } else {
-            headline = '👍 Brawo! Właściwy interwał trafiony w 3. próbie.';
+            headline = `👍 Brawo! Właściwe dźwięki akordu trafione w 3. próbie.`;
         }
 
         if (feedback) {
@@ -937,15 +848,14 @@
             feedback.innerHTML = `
                 <div style="font-size: 1.18rem; font-weight: 700; color: ${headlineClass}; margin-bottom: 3px;">${headline}</div>
                 <div style="font-size: 0.92rem; color: var(--ink);">
-                    1. dźwięk: <strong>${rootLabelStr}</strong> ${rootSolf ? `(${rootSolf})` : ''} &bull; 
-                    2. dźwięk: <strong>${targetLabelStr}</strong> ${targetSolf ? `(${targetSolf})` : ''}
+                    Dźwięki akordu: ${labels.join(' &bull; ')}
                 </div>
             `;
         }
     }
 
-    function handleMaxAttemptsFailed(pitch, heardName) {
-        renderScore(1);
+    function handleMaxAttemptsFailed() {
+        renderScore(2);
 
         const feedback = document.getElementById('feedback');
         const legend = document.getElementById('feedback-legend');
@@ -962,16 +872,18 @@
             singText.textContent = 'Zaśpiewaj ponownie';
         }
 
-        const targetAccidental = targetNote.alter === 1 ? '#' : targetNote.alter === -1 ? 'b' : '';
-        const targetSolf = SOLMIZATION[targetNote.letter + targetAccidental] || SOLMIZATION[targetNote.letter] || '';
-        const targetLabelStr = `${MT.noteLabel(targetNote)}${targetNote.octave}`;
+        const labels = triadNotes.map(n => {
+            const acc = n.alter === 1 ? '#' : n.alter === -1 ? 'b' : '';
+            const solf = SOLMIZATION[n.letter + acc] || SOLMIZATION[n.letter] || '';
+            return `<strong>${MT.noteLabel(n)}${n.octave}</strong> ${solf ? `(${solf})` : ''}`;
+        });
 
         if (feedback) {
             feedback.className = 'feedback-msg feedback-wrong';
             feedback.innerHTML = `
-                <div style="font-size: 1.15rem; font-weight: 700; color: var(--coral); margin-bottom: 3px;">💡 Ten interwał sprawił trudność po 3 próbach.</div>
+                <div style="font-size: 1.15rem; font-weight: 700; color: var(--coral); margin-bottom: 3px;">💡 Ten trójdźwięk sprawił trudność po 3 próbach.</div>
                 <div style="font-size: 0.92rem; color: var(--ink); margin-bottom: 4px;">
-                    Poprawny dźwięk docelowy to: <strong>${targetLabelStr}</strong> ${targetSolf ? `(${targetSolf})` : ''}.
+                    Poprawne składniki akordu to: ${labels.join(' &bull; ')}.
                 </div>
                 <small style="color: var(--muted);">Włącz <em>„Posłuchaj wzorca”</em>, zaśpiewaj razem z fortepianem i przejdź do kolejnego zadania.</small>
             `;

@@ -83,12 +83,24 @@
 
         const clef = pickClef();
         const rootOctave = clef === 'bass' ? BASS_ROOT_OCTAVE : TREBLE_ROOT_OCTAVE;
-        const rootLetter = MT.LETTERS[Math.floor(Math.random() * MT.LETTERS.length)];
 
-        currentKey = pool[Math.floor(Math.random() * pool.length)];
-        const type = TRIAD_TYPES[currentKey];
-        const rootNote = { letter: rootLetter, alter: 0, octave: rootOctave };
-        const notes = MT.buildTriadNotes(rootNote, type.shape, type.inversion);
+        let notes = null;
+        for (let i = 0; i < 100; i++) {
+            currentKey = pool[Math.floor(Math.random() * pool.length)];
+            const type = TRIAD_TYPES[currentKey];
+            const rootLetter = MT.LETTERS[Math.floor(Math.random() * MT.LETTERS.length)];
+            const rootNote = { letter: rootLetter, alter: 0, octave: rootOctave };
+            const candidateNotes = MT.buildTriadNotes(rootNote, type.shape, type.inversion);
+            if (MT.isCleanTriad(candidateNotes)) {
+                notes = candidateNotes;
+                break;
+            }
+        }
+
+        if (!notes) {
+            currentKey = 'durowy_z';
+            notes = MT.buildTriadNotes({ letter: 'C', alter: 0, octave: rootOctave }, 'durowy', 0);
+        }
 
         try {
             await KszaVerovio.ensureReady();
