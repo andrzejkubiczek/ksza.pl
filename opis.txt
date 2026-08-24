@@ -72,11 +72,9 @@ dist/                          - folder wygenerowanych plików produkcyjnych (np
   sekstowe (+₃, o₃) i kwartsekstowe (+₅, o₅). Warianty: ze słuchu, zapis nutowy,
   budowanie na pięciolinii oraz śpiewanie składników akordu do mikrofonu (3-etapowe).
 
-- Gamy i stopnie (gamy.html, gamy-stopnie.html):
-  Gama durowa i cztery odmiany molowej (eolska, harmoniczna, dorycka, melodyczna).
-  Ćwiczenie na stopnie gra gamę (kontekst tonalny), a następnie losowy stopień (I-VIII).
+- Gamy i stopnie (gamy.html, gamy-stopnie.html, gamy-spiewaj.html):
+  Warianty: rozpoznawanie odmiany, badanie stopni (I-VIII) oraz śpiewanie gam do mikrofonu.
 
-- Puzzle melodyczne (puzzle.html, puzzle-zapis.html):
   Układanie potasowanych taktów we właściwej kolejności (drag & drop). Pełny odsłuch
   rozpoczyna się odliczeniem jednego taktu metronomem w tempie utworu.
 

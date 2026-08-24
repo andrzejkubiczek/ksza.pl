@@ -10,6 +10,7 @@ Opis idei projektu znajduje się na podstronie [O projekcie](o-projekcie.html). 
 
 * **Interwały** – rozpoznawanie ze słuchu (tryb melodyczny w górę/dół, harmoniczny oraz mieszany), czytanie zapisu nutowego (klucz wiolinowy i basowy), interaktywne budowanie interwałów na pięciolinii oraz śpiewanie interwałów do mikrofonu z natychmiastową oceną intonacji głosu.
 * **Trójdźwięki** – durowy, molowy, zmniejszony i zwiększony w postaci zasadniczej oraz z przewrotami (sekstowy, kwartsekstowy); warianty: ze słuchu, zapis nutowy, budowanie na pięciolinii oraz śpiewanie składników akordu do mikrofonu.
+* **Gamy i stopnie** – rozpoznawanie gamy durowej oraz 4 odmian molowej (eolska, harmoniczna, dorycka, melodyczna), trening rozpoznawania stopni gamy (I–VIII) w kontekście tonalnym oraz śpiewanie gam do mikrofonu.
 * **Puzzle melodyczne** – układanie potasowanych fragmentów melodii we właściwej kolejności (ze słuchu lub z zapisu nutowego); pełny odsłuch poprzedzony jest odliczeniem jednego taktu metronomem w zadanym tempie.
 * **Dyktanda** – dyktando wysokościowe (podany klucz, tonacja i pierwszy dźwięk, reszta wysokości do uzupełnienia ze słuchu i sprawdzenia z natychmiastowym kolorowaniem nut) oraz pamięć melodyczna (powtarzanie usłyszanej frazy na klawiaturze po dźwięku odniesienia $a^1 = 440\text{ Hz}$).
 * **Rytm** – puzzle rytmiczne oparte na ksylofonie i pojedynczej linii z kluczem perkusyjnym.
