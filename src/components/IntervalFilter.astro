@@ -1,0 +1,66 @@
+---
+export interface Props {
+  id?: string;
+}
+
+const { id = 'interval-filter' } = Astro.props;
+
+const INTERVALS = [
+  { symbol: '1', name: 'Pryma cz.' },
+  { symbol: '2>', name: 'Sekunda m.' },
+  { symbol: '2', name: 'Sekunda w.' },
+  { symbol: '3>', name: 'Tercja m.' },
+  { symbol: '3', name: 'Tercja w.' },
+  { symbol: '4', name: 'Kwarta cz.' },
+  { symbol: '4<', name: 'Tryton' },
+  { symbol: '5', name: 'Kwinta cz.' },
+  { symbol: '6>', name: 'Seksta m.' },
+  { symbol: '6', name: 'Seksta w.' },
+  { symbol: '7', name: 'Septyma m.' },
+  { symbol: '7<', name: 'Septyma w.' },
+  { symbol: '8', name: 'Oktawa cz.' }
+];
+
+const PRESETS = [
+  { id: 'all', label: 'Wszystkie' },
+  { id: 'perfect', label: 'Czyste (1, 4, 5, 8)' },
+  { id: 'perfect-2-3', label: '+ Sekundy i tercje' },
+  { id: 'without-sevenths', label: 'Bez septymy' },
+];
+---
+<details class="interval-filter" id={id}>
+  <summary class="interval-filter-summary" aria-label="Rozwiń wybór zakresu interwałów">
+    <span class="interval-filter-label">
+      <span class="interval-filter-icon" aria-hidden="true">⚙</span>
+      <span>Zakres interwałów:</span>
+      <span class="interval-filter-badge" id={`${id}-badge`}>Wszystkie (13)</span>
+    </span>
+    <span class="interval-filter-chevron" aria-hidden="true">▾</span>
+  </summary>
+  <div class="interval-filter-content">
+    <div class="interval-presets" role="group" aria-label="Gotowe zestawy interwałów">
+      {PRESETS.map((p) => (
+        <button type="button" class="preset-btn" data-preset={p.id}>
+          {p.label}
+        </button>
+      ))}
+    </div>
+    <div class="interval-toggles" role="group" aria-label="Wybór pojedynczych interwałów">
+      {INTERVALS.map((item) => (
+        <button
+          type="button"
+          class="interval-toggle-chip is-active"
+          data-symbol={item.symbol}
+          aria-pressed="true"
+        >
+          <strong>{item.symbol === '4<' ? '4</5>' : item.symbol}</strong>
+          <small>{item.name}</small>
+        </button>
+      ))}
+    </div>
+    <div class="interval-filter-hint" id={`${id}-hint`} style="display: none;" role="alert">
+      Wybierz co najmniej 2 interwały do ćwiczenia.
+    </div>
+  </div>
+</details>
+

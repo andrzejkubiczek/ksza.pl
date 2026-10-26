@@ -95,6 +95,15 @@
         return selected;
     }
 
+    function getActiveSymbolsPool() {
+        if (window.KszaIntervalFilter) {
+            const active = KszaIntervalFilter.getActiveSymbols();
+            const filtered = SYMBOLS.filter((s) => active.includes(s));
+            if (filtered.length >= 2) return filtered;
+        }
+        return SYMBOLS;
+    }
+
     async function generateNewQuestion() {
         hasAnswered = false;
         const feedback = document.getElementById('feedback');
@@ -109,7 +118,8 @@
         const level = currentLevel();
         const rootOctave = clef === 'bass' ? BASS_ROOT_OCTAVE : TREBLE_ROOT_OCTAVE;
         const rootLetter = MT.LETTERS[Math.floor(Math.random() * MT.LETTERS.length)];
-        currentSymbol = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+        const pool = getActiveSymbolsPool();
+        currentSymbol = pool[Math.floor(Math.random() * pool.length)];
         direction = level === '2' && Math.random() < 0.5 ? -1 : 1;
         const rootAlter = level === '2' ? pickRootAlter(rootLetter, currentSymbol, direction) : 0;
         rootNote = { letter: rootLetter, alter: rootAlter, octave: rootOctave };
@@ -188,6 +198,17 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+        if (window.KszaIntervalFilter) {
+            KszaIntervalFilter.init({
+                filterId: 'interval-filter',
+                onChange: (symbols) => {
+                    if (currentSymbol && !symbols.includes(currentSymbol)) {
+                        generateNewQuestion();
+                    }
+                }
+            });
+        }
+
         generateNewQuestion();
         KszaGestureLayer.setup('gesture-layer', {
             canEdit: () => !hasAnswered,

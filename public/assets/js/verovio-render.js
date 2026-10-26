@@ -24,7 +24,9 @@ window.KszaVerovio = (() => {
                 } catch (e) {}
             };
 
-            verovio.module.onRuntimeInitialized = tryInit;
+            if (verovio.module) {
+                verovio.module.onRuntimeInitialized = tryInit;
+            }
             const pollId = setInterval(tryInit, 50);
             const timeoutId = setTimeout(() => {
                 settled = true;

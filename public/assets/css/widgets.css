@@ -365,6 +365,195 @@
     cursor: not-allowed;
 }
 
+.interval-choice.interval-excluded {
+    opacity: 0.22;
+    filter: grayscale(1);
+    cursor: not-allowed;
+    background: var(--surface-subtle);
+    border-color: var(--border);
+    box-shadow: none;
+    transform: none !important;
+    pointer-events: none;
+}
+
+/* -------------------------------------------------------------------------
+   Rozwijany panel wyboru zakresu interwałów (IntervalFilter)
+   ------------------------------------------------------------------------- */
+.interval-filter {
+    margin: 0 auto 18px;
+    background: var(--surface-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    text-align: left;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.interval-filter[open] {
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-subtle);
+}
+
+.interval-filter-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    cursor: pointer;
+    user-select: none;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--ink);
+    list-style: none;
+    transition: background 0.15s ease;
+}
+
+.interval-filter-summary::-webkit-details-marker {
+    display: none;
+}
+
+.interval-filter-summary:hover {
+    background: var(--key-hover);
+}
+
+.interval-filter-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.interval-filter-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    font-size: 0.95rem;
+}
+
+.interval-filter-badge {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--ink);
+}
+
+.interval-filter-chevron {
+    font-size: 0.75rem;
+    color: var(--muted);
+    transition: transform 0.2s ease;
+}
+
+.interval-filter[open] .interval-filter-chevron {
+    transform: rotate(180deg);
+}
+
+.interval-filter-content {
+    padding: 12px 14px 14px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+}
+
+.interval-presets {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.preset-btn {
+    appearance: none;
+    background: var(--surface-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    padding: 5px 11px;
+    font-size: 0.78rem;
+    font-family: inherit;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.preset-btn:hover {
+    color: var(--ink);
+    border-color: var(--border-strong);
+    background: var(--key-hover);
+}
+
+.preset-btn.is-active {
+    background: var(--ink);
+    color: #ffffff;
+    border-color: var(--ink);
+}
+
+.interval-toggles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+    gap: 6px;
+}
+
+.interval-toggle-chip {
+    appearance: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 3px;
+    background: var(--surface-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+
+.interval-toggle-chip strong {
+    font-size: 0.92rem;
+    color: var(--muted);
+    line-height: 1.15;
+}
+
+.interval-toggle-chip small {
+    font-size: 0.65rem;
+    color: var(--muted-light);
+    line-height: 1.2;
+    margin-top: 2px;
+}
+
+.interval-toggle-chip:hover {
+    background: var(--key-hover);
+    border-color: var(--border-strong);
+}
+
+.interval-toggle-chip.is-active {
+    background: var(--surface);
+    border-color: var(--gold);
+    box-shadow: 0 0 0 1px var(--gold);
+}
+
+.interval-toggle-chip.is-active strong {
+    color: var(--ink);
+    font-weight: 700;
+}
+
+.interval-toggle-chip.is-active small {
+    color: var(--gold);
+}
+
+.interval-filter-hint {
+    margin-top: 8px;
+    font-size: 0.78rem;
+    color: var(--coral);
+    font-weight: 600;
+    text-align: center;
+}
+
 .scale-choices {
     display: flex;
     flex-direction: column;

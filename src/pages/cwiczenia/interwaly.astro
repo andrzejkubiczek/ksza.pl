@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import SubNav from '../../components/SubNav.astro';
+import IntervalFilter from '../../components/IntervalFilter.astro';
 ---
 <Layout
   title="Interwały - ksza.pl"
@@ -51,6 +52,8 @@ import SubNav from '../../components/SubNav.astro';
           </div>
         </div>
 
+        <IntervalFilter id="interval-filter" />
+
         <div id="status-line" class="status-line"></div>
 
         <div class="player-controls">
@@ -85,6 +88,7 @@ import SubNav from '../../components/SubNav.astro';
   <Fragment slot="scripts">
     <script is:inline src="/assets/vendor/smplr.js"></script>
     <script is:inline src="/assets/js/core.js"></script>
+    <script is:inline src="/assets/js/interval-filter.js"></script>
     <script is:inline src="/assets/js/interwaly.js"></script>
   </Fragment>
 </Layout>

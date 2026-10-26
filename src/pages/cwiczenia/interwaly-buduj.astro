@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import SubNav from '../../components/SubNav.astro';
+import IntervalFilter from '../../components/IntervalFilter.astro';
 ---
 <Layout
   title="Zbuduj interwał - ksza.pl"
@@ -39,6 +40,8 @@ import SubNav from '../../components/SubNav.astro';
             </div>
           </div>
         </div>
+
+        <IntervalFilter id="interval-filter" />
 
         <p id="task-line" class="task-line"></p>
 
@@ -79,12 +82,13 @@ import SubNav from '../../components/SubNav.astro';
   </main>
 
   <Fragment slot="scripts">
-    <script is:inline src="https://cdn.jsdelivr.net/npm/verovio@6.2.0/dist/verovio-toolkit-wasm.js"></script>
+    <script is:inline src="https://cdn.jsdelivr.net/npm/verovio@6.3.0/dist/verovio-toolkit-wasm.js"></script>
     <script is:inline src="/assets/js/core.js"></script>
     <script is:inline src="/assets/js/music-theory.js"></script>
     <script is:inline src="/assets/js/verovio-render.js"></script>
     <script is:inline src="/assets/js/gesture-layer.js"></script>
     <script is:inline src="/assets/js/piano-keyboard.js"></script>
+    <script is:inline src="/assets/js/interval-filter.js"></script>
     <script is:inline src="/assets/js/interwaly-buduj.js"></script>
   </Fragment>
 </Layout>

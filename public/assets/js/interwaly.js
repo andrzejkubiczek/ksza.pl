@@ -53,6 +53,37 @@
         if (playBtn) playBtn.disabled = false;
     }
 
+    function getActiveIntervalPool() {
+        if (window.KszaIntervalFilter) {
+            const activeSymbols = KszaIntervalFilter.getActiveSymbols();
+            const filtered = intervals.filter((it) => activeSymbols.includes(it.symbol));
+            if (filtered.length >= 2) return filtered;
+        }
+        return intervals;
+    }
+
+    function updateChoiceButtonsState() {
+        const activeSymbols = window.KszaIntervalFilter
+            ? window.KszaIntervalFilter.getActiveSymbols()
+            : intervals.map((it) => it.symbol);
+
+        document.querySelectorAll('.interval-choice').forEach((btn) => {
+            const symbol = btn.dataset.symbol;
+            const isActive = activeSymbols.includes(symbol);
+            if (isActive) {
+                btn.classList.remove('interval-excluded');
+                btn.removeAttribute('aria-disabled');
+                if (!hasAnswered) {
+                    btn.removeAttribute('disabled');
+                }
+            } else {
+                btn.classList.add('interval-excluded');
+                btn.setAttribute('aria-disabled', 'true');
+                btn.setAttribute('disabled', 'true');
+            }
+        });
+    }
+
     function generateNewInterval() {
         stopScheduledInterval();
         hasAnswered = false;
@@ -64,9 +95,10 @@
         document.getElementById('next-btn').style.display = 'none';
         document.getElementById('play-btn').style.display = 'inline-flex';
 
-        document.querySelectorAll('.interval-choice').forEach((b) => b.removeAttribute('disabled'));
+        updateChoiceButtonsState();
 
-        currentInterval = intervals[Math.floor(Math.random() * intervals.length)];
+        const pool = getActiveIntervalPool();
+        currentInterval = pool[Math.floor(Math.random() * pool.length)];
         const startIndex = pickStartIndex(currentInterval.semitones);
 
         const lowerNote = notesArray[startIndex];
@@ -136,6 +168,7 @@
 
     function checkAnswer(selectedSymbol) {
         if (hasAnswered) return;
+        if (window.KszaIntervalFilter && !KszaIntervalFilter.isIntervalActive(selectedSymbol)) return;
         hasAnswered = true;
 
         document.querySelectorAll('.interval-choice').forEach((b) => b.setAttribute('disabled', 'true'));
@@ -159,6 +192,18 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+        if (window.KszaIntervalFilter) {
+            KszaIntervalFilter.init({
+                filterId: 'interval-filter',
+                onChange: (symbols) => {
+                    updateChoiceButtonsState();
+                    if (currentInterval && !symbols.includes(currentInterval.symbol)) {
+                        generateNewInterval();
+                    }
+                }
+            });
+        }
+
         generateNewInterval();
 
         document.getElementById('play-btn')?.addEventListener('click', playCurrentInterval);

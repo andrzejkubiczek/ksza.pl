@@ -54,6 +54,37 @@
 
     const setStatus = (msg, type) => KszaUI.setStatus(msg, type);
 
+    function getActiveSymbolsPool() {
+        if (window.KszaIntervalFilter) {
+            const active = KszaIntervalFilter.getActiveSymbols();
+            const filtered = SYMBOLS.filter((s) => active.includes(s));
+            if (filtered.length >= 2) return filtered;
+        }
+        return SYMBOLS;
+    }
+
+    function updateChoiceButtonsState() {
+        const activeSymbols = window.KszaIntervalFilter
+            ? window.KszaIntervalFilter.getActiveSymbols()
+            : SYMBOLS;
+
+        document.querySelectorAll('.interval-choice').forEach((btn) => {
+            const symbol = btn.dataset.symbol;
+            const isActive = activeSymbols.includes(symbol);
+            if (isActive) {
+                btn.classList.remove('interval-excluded');
+                btn.removeAttribute('aria-disabled');
+                if (!hasAnswered) {
+                    btn.disabled = false;
+                }
+            } else {
+                btn.classList.add('interval-excluded');
+                btn.setAttribute('aria-disabled', 'true');
+                btn.disabled = true;
+            }
+        });
+    }
+
     async function generateNewQuestion() {
         hasAnswered = false;
         const feedback = document.getElementById('feedback');
@@ -62,15 +93,18 @@
             feedback.className = 'feedback-msg';
         }
         document.getElementById('next-btn').style.display = 'none';
+
+        updateChoiceButtonsState();
+
         document.querySelectorAll('.interval-choice').forEach((btn) => {
-            btn.disabled = false;
             btn.classList.remove('is-correct', 'is-wrong');
         });
 
         const clef = pickClef();
         const rootOctave = clef === 'bass' ? BASS_ROOT_OCTAVE : TREBLE_ROOT_OCTAVE;
         const rootLetter = MT.LETTERS[Math.floor(Math.random() * MT.LETTERS.length)];
-        const symbol = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+        const pool = getActiveSymbolsPool();
+        const symbol = pool[Math.floor(Math.random() * pool.length)];
 
         const rootNote = { letter: rootLetter, alter: 0, octave: rootOctave };
         const upperNote = MT.spellByShape(rootNote, INTERVAL_DEFS[symbol], 1);
@@ -89,6 +123,7 @@
 
     function checkAnswer(selectedSymbol) {
         if (hasAnswered) return;
+        if (window.KszaIntervalFilter && !KszaIntervalFilter.isIntervalActive(selectedSymbol)) return;
         hasAnswered = true;
 
         document.querySelectorAll('.interval-choice').forEach((btn) => {
@@ -115,6 +150,18 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+        if (window.KszaIntervalFilter) {
+            KszaIntervalFilter.init({
+                filterId: 'interval-filter',
+                onChange: (symbols) => {
+                    updateChoiceButtonsState();
+                    if (currentSymbol && !symbols.includes(currentSymbol)) {
+                        generateNewQuestion();
+                    }
+                }
+            });
+        }
+
         generateNewQuestion();
 
         document.getElementById('clef-select')?.addEventListener('change', generateNewQuestion);
