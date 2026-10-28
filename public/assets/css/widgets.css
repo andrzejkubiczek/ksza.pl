@@ -2,21 +2,22 @@
     font-family: var(--font-body);
     color: var(--ink);
     background: var(--surface);
-    max-width: 640px;
+    max-width: 960px;
     margin: 0 auto;
-    padding: 36px 32px 34px;
+    padding: 38px 46px 40px;
     border-radius: var(--radius-lg);
     border: 1px solid var(--border);
     box-shadow: var(--shadow-lg);
     text-align: center;
     position: relative;
+    transition: padding 0.2s ease, border-radius 0.2s ease, max-width 0.2s ease;
 }
 
 .widget-header h1 {
-    font-size: 1.75rem;
+    font-size: clamp(1.45rem, 3.2vw, 1.85rem);
     font-family: var(--font-display);
     letter-spacing: -0.015em;
-    margin: 0 0 8px;
+    margin: 0 0 6px;
     color: var(--ink);
 }
 
@@ -29,26 +30,28 @@
 
 .controls-row {
     display: flex;
-    gap: 12px;
-    margin-bottom: 16px;
+    gap: 10px;
+    margin-bottom: 18px;
     text-align: left;
     flex-wrap: wrap;
     justify-content: center;
+    align-items: flex-end;
 }
 
 .field {
-    flex: 1 1 170px;
-    max-width: 270px;
+    flex: 0 1 auto;
+    min-width: 130px;
+    max-width: 220px;
 }
 
 .field label {
     display: block;
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--muted);
-    margin-bottom: 6px;
+    margin-bottom: 5px;
 }
 
 .select-wrap {
@@ -58,10 +61,10 @@
 .select-wrap::after {
     content: '';
     position: absolute;
-    right: 15px;
+    right: 14px;
     top: 50%;
-    width: 7px;
-    height: 7px;
+    width: 6px;
+    height: 6px;
     border-right: 2px solid var(--muted);
     border-bottom: 2px solid var(--muted);
     transform: translateY(-65%) rotate(45deg);
@@ -71,8 +74,8 @@
 .field select {
     width: 100%;
     appearance: none;
-    padding: 11px 36px 11px 14px;
-    font-size: 0.9rem;
+    padding: 9px 32px 9px 12px;
+    font-size: 0.88rem;
     font-family: inherit;
     font-weight: 500;
     color: var(--ink);
@@ -175,7 +178,7 @@
 }
 
 .player-controls {
-    margin: 18px 0 22px;
+    margin: 18px 0 18px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -186,24 +189,24 @@
 .btn-primary {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    background: linear-gradient(135deg, #deb05b 0%, #c28827 100%);
-    color: #18150a;
-    border: none;
-    padding: 13px 26px;
+    gap: 9px;
+    background: var(--ink);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 12px 28px;
     font-family: inherit;
     font-size: 0.94rem;
-    font-weight: 700;
+    font-weight: 600;
     cursor: pointer;
     border-radius: var(--radius-pill);
-    box-shadow: 0 8px 20px -6px rgba(194, 136, 39, 0.55);
-    transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.16s ease, filter 0.16s ease;
+    box-shadow: 0 4px 14px -2px rgba(22, 28, 26, 0.16);
+    transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.16s ease, background 0.16s ease;
 }
 
 .btn-primary:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 26px -6px rgba(194, 136, 39, 0.7);
-    filter: brightness(1.03);
+    transform: translateY(-1.5px);
+    box-shadow: 0 8px 20px -4px rgba(22, 28, 26, 0.24);
+    background: #232d29;
 }
 
 .btn-primary:active:not(:disabled) {
@@ -217,11 +220,11 @@
 @keyframes btnPulsePlaying {
     0% {
         transform: scale(0.98);
-        box-shadow: 0 4px 14px -2px rgba(194, 136, 39, 0.4), 0 0 0 0 rgba(194, 136, 39, 0.4);
+        box-shadow: 0 4px 12px -2px rgba(22, 28, 26, 0.2), 0 0 0 0 rgba(42, 111, 88, 0.4);
     }
     100% {
         transform: scale(1.02);
-        box-shadow: 0 10px 26px -4px rgba(194, 136, 39, 0.7), 0 0 0 10px rgba(194, 136, 39, 0);
+        box-shadow: 0 8px 22px -4px rgba(22, 28, 26, 0.3), 0 0 0 8px rgba(42, 111, 88, 0);
     }
 }
 
@@ -236,23 +239,24 @@
 .btn-dark {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    background: var(--ink);
-    color: #fdfbf7;
-    border: none;
-    padding: 13px 26px;
+    gap: 9px;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--border-strong);
+    padding: 12px 26px;
     font-family: inherit;
     font-size: 0.94rem;
     font-weight: 600;
     cursor: pointer;
     border-radius: var(--radius-pill);
-    box-shadow: 0 8px 18px -8px rgba(23, 24, 34, 0.4);
-    transition: transform 0.16s ease, background 0.16s ease;
+    box-shadow: 0 2px 8px -2px rgba(24, 25, 34, 0.05);
+    transition: transform 0.16s ease, background 0.16s ease, border-color 0.16s ease;
 }
 
 .btn-dark:hover {
-    transform: translateY(-2px);
-    background: #282a39;
+    transform: translateY(-1.5px);
+    background: var(--surface-subtle);
+    border-color: var(--ink);
 }
 
 .btn-ghost {
@@ -301,24 +305,56 @@
 }
 
 .feedback-msg {
-    min-height: 28px;
+    min-height: 32px;
     font-weight: 600;
-    font-size: 1rem;
-    margin-bottom: 16px;
-    display: flex;
+    font-size: 0.95rem;
+    margin: 4px auto 18px;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 8px;
+    padding: 5px 18px;
+    border-radius: var(--radius-pill);
+    border: 1px solid transparent;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+    max-width: 100%;
 }
 
-.feedback-msg.feedback-correct { color: var(--green); }
-.feedback-msg.feedback-wrong   { color: var(--coral); }
-.feedback-msg.feedback-partial { color: var(--coral); }
+.feedback-msg:empty {
+    border-color: transparent;
+    background: transparent;
+    padding: 0;
+}
+
+.feedback-msg.feedback-correct {
+    color: var(--green);
+    background: var(--green-soft);
+    border-color: rgba(30, 110, 75, 0.22);
+}
+
+.feedback-msg.feedback-wrong {
+    color: var(--coral);
+    background: var(--coral-soft);
+    border-color: rgba(184, 61, 39, 0.22);
+}
+
+.feedback-msg.feedback-warn,
+.feedback-msg.feedback-partial {
+    color: var(--gold);
+    background: var(--gold-soft);
+    border-color: rgba(184, 134, 11, 0.25);
+}
 
 .intervals-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 10px;
+    max-width: 680px;
+    margin: 0 auto;
+}
+
+.intervals-grid:not(#triad-grid) > :last-child:nth-child(13) {
+    grid-column: 2 / span 2;
 }
 
 .interval-choice {
@@ -326,31 +362,33 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    background: var(--surface-subtle);
+    gap: 3px;
+    background: var(--surface);
     border: 1px solid var(--border);
     padding: 13px 8px 11px;
     font-family: inherit;
     color: var(--ink);
     cursor: pointer;
     border-radius: var(--radius-md);
-    box-shadow: 0 2px 4px rgba(23, 24, 34, 0.03);
+    box-shadow: var(--shadow-subtle);
     transition: background 0.15s ease, transform 0.12s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .interval-choice strong {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     font-weight: 700;
+    line-height: 1.2;
 }
 
 .interval-choice small {
-    font-size: 0.72rem;
+    font-size: 0.73rem;
     color: var(--muted);
     font-weight: 500;
+    line-height: 1.2;
 }
 
 .interval-choice:hover:not(:disabled) {
-    background: var(--surface);
+    background: #ffffff;
     border-color: var(--gold);
     transform: translateY(-2px);
     box-shadow: 0 6px 14px -4px var(--gold-glow);
@@ -380,6 +418,7 @@
    Rozwijany panel wyboru zakresu interwałów (IntervalFilter)
    ------------------------------------------------------------------------- */
 .interval-filter {
+    max-width: 520px;
     margin: 0 auto 18px;
     background: var(--surface-subtle);
     border: 1px solid var(--border);
@@ -462,7 +501,8 @@
     display: flex;
     gap: 6px;
     flex-wrap: wrap;
-    margin-bottom: 10px;
+    justify-content: center;
+    margin-bottom: 12px;
 }
 
 .preset-btn {
@@ -493,17 +533,21 @@
 
 .interval-toggles {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+    grid-template-columns: repeat(14, 1fr);
     gap: 6px;
+    max-width: 480px;
+    margin: 0 auto;
 }
 
 .interval-toggle-chip {
+    grid-column: span 2;
+    aspect-ratio: 1;
     appearance: none;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 6px 3px;
+    padding: 4px 2px;
     background: var(--surface-subtle);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
@@ -513,17 +557,23 @@
     user-select: none;
 }
 
+/* Drugi rząd (6 kwadratów) wyśrodkowany pod pierwszym (7 kwadratów) */
+.interval-toggle-chip:nth-child(8) {
+    grid-column: 2 / span 2;
+}
+
 .interval-toggle-chip strong {
     font-size: 0.92rem;
     color: var(--muted);
-    line-height: 1.15;
+    line-height: 1.1;
 }
 
 .interval-toggle-chip small {
-    font-size: 0.65rem;
+    font-size: 0.62rem;
     color: var(--muted-light);
-    line-height: 1.2;
+    line-height: 1.15;
     margin-top: 2px;
+    text-align: center;
 }
 
 .interval-toggle-chip:hover {
@@ -738,13 +788,14 @@
 .subnav {
     display: inline-flex;
     justify-content: center;
+    align-items: center;
     background: var(--surface-subtle);
-    padding: 5px;
+    padding: 4px;
     border-radius: var(--radius-pill);
     border: 1px solid var(--border);
     margin: 0 auto 24px;
     gap: 4px;
-    flex-wrap: wrap;
+    max-width: 100%;
     box-shadow: inset 0 1px 3px rgba(24, 26, 36, 0.03);
 }
 
@@ -757,6 +808,7 @@
     border: none;
     transition: all 0.16s ease;
     text-decoration: none;
+    white-space: nowrap;
 }
 
 .subnav a:hover {
@@ -766,8 +818,8 @@
 
 .subnav a[aria-current="page"] {
     background: var(--ink);
-    color: #fdfbf7;
-    box-shadow: 0 2px 8px rgba(24, 26, 36, 0.18);
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(22, 28, 26, 0.18);
 }
 
 .task-line {
@@ -866,9 +918,9 @@
 
 .accidental-btn.is-active {
     background: var(--ink);
-    color: #fdfbf7;
+    color: #ffffff;
     border-color: var(--ink);
-    box-shadow: 0 4px 12px rgba(24, 26, 36, 0.2);
+    box-shadow: 0 4px 12px rgba(22, 28, 26, 0.2);
 }
 
 .accidental-btn:disabled {
@@ -995,7 +1047,7 @@
 .piano-black-key .piano-key-label {
     font-size: 0.56rem;
     line-height: 1.2;
-    color: #fdfbf6;
+    color: #ffffff;
 }
 
 .echo-keyboard-wrap {
@@ -1045,7 +1097,7 @@
 }
 
 .echo-black-key:hover:not(:disabled) {
-    background: #3a3d4a;
+    background: #2b3632;
 }
 
 .echo-black-key:active:not(:disabled) {
@@ -1162,7 +1214,8 @@
     width: 100%;
     max-width: 380px;
     height: 10px;
-    background: #e2dfd5;
+    background: var(--surface-subtle);
+    border: 1px solid var(--border);
     border-radius: 5px;
     overflow: visible;
 }
@@ -1386,107 +1439,331 @@
     background: var(--coral);
 }
 
+/* -------------------------------------------------------------
+   RESPONSYWNOŚĆ (MEDIA QUERIES) - 3-POZIOMOWY SYSTEM ERGONOMICZNY
+-------------------------------------------------------------- */
+
+/* 1. Tablet Studio (601px - 991px) */
+@media (max-width: 991px) {
+    .widget {
+        max-width: 720px;
+        padding: 30px 26px 32px;
+        border-radius: var(--radius-lg);
+    }
+
+    .controls-row {
+        gap: 8px;
+        justify-content: center;
+    }
+
+    .field {
+        min-width: 120px;
+    }
+
+    .player-controls {
+        margin: 14px 0 16px;
+    }
+
+    .intervals-grid {
+        grid-template-columns: repeat(3, 1fr);
+        max-width: 500px;
+        gap: 8px;
+    }
+
+    .intervals-grid:not(#triad-grid) > :last-child:nth-child(13) {
+        grid-column: 2;
+    }
+}
+
+/* 2. Smartfon - Strefa Kciuka (<=600px) */
 @media (max-width: 600px) {
     .widget {
-        padding: 20px 14px 18px;
+        padding: 20px 14px 22px;
         border-radius: 16px;
+        margin: 0 auto;
+        box-shadow: 0 4px 18px -4px rgba(24, 25, 34, 0.08);
     }
+
     .widget-header h1 {
         font-size: 1.35rem;
         margin: 0 0 4px;
     }
+
     .widget-header p {
-        font-size: 0.85rem;
+        font-size: 0.84rem;
     }
+
+    /* Subnav jako horyzontalna przewijana wstążka dotykowa */
+    .subnav {
+        display: flex;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 3px;
+        gap: 4px;
+        justify-content: flex-start;
+        border-radius: var(--radius-pill);
+        margin: 0 auto 16px;
+    }
+
+    .subnav::-webkit-scrollbar {
+        display: none;
+    }
+
+    .subnav a {
+        flex: 0 0 auto;
+        padding: 6px 13px;
+        font-size: 0.78rem;
+    }
+
+    /* Kontrolki w zwartej siatce */
     .controls-row {
-        flex-direction: row;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
         gap: 8px;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
+        align-items: stretch;
     }
+
     .field {
-        flex: 1 1 120px;
-        min-width: 110px;
+        min-width: 0;
         max-width: none;
+        width: 100%;
     }
+
     .field label {
-        font-size: 0.68rem;
-        margin-bottom: 4px;
+        font-size: 0.65rem;
+        margin-bottom: 3px;
     }
+
     .field select {
-    }
-    .player-controls {
-        margin: 12px 0 14px;
-        gap: 8px;
-    }
-    .btn-primary, .btn-dark {
-        padding: 11px 22px;
-        font-size: 0.88rem;
-    }
-    .btn-ghost {
-        padding: 9px 16px;
+        padding: 8px 28px 8px 10px;
         font-size: 0.82rem;
     }
+
+    .player-controls {
+        margin: 10px 0 14px;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .btn-primary, .btn-dark {
+        padding: 10px 20px;
+        font-size: 0.86rem;
+    }
+
+    .btn-ghost {
+        padding: 8px 14px;
+        font-size: 0.8rem;
+    }
+
+    /* Ukrycie dekoracyjnej pięciolinii dla oszczędności pionowej przestrzeni */
     .staff {
-        margin: 12px auto;
+        display: none;
     }
-    .answer-group {
-        margin: 12px 0 16px;
-    }
+
+    /* Kontenery nutowe Verovio dopasowane do ekranu telefonu */
     .notation-wrap {
         margin-bottom: 12px;
     }
+
     .notation-container {
-        padding: 10px 6px;
-        border-radius: 12px;
+        padding: 8px 4px;
+        min-height: 110px;
+        border-radius: 10px;
+        margin: 0 0 14px;
     }
+
     .feedback-msg {
-        min-height: 22px;
-        font-size: 0.92rem;
-        margin-bottom: 10px;
+        min-height: 28px;
+        font-size: 0.88rem;
+        padding: 4px 14px;
+        margin: 2px auto 14px;
     }
-    .feedback-area {
-        min-height: 38px;
-        margin: 12px 0 0;
+
+    /* Wybór zakresu interwałów (IntervalFilter) na telefonie */
+    .interval-filter {
+        max-width: 100%;
+        margin-bottom: 14px;
     }
+
+    .interval-toggles {
+        gap: 4px;
+        max-width: 100%;
+    }
+
+    .interval-toggle-chip {
+        padding: 2px 1px;
+    }
+
+    .interval-toggle-chip strong {
+        font-size: 0.8rem;
+    }
+
+    .interval-toggle-chip small {
+        font-size: 0.52rem;
+    }
+
+    /* Klawiatura odpowiedzi: 3 kolumny pod kciuk */
     .intervals-grid {
+        grid-template-columns: repeat(3, 1fr);
+        max-width: 100%;
         gap: 6px;
     }
+
+    .intervals-grid:not(#triad-grid) > :last-child:nth-child(13) {
+        grid-column: 2;
+    }
+
     .interval-choice {
         padding: 10px 4px 8px;
+        border-radius: 8px;
     }
+
     .interval-choice strong {
+        font-size: 1rem;
+    }
+
+    .interval-choice small {
+        font-size: 0.65rem;
+    }
+
+    /* Narzędzia budowania nut i akcydentów */
+    .note-builder {
+        gap: 12px;
+        margin: 0 0 16px;
+    }
+
+    .note-builder-controls {
+        gap: 14px;
+    }
+
+    .letter-btn {
+        width: 42px;
+        height: 42px;
         font-size: 0.95rem;
     }
-    .puzzle-grid {
-        gap: 6px;
-        margin-bottom: 12px;
+
+    .accidental-btn {
+        min-width: 44px;
+        padding: 9px 10px;
+        font-size: 0.95rem;
     }
-    .note-edit-group {
-        gap: 8px;
-        margin-bottom: 12px;
-    }
-    .piano-keyboard-wrap {
-        margin: 10px 0 14px;
-    }
+
+    /* Moduł wokalny i tuner */
     .sing-task-card {
-        padding: 10px 14px;
-        gap: 12px;
+        padding: 10px 12px;
+        gap: 10px;
+        margin: 8px auto 12px;
     }
+
     .sing-task-badge {
-        width: 44px;
-        height: 44px;
-        font-size: 1.35rem;
+        width: 42px;
+        height: 42px;
+        font-size: 1.3rem;
         border-radius: 10px;
     }
+
     .sing-task-title {
-        font-size: 1.02rem;
+        font-size: 0.98rem;
     }
+
     .tuner-card {
         padding: 12px 14px;
         margin: 10px 0 14px;
     }
+
     .tuner-note {
         font-size: 1.5rem;
+    }
+
+    /* Pokoje puzzli i rytmu */
+    .puzzle-list {
+        gap: 6px;
+        margin-bottom: 14px;
+    }
+
+    .fragment-card {
+        padding: 8px 10px;
+        gap: 8px;
+    }
+
+    .drag-handle {
+        font-size: 1.25rem;
+        padding: 6px 4px;
+    }
+
+    .echo-keyboard-wrap {
+        margin: 0 0 16px;
+    }
+
+    .piano-keyboard-wrap {
+        margin: 8px 0 14px;
+    }
+}
+
+/* 3. Kompaktowe telefony (<=380px) */
+@media (max-width: 380px) {
+    .widget {
+        padding: 16px 10px 18px;
+        border-radius: 12px;
+    }
+
+    .widget-header h1 {
+        font-size: 1.22rem;
+    }
+
+    .controls-row {
+        grid-template-columns: 1fr;
+    }
+
+    .interval-toggles {
+        gap: 3px;
+    }
+
+    .interval-toggle-chip strong {
+        font-size: 0.74rem;
+    }
+
+    .interval-toggle-chip small {
+        font-size: 0.48rem;
+    }
+
+    .btn-primary, .btn-dark {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .intervals-grid {
+        gap: 4px;
+    }
+
+    .interval-choice {
+        padding: 8px 2px 6px;
+    }
+
+    .interval-choice strong {
+        font-size: 0.92rem;
+    }
+
+    .interval-choice small {
+        font-size: 0.6rem;
+        letter-spacing: -0.02em;
+    }
+
+    .note-builder-controls {
+        gap: 8px;
+    }
+
+    .letter-btn {
+        width: 38px;
+        height: 38px;
+    }
+
+    .accidental-btn {
+        min-width: 38px;
+        padding: 8px 6px;
     }
 }
