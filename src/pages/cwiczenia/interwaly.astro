@@ -16,7 +16,7 @@ import IntervalFilter from '../../components/IntervalFilter.astro';
         <SubNav group="interwaly" />
         <div class="widget-header">
           <h1>Rozpoznaj interwał</h1>
-          <p>Posłuchaj dźwięków i wskaż interwał.<br><small>Dźwięki grane są losowo: w górę albo w dół.</small></p>
+          <p>Posłuchaj dźwięków i wskaż interwał.<br><small id="direction-hint">Poziom 1: dźwięki grane są w górę.</small></p>
         </div>
 
         <ul class="staff" aria-hidden="true"><li></li><li></li><li></li><li></li><li></li></ul>
@@ -46,9 +46,14 @@ import IntervalFilter from '../../components/IntervalFilter.astro';
               </select>
             </div>
           </div>
-          <div class="field tempo-field">
-            <label for="tempo-slider">Tempo <span id="tempo-value">100%</span></label>
-            <input type="range" id="tempo-slider" min="50" max="150" step="5" value="100">
+          <div class="field">
+            <label for="level-select">Poziom</label>
+            <div class="select-wrap">
+              <select id="level-select">
+                <option value="1">Poziom 1 – w górę</option>
+                <option value="2">Poziom 2 – w górę i w dół</option>
+              </select>
+            </div>
           </div>
         </div>
 
