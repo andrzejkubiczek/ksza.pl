@@ -195,7 +195,9 @@
 
         const badgeEl = document.getElementById('task-badge');
         if (badgeEl) {
-            badgeEl.textContent = currentSymbol === '4<' ? '4</5>' : currentSymbol;
+            const displaySymbol = currentSymbol === '4<' ? '4</5>' : currentSymbol;
+            badgeEl.textContent = displaySymbol;
+            badgeEl.classList.toggle('badge-sm', displaySymbol.length > 2);
         }
 
         const dirTag = document.getElementById('task-direction-tag');

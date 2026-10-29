@@ -1158,6 +1158,13 @@
     font-size: 1.65rem;
     font-weight: 800;
     line-height: 1;
+    text-align: center;
+    padding: 0 2px;
+}
+
+.sing-task-badge.badge-sm {
+    font-size: 0.88rem;
+    letter-spacing: -0.03em;
 }
 
 .sing-task-body {
@@ -1432,6 +1439,11 @@
         height: 42px;
         font-size: 1.3rem;
         border-radius: 10px;
+    }
+
+    .sing-task-badge.badge-sm {
+        font-size: 0.72rem;
+        letter-spacing: -0.03em;
     }
 
     .sing-task-title {
