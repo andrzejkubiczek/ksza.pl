@@ -941,6 +941,12 @@
 .notation-container svg {
     max-width: 100%;
     height: auto;
+    display: block;
+    flex-shrink: 0;
+}
+
+.notation-container g.staff {
+    display: inline !important;
 }
 
 .notation-container g.note.note-feedback-correct,
@@ -1340,7 +1346,7 @@
         font-size: 0.8rem;
     }
 
-    .staff {
+    ul.staff {
         display: none;
     }
 

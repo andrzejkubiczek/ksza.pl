@@ -136,7 +136,7 @@ input:focus-visible {
     padding: 0 24px;
 }
 
-.staff {
+ul.staff {
     list-style: none;
     display: flex;
     flex-direction: column;
@@ -146,7 +146,7 @@ input:focus-visible {
     padding: 0;
 }
 
-.staff li {
+ul.staff li {
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--gold) 50%, transparent);
     opacity: 0.35;
