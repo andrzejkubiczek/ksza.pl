@@ -1,7 +1,4 @@
 (() => {
-    // -------------------------------------------------------------------------
-    // 1. STAŁE I DANE MUZYCZNE
-    // -------------------------------------------------------------------------
     const NOTES_ARRAY = [
         'C3', 'C#3', 'D3', 'D#3', 'E3', 'F3', 'F#3', 'G3', 'G#3', 'A3', 'A#3', 'B3',
         'C4', 'C#4', 'D4', 'D#4', 'E4', 'F4', 'F#4', 'G4', 'G#4', 'A4', 'A#4', 'B4',
@@ -9,27 +6,24 @@
     ];
 
     const INTERVALS = [
-        { semitones: 0, symbol: '1' },
-        { semitones: 1, symbol: '2>' },
-        { semitones: 2, symbol: '2' },
-        { semitones: 3, symbol: '3>' },
-        { semitones: 4, symbol: '3' },
-        { semitones: 5, symbol: '4' },
-        { semitones: 6, symbol: '4<' },
-        { semitones: 7, symbol: '5' },
-        { semitones: 8, symbol: '6>' },
-        { semitones: 9, symbol: '6' },
-        { semitones: 10, symbol: '7' },
-        { semitones: 11, symbol: '7<' },
-        { semitones: 12, symbol: '8' }
+        { semitones: 0, symbol: '1', label: 'Pryma czysta' },
+        { semitones: 1, symbol: '2>', label: 'Sekunda mała' },
+        { semitones: 2, symbol: '2', label: 'Sekunda wielka' },
+        { semitones: 3, symbol: '3>', label: 'Tercja mała' },
+        { semitones: 4, symbol: '3', label: 'Tercja wielka' },
+        { semitones: 5, symbol: '4', label: 'Kwarta czysta' },
+        { semitones: 6, symbol: '4<', label: 'Tryton' },
+        { semitones: 7, symbol: '5', label: 'Kwinta czysta' },
+        { semitones: 8, symbol: '6>', label: 'Seksta mała' },
+        { semitones: 9, symbol: '6', label: 'Seksta wielka' },
+        { semitones: 10, symbol: '7', label: 'Septyma mała' },
+        { semitones: 11, symbol: '7<', label: 'Septyma wielka' },
+        { semitones: 12, symbol: '8', label: 'Oktawa czysta' }
     ];
 
     const ARRAY_BASE_SEMITONE = KszaInstrumentRange.toSemitone(NOTES_ARRAY[0]);
     const LEVEL_STORAGE_KEY = 'ksza_interval_level';
 
-    // -------------------------------------------------------------------------
-    // 2. CZASY ODSŁUCHU (STAŁE TEMPO 95%)
-    // -------------------------------------------------------------------------
     const FIXED_TEMPO_SPEED = 0.95;
     const NOTE_DURATION = 0.9375 / FIXED_TEMPO_SPEED;
     const GAP_BEFORE_SECOND = 1.1875 / FIXED_TEMPO_SPEED;
@@ -37,9 +31,6 @@
     const HARMONIC_DURATION = 1.75 / FIXED_TEMPO_SPEED;
     const MIXED_GAP = 1.0 / FIXED_TEMPO_SPEED;
 
-    // -------------------------------------------------------------------------
-    // 3. STAN APLIKACJI
-    // -------------------------------------------------------------------------
     const state = {
         currentInterval: null,
         firstNoteName: '',
@@ -49,9 +40,6 @@
         scheduledTimeouts: []
     };
 
-    // -------------------------------------------------------------------------
-    // 4. ELEMENTY DOM I POMOCNIKI
-    // -------------------------------------------------------------------------
     const dom = {
         instrumentSelect: () => document.getElementById('instrument-select'),
         modeSelect: () => document.getElementById('mode-select'),
@@ -65,9 +53,6 @@
 
     const onAudioState = KszaUI.createAudioStateHandler('play-btn');
 
-    // -------------------------------------------------------------------------
-    // 5. OBSŁUGA POZIOMU (KIERUNKU)
-    // -------------------------------------------------------------------------
     function getLevel() {
         return dom.levelSelect()?.value || '1';
     }
@@ -76,8 +61,8 @@
         const hint = dom.directionHint();
         if (!hint) return;
         hint.textContent = getLevel() === '1'
-            ? 'Poziom 1: dźwięki grane są w górę.'
-            : 'Poziom 2: dźwięki grane są losowo w górę albo w dół.';
+            ? 'Posłuchaj dźwięków i wskaż interwał (grane w górę).'
+            : 'Posłuchaj dźwięków i wskaż interwał (grane w górę lub w dół).';
     }
 
     function initLevel() {
@@ -92,9 +77,6 @@
         updateDirectionHint();
     }
 
-    // -------------------------------------------------------------------------
-    // 6. FILTROWANIE INTERWAŁÓW I PRZYCISKI ODPOWIEDZI
-    // -------------------------------------------------------------------------
     function getActiveIntervalPool() {
         if (window.KszaIntervalFilter) {
             const activeSymbols = KszaIntervalFilter.getActiveSymbols();
@@ -126,9 +108,6 @@
         });
     }
 
-    // -------------------------------------------------------------------------
-    // 7. LOSOWANIE I GENEROWANIE INTERWAŁU
-    // -------------------------------------------------------------------------
     function pickStartIndex(semitones) {
         const instrument = dom.instrumentSelect()?.value || 'piano';
         const range = KszaInstrumentRange.range(instrument);
@@ -176,9 +155,6 @@
         }
     }
 
-    // -------------------------------------------------------------------------
-    // 8. ODTWARZANIE DŹWIĘKÓW (AUDIO)
-    // -------------------------------------------------------------------------
     function stopScheduledPlayback() {
         state.scheduledTimeouts.forEach((id) => clearTimeout(id));
         state.scheduledTimeouts = [];
@@ -233,9 +209,6 @@
         state.scheduledTimeouts.push(endId);
     }
 
-    // -------------------------------------------------------------------------
-    // 9. SPRAWDZANIE ODPOWIEDZI
-    // -------------------------------------------------------------------------
     function checkAnswer(selectedSymbol) {
         if (state.hasAnswered) return;
         if (window.KszaIntervalFilter && !KszaIntervalFilter.isIntervalActive(selectedSymbol)) return;
@@ -247,10 +220,10 @@
         if (feedback) {
             if (selectedSymbol === state.currentInterval.symbol) {
                 feedback.className = 'feedback-msg feedback-correct';
-                feedback.textContent = 'Doskonale! To prawidłowa odpowiedź.';
+                feedback.textContent = 'Dobrze!';
             } else {
                 feedback.className = 'feedback-msg feedback-wrong';
-                feedback.textContent = `Niestety nie. Poprawna odpowiedź: ${state.currentInterval.symbol}.`;
+                feedback.textContent = `To była ${state.currentInterval.label.toLowerCase()} (${state.currentInterval.symbol}).`;
             }
         }
 
@@ -265,9 +238,6 @@
         setTimeout(playCurrentInterval, 250);
     }
 
-    // -------------------------------------------------------------------------
-    // 10. INICJALIZACJA I OBSŁUGA ZDARZEŃ
-    // -------------------------------------------------------------------------
     document.addEventListener('DOMContentLoaded', () => {
         initLevel();
 

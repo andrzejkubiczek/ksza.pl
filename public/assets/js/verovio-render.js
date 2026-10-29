@@ -2,7 +2,6 @@ window.KszaVerovio = (() => {
     let toolkit = null;
     let readyPromise = null;
 
-    // Potrójne zabezpieczenie inicjalizacji: sprawdzenie natychmiastowe, callback onRuntimeInitialized, polling co 50ms
     function ensureReady() {
         if (readyPromise) return readyPromise;
         readyPromise = new Promise((resolve, reject) => {

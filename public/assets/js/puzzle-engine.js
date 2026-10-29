@@ -91,7 +91,6 @@ window.KszaPuzzleEngine = (() => {
                 if (notation) {
                     const noteXmls = noteEls.map((n) => {
                         if (!rhythmStaff) return serializer.serializeToString(n);
-                        // Przy kluczu perkusyjnym Verovio wymaga stałej wysokości E4 do wyrenderowania na 1 linii
                         const clone = n.cloneNode(true);
                         const pitchEl = clone.querySelector('pitch');
                         if (pitchEl) {

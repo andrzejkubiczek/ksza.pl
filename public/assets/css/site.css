@@ -8,7 +8,6 @@
     --muted: #5e6b66;
     --muted-light: #8a9691;
     
-    /* Accents - Nordic Studio & Szałwia alpejska */
     --gold: #2a6f58;
     --gold-light: #3a8c70;
     --gold-soft: rgba(42, 111, 88, 0.09);
@@ -153,9 +152,6 @@ input:focus-visible {
     opacity: 0.35;
 }
 
-/* -------------------------------------------------------------
-   NAGŁÓWEK (HEADER) - JASNY, MINIMALISTYCZNY
--------------------------------------------------------------- */
 .site-header {
     background: rgba(243, 244, 243, 0.94);
     border-bottom: 1px solid var(--border);
@@ -304,9 +300,6 @@ input:focus-visible {
     }
 }
 
-/* -------------------------------------------------------------
-   HERO & STRONA GŁÓWNA
--------------------------------------------------------------- */
 .hero {
     text-align: center;
     padding: 48px 0 16px;
@@ -389,9 +382,6 @@ input:focus-visible {
     100% { transform: scaleY(1); opacity: 0.85; }
 }
 
-/* -------------------------------------------------------------
-   KARTY ĆWICZEŃ (EXERCISE GRID)
--------------------------------------------------------------- */
 .exercise-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -525,9 +515,6 @@ input:focus-visible {
     transform: translateX(3px);
 }
 
-/* -------------------------------------------------------------
-   SEKCJA ROZGRZEWKI (DAILY BANNER)
-------------------------------------------------------------- */
 .daily-warmup-banner {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -588,9 +575,6 @@ input:focus-visible {
     color: #ffffff;
 }
 
-/* -------------------------------------------------------------
-   STRONA STATYCZNA / O PROJEKCIE
-------------------------------------------------------------- */
 .page-content {
     max-width: var(--container-narrow);
     margin: 0 auto;
@@ -627,9 +611,6 @@ input:focus-visible {
     padding: 32px 0 60px;
 }
 
-/* -------------------------------------------------------------
-   STOPKA (FOOTER)
--------------------------------------------------------------- */
 .site-footer {
     padding: 28px 0 24px;
     border-top: 1px solid var(--border);
@@ -655,9 +636,6 @@ input:focus-visible {
     color: var(--muted-light);
 }
 
-/* -------------------------------------------------------------
-   RESPONSYWNOŚĆ GLOBALNA (MEDIA QUERIES)
-------------------------------------------------------------- */
 @media (max-width: 900px) {
     .exercise-grid {
         grid-template-columns: repeat(2, 1fr);

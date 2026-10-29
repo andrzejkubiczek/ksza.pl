@@ -139,10 +139,10 @@
         if (feedback) {
             if (selectedSymbol === currentSymbol) {
                 feedback.className = 'feedback-msg feedback-correct';
-                feedback.textContent = 'Doskonale! To prawidłowa odpowiedź.';
+                feedback.textContent = 'Dobrze!';
             } else {
                 feedback.className = 'feedback-msg feedback-wrong';
-                feedback.textContent = `Niestety nie. Poprawna odpowiedź: ${INTERVAL_DEFS[currentSymbol].label}.`;
+                feedback.textContent = `To ${INTERVAL_DEFS[currentSymbol].label.toLowerCase()} (${currentSymbol}).`;
             }
         }
 

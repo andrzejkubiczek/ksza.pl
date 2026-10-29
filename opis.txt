@@ -1,121 +1,125 @@
-=== ksza.pl - dokumentacja techniczna i przewodnik wdrożenia ===
+=== ksza.pl – opis projektu i dokumentacja ===
 
-Strona internetowa ksza.pl to w pełni statyczna aplikacja edukacyjna do nauki
-kształcenia słuchu i czytania nut. Działa bezpośrednio w przeglądarce
-(na komputerach, tabletach i telefonach) - bez bazy danych, bez backendu
-i bez konieczności logowania.
+ksza.pl to statyczna strona z interaktywnymi ćwiczeniami do kształcenia słuchu.
+Działa bezpośrednio w przeglądarce na komputerze, tablecie i telefonie – bez
+logowania, bez bazy danych i bez zewnętrznego serwera aplikacyjnego.
 
 
-1. ARCHITEKTURA AUDIO (smplr + Versilian / VSCO2 / Steinway)
+1. DŹWIĘK I ZAPIS NUTOWY
 
-A. Silnik dźwiękowy:
-   Aplikacja korzysta z silnika samplera "smplr", trwałego magazynu CacheStorage
-   oraz natywnego Web Audio API:
-   - Fortepian (piano): Splendid Grand Piano (wielowarstwowy fortepian koncertowy Steinway B).
-   - Ksylofon (xylophone): Versilian VCSL (koncertowy ksylofon sztabkowy na twardych pałkach).
+A. Silnik dźwiękowy (smplr + Web Audio API):
+   - Fortepian (piano): Splendid Grand Piano (Steinway B).
+   - Ksylofon (xylophone): Versilian VCSL (twarde pałki).
    - Instrumenty orkiestrowe (klarnet, skrzypce, flet, trąbka, fagot):
-     autentyczne, akustyczne nagrania orkiestry kameralnej Versilian VSCO2
-     znajdujące się lokalnie w katalogu "assets/audio/".
-   - Metronom: bezlatencyjny generator impulsów trójkątnych OscillatorNode.
+     próbki akustyczne z biblioteki Versilian VSCO2 zapisane lokalnie w
+     katalogu "public/assets/audio/".
+   - Metronom: generator impulsów oparty na Web Audio API (OscillatorNode).
+   - Załadowane próbki zapisywane są w pamięci podręcznej przeglądarki
+     (CacheStorage), dzięki czemu nie muszą być pobierane przy kolejnych
+     wizytach.
 
-B. Próbki audio (assets/audio/):
-   Wszystkie próbki orkiestrowe VSCO2 są umieszczone bezpośrednio w projekcie:
-   - assets/audio/clarinet/ (11 próbek MP3)
-   - assets/audio/violin/   (14 próbek MP3)
-   - assets/audio/flute/    (10 próbek MP3)
-   - assets/audio/trumpet/  (11 próbek MP3)
-   - assets/audio/bassoon/  (10 próbek MP3)
+B. Zapis nutowy (Verovio 6.3):
+   - Nuty na pięciolinii renderowane są dynamicznie do formatu SVG na podstawie
+     kodu MusicXML (z użyciem czcionki nutowej Leland).
 
-C. Publikacja:
-   Wgraj zawartość folderu "dist/" (powstałego po poleceniu npm run build)
-   do katalogu głównego serwera HTTP (np. Apache, Nginx, GitHub Pages, Netlify).
-   Nie jest wymagana żadna instalacja ani konfiguracja po stronie serwera.
-
-
-2. ARCHITEKTURA I STRUKTURA KATALOGÓW
-
-src/layouts/Layout.astro       - główny szablon layoutu (head, fonts, motyw, RWD)
-src/components/*.astro         - komponenty (NavMenu, SubNav, Footer)
-src/pages/index.astro          - strona główna (Start)
-src/pages/o-projekcie.astro    - strona informacyjna o projekcie
-src/pages/cwiczenia/*.astro    - dedykowane strony ćwiczeń
-public/assets/css/site.css     - globalne style, layout, motyw "Kontrastowe karty", RWD
-public/assets/css/widgets.css  - style widżetów ćwiczeń, notacji Verovio, klawiatur
-public/assets/audio/           - lokalne próbki akustyczne orkiestry Versilian VSCO2
-public/assets/vendor/smplr.js  - silnik samplera Web Audio API
-public/assets/js/core.js       - moduł audio (KszaAudio), tempo, rejestry instrumentów
-public/assets/js/pitch-detector.js - detektor wysokości głosu (YIN, autokorelacja, Web Audio)
-public/assets/js/music-theory.js - drabina diatoniczna, enharmonia, generator MusicXML
-public/assets/js/verovio-render.js - asynchroniczny silnik renderowania nut SVG (Leland font)
-public/assets/js/gesture-layer.js - obsługa gestów Pointer Events (przeciąganie/tap)
-public/assets/js/puzzle-engine.js - uniwersalny silnik układanek (MusicXML, metronom, SortableJS)
-public/assets/js/scale-tonics.js - toniki gam, algorytm doboru oktawy instrumentu
-public/assets/js/klasa-filter.js - filtr klasowy (kolejność dydaktyczna: IV/6 - IV/4)
-public/assets/js/piano-keyboard.js - statyczna klawiatura pomocnicza (białe/czarne klawisze)
-public/assets/js/*.js (reszta) - kontrolery logiki poszczególnych ćwiczeń
-public/dyktanda/puzzle/        - manifest (puzzle.json) i pliki MusicXML dyktand-puzzle
-public/dyktanda/wysokosciowe/  - manifest (dyktanda.json) i pliki dyktand wysokościowych
-public/dyktanda/rytm/          - manifest (rytm.json) i pliki rytmów-puzzle
-dist/                          - folder wygenerowanych plików produkcyjnych (npm run build)
+C. Publikacja na serwerze:
+   - Po wykonaniu polecenia `npm run build` gotowe pliki statyczne trafiają do
+     katalogu "dist/". Zawartość tego folderu wystarczy wgrać na dowolny serwer
+     HTTP.
 
 
-3. ZASADY DZIAŁANIA POSZCZEGÓLNYCH ĆWICZEŃ
+2. STRUKTURA PROJEKTU
 
-- Interwały (interwaly.html, interwaly-zapis.html, interwaly-buduj.html, interwaly-spiewaj.html):
-  Rozpoznawanie ze słuchu (melodycznie, harmonicznie, mieszanie), rozpoznawanie
-  zapisu nutowego w kluczu wiolinowym/basowym, interaktywne budowanie interwałów
-  oraz śpiewanie interwałów do mikrofonu (intonacja dwuetapowa z tunerem na żywo).
-  Dźwięki są automatycznie transponowane w oktawach, aby mieściły się w skali instrumentu.
+src/layouts/Layout.astro            - główny szablon strony (czcionki Outfit i Manrope, nagłówek, stopka)
+src/components/NavMenu.astro        - główne menu nawigacyjne
+src/components/SubNav.astro         - przełącznik zakładek w obrębie danego działu ćwiczeń
+src/components/IntervalFilter.astro - rozwijany panel wyboru zakresu interwałów
+src/components/Footer.astro         - stopka strony
+src/pages/index.astro               - strona główna
+src/pages/o-projekcie.astro         - strona z opisem projektu
+src/pages/cwiczenia/*.astro         - podstrony poszczególnych ćwiczeń
 
-- Trójdźwięki (trojdzwieki.html, trojdzwieki-zapis.html, trojdzwieki-buduj.html, trojdzwieki-spiewaj.html):
-  Durowy (+), molowy (o), zmniejszony (>), zwiększony (<) oraz przewroty
-  sekstowe (+₃, o₃) i kwartsekstowe (+₅, o₅). Warianty: ze słuchu, zapis nutowy,
-  budowanie na pięciolinii oraz śpiewanie składników akordu do mikrofonu (3-etapowe).
+public/assets/css/site.css          - style główne, kolorystyka (jasne tło, grafit, alpejska szałwia) i układ responsywny
+public/assets/css/widgets.css       - style widżetów ćwiczeń, pięciolinii, przycisków i klawiatur
+public/assets/audio/                - lokalne próbki MP3 instrumentów orkiestrowych
+public/assets/vendor/smplr.js       - biblioteka obsługująca odtwarzanie próbek dźwiękowych
 
-- Gamy i stopnie (gamy.html, gamy-stopnie.html, gamy-spiewaj.html):
-  Warianty: rozpoznawanie odmiany, badanie stopni (I-VIII) oraz śpiewanie gam do mikrofonu.
+public/assets/js/core.js            - obsługa dźwięku (KszaAudio), tempa i skal poszczególnych instrumentów
+public/assets/js/interval-filter.js - obsługa filtra zakresu interwałów z zapisem ustawień w localStorage
+public/assets/js/music-theory.js    - obliczenia diatoniczne, znaki chromatyczne i budowanie struktur MusicXML
+public/assets/js/verovio-render.js  - inicjalizacja biblioteki Verovio i renderowanie nut
+public/assets/js/gesture-layer.js   - obsługa przesuwania nut na pięciolinii za pomocą myszki lub dotyku
+public/assets/js/puzzle-engine.js   - wspólny moduł dla puzzli melodycznych i rytmicznych
+public/assets/js/scale-tonics.js    - zestaw tonacji i dobór oktawy odpowiedniej dla wybranego instrumentu
+public/assets/js/klasa-filter.js    - filtrowanie dyktand i rytmów według klasy (IV/6 – IV/4)
+public/assets/js/piano-keyboard.js  - pomocnicza klawiatura fortepianu pod pięciolinią
+public/assets/js/*.js (pozostałe)   - skrypty obsługujące logikę poszczególnych ćwiczeń
 
-  Układanie potasowanych taktów we właściwej kolejności (drag & drop). Pełny odsłuch
-  rozpoczyna się odliczeniem jednego taktu metronomem w tempie utworu.
-
-- Dyktanda wysokościowe (dyktanda-wysokosciowe.html):
-  Rytm i pierwszy dźwięk są podane; uczeń dopasowuje wysokości pozostałych nut
-  przyciskami lub gestem nad pięciolinią. Sprawdzenie nanosi kolory feedbacku
-  (zielony/czerwony) bez blokowania możliwości dalszej edycji.
-
-- Pamięć melodyczna (pamiec-melodyczna.html):
-  Przed każdą frazą odtwarzany jest dźwięk odniesienia a1 (440 Hz). Uczeń powtarza
-  usłyszaną melodię na wbudowanej klawiaturze (C4-C5). 5 poziomów trudności.
-
-- Rytm (rytm.html, rytm-zapis.html):
-  Puzzle rytmiczne – stała wysokość dźwięku (zawsze ksylofon), zmienny rytm.
-  Zapis nutowy rysowany jest na pojedynczej linii z kluczem perkusyjnym.
+public/dyktanda/puzzle/             - pliki MusicXML oraz lista (puzzle.json) dla puzzli melodycznych
+public/dyktanda/wysokosciowe/       - pliki MusicXML oraz lista (dyktanda.json) dla dyktand wysokościowych
+public/dyktanda/rytm/               - pliki MusicXML oraz lista (rytm.json) dla puzzli rytmicznych
 
 
-4. DODAWANIE NOWEGO DYKTANDA LUB RYTMU
+3. OPIS DZIAŁANIA ĆWICZEŃ
 
-1. Wyeksportuj utwór z programu nutowego (np. MuseScore, Sibelius, Finale) jako
-   NIESKOMPRESOWANY MusicXML (.xml lub .musicxml).
-2. Wgraj plik do odpowiedniego folderu (dyktanda/puzzle/, dyktanda/wysokosciowe/ lub dyktanda/rytm/).
-3. Dopisz obiekt do właściwego manifestu (puzzle.json, dyktanda.json lub rytm.json):
+- Interwały (ze słuchu, zapis nutowy, budowanie, śpiewanie):
+  We wszystkich czterech trybach dostępny jest filtr pozwalający wybrać zakres
+  ćwiczonych interwałów (gotowe zestawy lub wybór pojedynczych interwałów).
+  W ćwiczeniu słuchowym tempo jest stałe (95%), a do wyboru są dwa poziomy:
+  interwały grane wyłącznie w górę oraz grane losowo w górę i w dół. Przy
+  zmianie instrumentu dźwięki są automatycznie dopasowywane do jego rejestru.
+
+- Trójdźwięki (ze słuchu, zapis nutowy, budowanie, śpiewanie):
+  Poziom 1 obejmuje cztery trójdźwięki w postaci zasadniczej (durowy, molowy,
+  zmniejszony i zwiększony), natomiast poziom 2 dodaje pierwszy i drugi przewrót
+  trójdźwięku durowego oraz molowego.
+
+- Gamy i stopnie (odmiany gam, stopnie gamy, śpiewanie):
+  Rozpoznawanie gamy durowej i czterech odmian gamy molowej (eolskiej,
+  harmonicznej, doryckiej i melodycznej), rozpoznawanie stopni gamy po
+  wcześniejszym odsłuchaniu skali oraz ćwiczenie śpiewania gam.
+
+- Ćwiczenia śpiewane („Zaśpiewaj” dla interwałów, trójdźwięków i gam):
+  Oparte na samokontroli przy fortepianie, bez udziału mikrofonu. Na pięciolinii
+  wyświetlany jest dźwięk początkowy, który można odtworzyć przyciskiem
+  „Zagraj pierwszy dźwięk”. Po zaśpiewaniu zadania przycisk „Sprawdź z
+  fortepianem” odsłania pełny zapis na pięciolinii i odtwarza kolejne dźwięki z
+  podświetleniem nut.
+
+- Puzzle melodyczne i Rytm:
+  Wybrany przykład dzielony jest na pojedyncze takty, które należy ułożyć we
+  właściwej kolejności na podstawie odsłuchu lub zapisu nutowego. Odtwarzanie
+  całości poprzedza jeden takt nabicia metronomu. W ćwiczeniach rytmicznych
+  zapis prezentowany jest na pojedynczej linii perkusyjnej, a dźwięk odtwarza
+  ksylofon.
+
+- Dyktanda wysokościowe:
+  Rytm oraz pierwszy dźwięk są podane na pięciolinii. Zadaniem jest ustawienie
+  wysokości kolejnych nut za pomocą przycisków lub gestu przeciągania. Po
+  sprawdzeniu poprawne dźwięki oznaczane są kolorem zielonym, a błędne
+  czerwonym, z możliwością dalszej korekty.
+
+- Pamięć melodyczna:
+  Każdy przykład rozpoczyna się dźwiękiem odniesienia a¹ (440 Hz), po którym
+  następuje krótka fraza melodyczna (od 3 do 6 dźwięków w zależności od
+  wybranego poziomu). Zadaniem jest odtworzenie usłyszanych dźwięków na
+  klawiaturze ekranowej.
+
+
+4. DODAWANIE NOWYCH DYKTAND I RYTMÓW
+
+1. Wyeksportuj przykład z programu do edycji nut (np. MuseScore) jako
+   nieskompresowany plik MusicXML (.musicxml lub .xml).
+2. Umieść plik w odpowiednim katalogu wewnątrz `public/dyktanda/` (`puzzle/`,
+   `wysokosciowe/` lub `rytm/`).
+3. Dopisz nową pozycję do pliku JSON w tym samym katalogu (`puzzle.json`,
+   `dyktanda.json` lub `rytm.json`), np.:
 
    [
-     { "title": "Dyktando 1 - gama C-dur", "file": "dyktando-01.musicxml", "klasy": ["I/4", "IV/6"] },
-     { "title": "Dyktando 2 - ogólne",     "file": "dyktando-02.musicxml", "klasy": [] }
+     { "title": "Dyktando 1 – gama C-dur", "file": "dyktando-01.musicxml", "klasy": ["IV/6", "I/4"] },
+     { "title": "Dyktando 2 – ogólne",     "file": "dyktando-02.musicxml", "klasy": [] }
    ]
 
-   Pole "klasy" przyjmuje oznaczenia: IV/6, V/6, VI/6, I/4, II/4, III/4, IV/4.
-   Pusta tablica [] lub brak pola oznacza utwór ogólny (widoczny zawsze).
-
-
-5. ZARZĄDZANIE MENU I STRONAMI W ASTRO
-
-Menu nawigacyjne witryny jest zarządzane centralnie w komponencie:
-src/components/NavMenu.astro
-
-Aby dodać nową zakładkę lub zmienić strukturę menu:
-1. Zmodyfikuj tablicę NAV_ITEMS w pliku src/components/NavMenu.astro.
-2. Przy kolejnym uruchomieniu `npm run dev` lub `npm run build` menu zostanie
-   automatycznie i spójnie wyrenderowane na wszystkich podstronach.
-3. Skrypt update-nav.py nie jest już wymagany w procesie budowania.
-
+   W polu `klasy` można podać oznaczenia: `IV/6`, `V/6`, `VI/6`, `I/4`, `II/4`,
+   `III/4`, `IV/4`. Pusta tablica `[]` oznacza, że przykład będzie dostępny dla
+   wszystkich klas.

@@ -414,9 +414,6 @@
     pointer-events: none;
 }
 
-/* -------------------------------------------------------------------------
-   Rozwijany panel wyboru zakresu interwałów (IntervalFilter)
-   ------------------------------------------------------------------------- */
 .interval-filter {
     max-width: 520px;
     margin: 0 auto 18px;
@@ -557,7 +554,6 @@
     user-select: none;
 }
 
-/* Drugi rząd (6 kwadratów) wyśrodkowany pod pierwszym (7 kwadratów) */
 .interval-toggle-chip:nth-child(8) {
     grid-column: 2 / span 2;
 }
@@ -947,7 +943,6 @@
     height: auto;
 }
 
-/* Klasy feedbacku nanoszone dynamicznie na elementy SVG wyrenderowane przez Verovio */
 .notation-container g.note.note-feedback-correct,
 .notation-container g.note.note-feedback-correct * {
     fill: var(--green) !important;
@@ -1134,159 +1129,6 @@
 .answer-slot.is-correct { border-color: var(--green); background: var(--green-soft); }
 .answer-slot.is-wrong   { border-color: var(--coral); background: rgba(192, 57, 43, 0.08); }
 
-/* -------------------------------------------------------------
-   MODUŁ ŚPIEWU / SOLFEŻ / PITCH TRACKER
-------------------------------------------------------------- */
-.mic-status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 5px 14px;
-    border-radius: var(--radius-pill);
-    font-size: 0.76rem;
-    font-weight: 600;
-    background: var(--surface-subtle);
-    color: var(--muted);
-    border: 1px solid var(--border);
-    margin-bottom: 12px;
-    transition: all 0.2s ease;
-}
-
-.mic-status-badge.is-active {
-    background: var(--green-soft);
-    color: var(--green);
-    border-color: var(--green);
-    box-shadow: 0 0 0 1px var(--green);
-}
-
-.tuner-card {
-    background: var(--surface-subtle);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: 16px 20px;
-    margin: 14px 0 18px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-}
-
-.tuner-header {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    width: 100%;
-    max-width: 380px;
-}
-
-.tuner-note {
-    font-size: 1.85rem;
-    font-weight: 800;
-    font-family: var(--font-display);
-    color: var(--ink);
-    line-height: 1;
-}
-
-.tuner-solfege {
-    font-size: 1.05rem;
-    font-weight: 600;
-    color: var(--muted);
-    font-style: italic;
-}
-
-.tuner-status {
-    font-size: 0.92rem;
-    font-weight: 700;
-    color: var(--muted);
-    transition: color 0.15s ease;
-}
-
-.tuner-status.is-in-tune {
-    color: var(--green);
-}
-
-.tuner-status.is-flat, .tuner-status.is-sharp {
-    color: var(--gold);
-}
-
-.tuner-meter {
-    position: relative;
-    width: 100%;
-    max-width: 380px;
-    height: 10px;
-    background: var(--surface-subtle);
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    overflow: visible;
-}
-
-.tuner-sweet-spot {
-    position: absolute;
-    top: 0;
-    left: 35%;
-    width: 30%;
-    height: 100%;
-    background: rgba(46, 125, 50, 0.25);
-    border-radius: 4px;
-}
-
-.tuner-center-mark {
-    position: absolute;
-    top: -4px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 2px;
-    height: 18px;
-    background: var(--green);
-    border-radius: 1px;
-    z-index: 2;
-}
-
-.tuner-indicator {
-    position: absolute;
-    top: -4px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: var(--gold);
-    border: 2.5px solid #ffffff;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-    transition: left 0.08s ease-out;
-    z-index: 3;
-}
-
-.tuner-hold-track {
-    width: 100%;
-    max-width: 380px;
-    height: 5px;
-    background: rgba(0, 0, 0, 0.08);
-    border-radius: 3px;
-    overflow: hidden;
-    margin-top: 2px;
-}
-
-.tuner-hold-progress {
-    height: 100%;
-    width: 0%;
-    background: var(--green);
-    border-radius: 3px;
-    transition: width 0.05s linear;
-}
-
-.tuner-status.is-holding {
-    color: var(--green);
-    font-weight: 800;
-}
-
-.btn-primary.btn-active {
-    background: var(--coral) !important;
-    color: #ffffff !important;
-    box-shadow: 0 8px 20px -6px rgba(204, 60, 48, 0.6) !important;
-}
-
-/* Karta zadania wokalnego */
 .sing-task-card {
     display: flex;
     align-items: center;
@@ -1340,18 +1182,6 @@
     letter-spacing: 0.02em;
 }
 
-.sing-tag.tag-step {
-    background: var(--gold-soft);
-    color: var(--gold);
-    border: 1px solid var(--gold);
-}
-
-.sing-tag.tag-attempt {
-    background: var(--plum-soft);
-    color: var(--plum);
-    border: 1px solid var(--plum);
-}
-
 .sing-tag.tag-direction-up {
     background: var(--teal-soft);
     color: var(--teal);
@@ -1380,15 +1210,9 @@
     font-weight: 800;
 }
 
-/* Podświetlenie aktywnej nuty docelowej w Verovio SVG */
 .notation-container g.note.note-current-target * {
     fill: var(--gold) !important;
     stroke: var(--gold) !important;
-}
-
-.notation-container g.note.note-feedback-correct * {
-    fill: var(--green) !important;
-    stroke: var(--green) !important;
 }
 
 .notation-container g.note.note-feedback-warn * {
@@ -1397,53 +1221,6 @@
     opacity: 0.95;
 }
 
-.notation-container g.note.note-feedback-wrong * {
-    fill: var(--coral) !important;
-    stroke: var(--coral) !important;
-}
-
-.feedback-legend {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 16px;
-    margin-top: 10px;
-    flex-wrap: wrap;
-    font-size: 0.8rem;
-    color: var(--muted);
-    font-weight: 500;
-}
-
-.legend-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.legend-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    display: inline-block;
-}
-
-.legend-dot.dot-correct {
-    background: var(--green);
-}
-
-.legend-dot.dot-warn {
-    background: var(--gold);
-}
-
-.legend-dot.dot-wrong {
-    background: var(--coral);
-}
-
-/* -------------------------------------------------------------
-   RESPONSYWNOŚĆ (MEDIA QUERIES) - 3-POZIOMOWY SYSTEM ERGONOMICZNY
--------------------------------------------------------------- */
-
-/* 1. Tablet Studio (601px - 991px) */
 @media (max-width: 991px) {
     .widget {
         max-width: 720px;
@@ -1475,7 +1252,6 @@
     }
 }
 
-/* 2. Smartfon - Strefa Kciuka (<=600px) */
 @media (max-width: 600px) {
     .widget {
         padding: 20px 14px 22px;
@@ -1493,7 +1269,6 @@
         font-size: 0.84rem;
     }
 
-    /* Subnav jako horyzontalna przewijana wstążka dotykowa */
     .subnav {
         display: flex;
         width: 100%;
@@ -1518,7 +1293,6 @@
         font-size: 0.78rem;
     }
 
-    /* Kontrolki w zwartej siatce */
     .controls-row {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
@@ -1559,12 +1333,10 @@
         font-size: 0.8rem;
     }
 
-    /* Ukrycie dekoracyjnej pięciolinii dla oszczędności pionowej przestrzeni */
     .staff {
         display: none;
     }
 
-    /* Kontenery nutowe Verovio dopasowane do ekranu telefonu */
     .notation-wrap {
         margin-bottom: 12px;
     }
@@ -1583,7 +1355,6 @@
         margin: 2px auto 14px;
     }
 
-    /* Wybór zakresu interwałów (IntervalFilter) na telefonie */
     .interval-filter {
         max-width: 100%;
         margin-bottom: 14px;
@@ -1606,7 +1377,6 @@
         font-size: 0.52rem;
     }
 
-    /* Klawiatura odpowiedzi: 3 kolumny pod kciuk */
     .intervals-grid {
         grid-template-columns: repeat(3, 1fr);
         max-width: 100%;
@@ -1630,7 +1400,6 @@
         font-size: 0.65rem;
     }
 
-    /* Narzędzia budowania nut i akcydentów */
     .note-builder {
         gap: 12px;
         margin: 0 0 16px;
@@ -1652,7 +1421,6 @@
         font-size: 0.95rem;
     }
 
-    /* Moduł wokalny i tuner */
     .sing-task-card {
         padding: 10px 12px;
         gap: 10px;
@@ -1670,16 +1438,6 @@
         font-size: 0.98rem;
     }
 
-    .tuner-card {
-        padding: 12px 14px;
-        margin: 10px 0 14px;
-    }
-
-    .tuner-note {
-        font-size: 1.5rem;
-    }
-
-    /* Pokoje puzzli i rytmu */
     .puzzle-list {
         gap: 6px;
         margin-bottom: 14px;
@@ -1704,7 +1462,6 @@
     }
 }
 
-/* 3. Kompaktowe telefony (<=380px) */
 @media (max-width: 380px) {
     .widget {
         padding: 16px 10px 18px;

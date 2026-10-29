@@ -187,10 +187,10 @@
         if (feedback) {
             if (isCorrect) {
                 feedback.className = 'feedback-msg feedback-correct';
-                feedback.textContent = 'Doskonale! To prawidłowo zbudowany interwał.';
+                feedback.textContent = 'Dobrze!';
             } else {
                 feedback.className = 'feedback-msg feedback-wrong';
-                feedback.textContent = `Niestety nie. Prawidłowy drugi dźwięk to ${MT.noteLabel(expected)}.`;
+                feedback.textContent = `Drugi dźwięk to ${MT.noteLabel(expected)}.`;
             }
         }
 

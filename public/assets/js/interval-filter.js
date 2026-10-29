@@ -67,21 +67,18 @@ window.KszaIntervalFilter = (() => {
         const presetKey = detectPreset(activeSymbols);
         const count = activeSymbols.length;
 
-        // Aktualizacja przycisków presetów
         rootEl.querySelectorAll('.preset-btn').forEach((btn) => {
             const isActive = btn.dataset.preset === presetKey;
             btn.classList.toggle('is-active', isActive);
             btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
         });
 
-        // Aktualizacja chipów przełączników
         rootEl.querySelectorAll('.interval-toggle-chip').forEach((chip) => {
             const isActive = activeSymbols.includes(chip.dataset.symbol);
             chip.classList.toggle('is-active', isActive);
             chip.setAttribute('aria-pressed', isActive ? 'true' : 'false');
         });
 
-        // Aktualizacja etykiety w nagłówku
         const badge = rootEl.querySelector('.interval-filter-badge');
         if (badge) {
             if (presetKey === 'all') {
@@ -150,7 +147,6 @@ window.KszaIntervalFilter = (() => {
             changeCallbacks.push(options.onChange);
         }
 
-        // Odczyt z pamięci podręcznej
         const saved = loadFromStorage();
         if (saved) {
             activeSymbols = saved;
@@ -158,7 +154,6 @@ window.KszaIntervalFilter = (() => {
             activeSymbols = [...ALL_SYMBOLS];
         }
 
-        // Obsługa kliknięć w presety
         rootEl.querySelectorAll('.preset-btn').forEach((btn) => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -166,7 +161,6 @@ window.KszaIntervalFilter = (() => {
             });
         });
 
-        // Obsługa kliknięć w poszczególne chipy
         rootEl.querySelectorAll('.interval-toggle-chip').forEach((chip) => {
             chip.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -176,7 +170,6 @@ window.KszaIntervalFilter = (() => {
 
         updateUI();
 
-        // Powiadomienie na start
         changeCallbacks.forEach((cb) => {
             try { cb([...activeSymbols]); } catch (e) {}
         });
@@ -189,4 +182,3 @@ window.KszaIntervalFilter = (() => {
         PRESETS
     };
 })();
-

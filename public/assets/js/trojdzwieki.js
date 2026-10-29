@@ -2,7 +2,6 @@
     const CHROMATIC = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
     const BASS_OCTAVE_OPTIONS = [3, 4];
 
-    // Offsety liczone od najniższego granego dźwięku (basu postaci akordu)
     const TRIAD_TYPES = [
         { key: 'durowy_z',     label: 'Durowy',                 offsets: [0, 4, 7], level: 1 },
         { key: 'molowy_z',     label: 'Molowy',                 offsets: [0, 3, 7], level: 1 },
@@ -171,10 +170,10 @@
         if (feedback) {
             if (selectedKey === currentTriadType.key) {
                 feedback.className = 'feedback-msg feedback-correct';
-                feedback.textContent = 'Doskonale! To prawidłowa odpowiedź.';
+                feedback.textContent = 'Dobrze!';
             } else {
                 feedback.className = 'feedback-msg feedback-wrong';
-                feedback.textContent = `Niestety nie. Poprawna odpowiedź: ${currentTriadType.label}.`;
+                feedback.textContent = `To był trójdźwięk ${currentTriadType.label.toLowerCase()}.`;
             }
         }
 

@@ -20,7 +20,7 @@
         '5': { pool: CHROMATIC_NOTES, length: 6 }
     };
 
-    const REFERENCE_NOTE = 'A4'; // a1 = 440 Hz
+    const REFERENCE_NOTE = 'A4';
     const REFERENCE_DURATION = 1.5;
     const REFERENCE_GAP = 0.7;
     const BASE_NOTE_DURATION = 0.85;

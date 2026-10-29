@@ -123,10 +123,10 @@
         if (feedback) {
             if (selectedKey === currentKey) {
                 feedback.className = 'feedback-msg feedback-correct';
-                feedback.textContent = 'Doskonale! To prawidłowa odpowiedź.';
+                feedback.textContent = 'Dobrze!';
             } else {
                 feedback.className = 'feedback-msg feedback-wrong';
-                feedback.textContent = `Niestety nie. Poprawna odpowiedź: ${TRIAD_TYPES[currentKey].label}.`;
+                feedback.textContent = `To trójdźwięk ${TRIAD_TYPES[currentKey].label.toLowerCase()}.`;
             }
         }
 

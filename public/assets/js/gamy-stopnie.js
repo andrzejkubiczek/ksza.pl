@@ -127,10 +127,10 @@
         if (feedback) {
             if (selectedDegree === correctDegree) {
                 feedback.className = 'feedback-msg feedback-correct';
-                feedback.textContent = 'Doskonale! To prawidłowa odpowiedź.';
+                feedback.textContent = 'Dobrze!';
             } else {
                 feedback.className = 'feedback-msg feedback-wrong';
-                feedback.textContent = `Niestety nie. Poprawna odpowiedź: stopień ${ROMAN[currentDegreeIndex]}.`;
+                feedback.textContent = `To był stopień ${ROMAN[currentDegreeIndex]}.`;
             }
         }
 

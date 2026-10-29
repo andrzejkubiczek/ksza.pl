@@ -3,7 +3,6 @@ window.KszaMusicTheory = (() => {
     const LETTER_NATURAL_OFFSET = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
     const ACCIDENTAL_NAMES = { '-2': 'flat-flat', '-1': 'flat', '0': 'natural', '1': 'sharp', '2': 'double-sharp' };
 
-    // Indeks diatoniczny rośnie o 1 na każdy krok literowy niezależnie od granic oktawy
     function ladderEntry(diatonicIndex) {
         const letterIdx = ((diatonicIndex % 7) + 7) % 7;
         const octave = Math.floor(diatonicIndex / 7);
@@ -60,10 +59,10 @@ window.KszaMusicTheory = (() => {
 
     function isCleanNote(note) {
         if (!note || typeof note.alter !== 'number' || Math.abs(note.alter) > 1) return false;
-        if (note.letter === 'F' && note.alter === -1) return false; // Fes
-        if (note.letter === 'C' && note.alter === -1) return false; // Ces
-        if (note.letter === 'B' && note.alter === 1) return false;  // His
-        if (note.letter === 'E' && note.alter === 1) return false;  // Eis
+        if (note.letter === 'F' && note.alter === -1) return false;
+        if (note.letter === 'C' && note.alter === -1) return false;
+        if (note.letter === 'B' && note.alter === 1) return false;
+        if (note.letter === 'E' && note.alter === 1) return false;
         return true;
     }
 

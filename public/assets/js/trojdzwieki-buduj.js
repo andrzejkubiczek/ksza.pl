@@ -215,10 +215,10 @@
         if (feedback) {
             if (isCorrect) {
                 feedback.className = 'feedback-msg feedback-correct';
-                feedback.textContent = 'Doskonale! To prawidłowo zbudowany trójdźwięk.';
+                feedback.textContent = 'Dobrze!';
             } else {
                 feedback.className = 'feedback-msg feedback-wrong';
-                feedback.textContent = `Niestety nie. Prawidłowo: środkowy dźwięk to ${MT.noteLabel(expectedNotes[1])}, górny to ${MT.noteLabel(expectedNotes[2])}.`;
+                feedback.textContent = `Prawidłowe dźwięki: środkowy ${MT.noteLabel(expectedNotes[1])}, górny ${MT.noteLabel(expectedNotes[2])}.`;
             }
         }
 

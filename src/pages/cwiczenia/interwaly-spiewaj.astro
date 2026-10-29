@@ -1,10 +1,11 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import SubNav from '../../components/SubNav.astro';
+import IntervalFilter from '../../components/IntervalFilter.astro';
 ---
 <Layout
   title="Zaśpiewaj interwał - ksza.pl"
-  description="Interaktywne ćwiczenie wokalne: usłysz dźwięk bazowy, wyobraź sobie interwał i zaśpiewaj go do mikrofonu z natychmiastową oceną intonacji."
+  description="Ćwiczenie solfeżowe: posłuchaj dźwięku wyjściowego, zaśpiewaj zadany interwał i sprawdź się z fortepianem."
   currentFamily="Interwały"
   creditType="both"
   includeWidgetsCss={true}
@@ -15,14 +16,7 @@ import SubNav from '../../components/SubNav.astro';
         <SubNav group="interwaly" />
         <div class="widget-header">
           <h1>Zaśpiewaj interwał</h1>
-          <p>
-            Posłuchaj dźwięku wyjściowego, powtórz go głosem i zaśpiewaj dźwięk docelowy do mikrofonu.<br>
-            <small>Aplikacja ocenia czystość intonacji obu dźwięków interwału na żywo.</small>
-          </p>
-        </div>
-
-        <div style="margin: 8px 0 10px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
-          <span id="mic-status-badge" class="mic-status-badge">○ Mikrofon wyłączony</span>
+          <p>Posłuchaj dźwięku wyjściowego, zaśpiewaj wskazany interwał, a potem sprawdź się z fortepianem.</p>
         </div>
 
         <div class="controls-row">
@@ -30,8 +24,8 @@ import SubNav from '../../components/SubNav.astro';
             <label for="level-select">Poziom</label>
             <div class="select-wrap">
               <select id="level-select">
-                <option value="1">Poziom 1 (Podstawowe interwały • dźwięki naturalne)</option>
-                <option value="2">Poziom 2 (Wszystkie interwały • chromatyka)</option>
+                <option value="1">Poziom 1 – w górę, dźwięki naturalne</option>
+                <option value="2">Poziom 2 – w górę i w dół, z chromatycznymi</option>
               </select>
             </div>
           </div>
@@ -47,13 +41,12 @@ import SubNav from '../../components/SubNav.astro';
           </div>
         </div>
 
-        <!-- Wyraźna karta zadania -->
+        <IntervalFilter id="interval-filter" />
+
         <div class="sing-task-card" aria-live="polite">
           <div class="sing-task-badge" id="task-badge">1</div>
           <div class="sing-task-body">
             <div class="sing-task-meta">
-              <span id="task-attempt-tag" class="sing-tag tag-attempt">Próba 1/3</span>
-              <span id="task-step-tag" class="sing-tag tag-step">Krok 1/2: Dźwięk wyjściowy</span>
               <span id="task-direction-tag" class="sing-tag tag-direction-up">w górę ↑</span>
               <span id="task-root-tag" class="sing-tag tag-root">od: <strong>C4</strong></span>
             </div>
@@ -66,52 +59,23 @@ import SubNav from '../../components/SubNav.astro';
         <div id="status-line" class="status-line"></div>
 
         <div class="player-controls">
-          <button type="button" id="ref-pitch-btn" class="btn-ghost" title="Zagraj dźwięk wyjściowy na fortepianie">
-            <span>🔔 Dźwięk wyjściowy</span>
+          <button type="button" id="ref-pitch-btn" class="btn-ghost">
+            <span>Dźwięk wyjściowy</span>
           </button>
-          <button type="button" id="sing-btn" class="btn-primary">
-            <span class="mic-icon" aria-hidden="true">🎤</span>
-            <span id="sing-btn-text">Zaśpiewaj interwał</span>
+          <button type="button" id="play-model-btn" class="btn-primary">
+            <span class="play-icon" aria-hidden="true"></span>
+            <span id="play-model-text">Sprawdź z fortepianem</span>
           </button>
-          <button type="button" id="play-model-btn" class="btn-dark" title="Odsłuchaj pełny interwał na fortepianie">
-            <span>Posłuchaj wzorca</span>
-          </button>
-          <button type="button" id="next-btn" class="btn-dark" style="display:none;">
+          <button type="button" id="next-btn" class="btn-dark">
             <span>Następny interwał →</span>
           </button>
         </div>
 
-        <!-- Wskaźnik intonacji / Tuner -->
-        <div id="tuner-card" class="tuner-card">
-          <div class="tuner-header">
-            <div style="display: flex; align-items: baseline; gap: 6px;">
-              <span id="tuner-note" class="tuner-note">—</span>
-              <span id="tuner-solfege" class="tuner-solfege"></span>
-            </div>
-            <span id="tuner-status" class="tuner-status">Mikrofon wyłączony</span>
-          </div>
-          <div class="tuner-meter">
-            <div class="tuner-sweet-spot" title="Strefa czystego dźwięku"></div>
-            <div class="tuner-center-mark" title="Idealna intonacja"></div>
-            <div id="tuner-indicator" class="tuner-indicator"></div>
-          </div>
-          <div class="tuner-hold-track" title="Wskaźnik podtrzymania dźwięku">
-            <div id="tuner-hold-progress" class="tuner-hold-progress"></div>
-          </div>
-        </div>
-
-        <!-- Pięciolinia z nutami Verovio -->
         <div class="notation-wrap">
           <div id="notation-container" class="notation-container" aria-live="polite"></div>
         </div>
 
-        <!-- Informacje zwrotne -->
         <div id="feedback" class="feedback-msg" aria-live="polite" role="status"></div>
-        <div id="feedback-legend" class="feedback-legend" style="display: none;">
-          <span class="legend-item"><span class="legend-dot dot-correct"></span> Czysty atak</span>
-          <span class="legend-item"><span class="legend-dot dot-warn"></span> Dociągany / niepewny</span>
-          <span class="legend-item"><span class="legend-dot dot-wrong"></span> Błędny dźwięk</span>
-        </div>
       </div>
     </div>
   </main>
@@ -122,7 +86,7 @@ import SubNav from '../../components/SubNav.astro';
     <script is:inline src="/assets/js/core.js"></script>
     <script is:inline src="/assets/js/music-theory.js"></script>
     <script is:inline src="/assets/js/verovio-render.js"></script>
-    <script is:inline src="/assets/js/pitch-detector.js"></script>
+    <script is:inline src="/assets/js/interval-filter.js"></script>
     <script is:inline src="/assets/js/interwaly-spiewaj.js"></script>
   </Fragment>
 </Layout>
