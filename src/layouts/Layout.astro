@@ -1,6 +1,8 @@
 ---
 import NavMenu from '../components/NavMenu.astro';
 import Footer from '../components/Footer.astro';
+import '@fontsource-variable/manrope';
+import '@fontsource-variable/outfit';
 
 export interface Props {
   title: string;
@@ -8,6 +10,7 @@ export interface Props {
   currentFamily?: string;
   creditType?: 'none' | 'smplr' | 'verovio' | 'both';
   includeWidgetsCss?: boolean;
+  noindex?: boolean;
 }
 
 const {
@@ -16,7 +19,11 @@ const {
   currentFamily,
   creditType = 'smplr',
   includeWidgetsCss = false,
+  noindex = false,
 } = Astro.props;
+
+const cleanPath = Astro.url.pathname.replace(/(^|\/)index\.html$/, '$1').replace(/\.html$/, '');
+const canonicalUrl = Astro.site ? new URL(cleanPath, Astro.site) : undefined;
 ---
 <!doctype html>
 <html lang="pl">
@@ -25,9 +32,18 @@ const {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{title}</title>
   <meta name="description" content={description}>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#f3f4f3">
+  <meta name="color-scheme" content="light">
+  {noindex && <meta name="robots" content="noindex">}
+  {canonicalUrl && <link rel="canonical" href={canonicalUrl}>}
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="ksza.pl">
+  <meta property="og:locale" content="pl_PL">
+  <meta property="og:title" content={title}>
+  <meta property="og:description" content={description}>
+  {canonicalUrl && <meta property="og:url" content={canonicalUrl}>}
+  <meta name="twitter:card" content="summary">
   <link rel="stylesheet" href="/assets/css/site.css">
   {includeWidgetsCss && <link rel="stylesheet" href="/assets/css/widgets.css">}
 </head>
@@ -49,5 +65,9 @@ const {
 <Footer creditType={creditType} />
 
 <slot name="scripts" />
+
+<script>
+  import '../scripts/site.js';
+</script>
 </body>
 </html>

@@ -6,45 +6,39 @@
     --border-strong: #b9c3bb;
     --ink: #161c1a;
     --muted: #5e6b66;
-    --muted-light: #8a9691;
-    
-    --gold: #2a6f58;
-    --gold-light: #3a8c70;
-    --gold-soft: rgba(42, 111, 88, 0.09);
-    --gold-glow: rgba(42, 111, 88, 0.18);
-    
-    --amber: #c87a3e;
-    --amber-soft: rgba(200, 122, 62, 0.1);
-    
+    --muted-light: #66736d;
+
+    --accent: #2a6f58;
+    --accent-light: #3a8c70;
+    --accent-soft: rgba(42, 111, 88, 0.09);
+    --accent-glow: rgba(42, 111, 88, 0.18);
+
     --plum: #58415c;
     --plum-soft: rgba(88, 65, 92, 0.08);
-    
+
     --teal: #216b60;
     --teal-soft: rgba(33, 107, 96, 0.08);
-    
+
     --indigo: #2c4c6f;
     --indigo-soft: rgba(44, 76, 111, 0.08);
-    
+
     --coral: #c24134;
     --coral-soft: rgba(194, 65, 52, 0.09);
-    
-    --green: #2a6f58;
-    --green-soft: rgba(42, 111, 88, 0.09);
-    
+
     --key: #ffffff;
     --key-hover: #eef0ee;
-    
+
     --radius-sm: 6px;
     --radius-md: 10px;
     --radius: 14px;
     --radius-lg: 18px;
     --radius-pill: 9999px;
-    
-    --font-display: 'Outfit', system-ui, -apple-system, sans-serif;
-    --font-body: 'Manrope', system-ui, -apple-system, sans-serif;
+
+    --font-display: 'Outfit Variable', 'Outfit', system-ui, -apple-system, sans-serif;
+    --font-body: 'Manrope Variable', 'Manrope', system-ui, -apple-system, sans-serif;
     --container: 1060px;
     --container-narrow: 760px;
-    
+
     --shadow-subtle: 0 2px 8px -2px rgba(22, 28, 26, 0.04), 0 1px 2px rgba(22, 28, 26, 0.03);
     --shadow-md: 0 8px 24px -6px rgba(22, 28, 26, 0.06), 0 2px 6px -1px rgba(22, 28, 26, 0.03);
     --shadow-lg: 0 20px 40px -12px rgba(22, 28, 26, 0.08), 0 1px 3px rgba(22, 28, 26, 0.03);
@@ -84,7 +78,7 @@ img {
 }
 
 a {
-    color: var(--gold);
+    color: var(--accent);
     text-decoration: none;
     transition: color 0.16s ease, transform 0.16s ease;
 }
@@ -111,7 +105,7 @@ p {
 }
 
 ::selection {
-    background: var(--gold-soft);
+    background: var(--accent-soft);
     color: var(--ink);
 }
 
@@ -119,7 +113,7 @@ a:focus-visible,
 button:focus-visible,
 select:focus-visible,
 input:focus-visible {
-    outline: 2px solid var(--gold);
+    outline: 2px solid var(--accent);
     outline-offset: 3px;
 }
 
@@ -148,7 +142,7 @@ ul.staff {
 
 ul.staff li {
     height: 1px;
-    background: linear-gradient(90deg, transparent, var(--gold) 50%, transparent);
+    background: linear-gradient(90deg, transparent, var(--accent) 50%, transparent);
     opacity: 0.35;
 }
 
@@ -193,14 +187,14 @@ ul.staff li {
 .brand-dot {
     width: 6px;
     height: 6px;
-    background: var(--gold);
+    background: var(--accent);
     border-radius: 50%;
     display: inline-block;
-    box-shadow: 0 0 6px var(--gold);
+    box-shadow: 0 0 6px var(--accent);
 }
 
 .brand:hover .brand-title {
-    color: var(--gold);
+    color: var(--accent);
 }
 
 .brand small {
@@ -313,10 +307,10 @@ ul.staff li {
     font-size: 0.74rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: var(--gold);
+    color: var(--accent);
     font-weight: 700;
     margin-bottom: 14px;
-    background: var(--gold-soft);
+    background: var(--accent-soft);
     padding: 5px 14px;
     border-radius: var(--radius-pill);
     border: 1px solid rgba(184, 131, 43, 0.16);
@@ -326,7 +320,7 @@ ul.staff li {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: var(--gold);
+    background: var(--accent);
     animation: pulseDot 2s infinite ease-in-out;
 }
 
@@ -360,7 +354,7 @@ ul.staff li {
 .hero-waveform span {
     width: 3px;
     border-radius: 3px;
-    background: linear-gradient(180deg, var(--gold-light), var(--gold));
+    background: linear-gradient(180deg, var(--accent-light), var(--accent));
     opacity: 0.7;
     animation: waveBar 1.8s ease-in-out infinite alternate;
 }
@@ -425,12 +419,12 @@ ul.staff li {
     border-color: rgba(26, 27, 34, 0.14);
 }
 
-.exercise-card.accent-gold::before   { background: var(--gold); }
+.exercise-card.accent-main::before   { background: var(--accent); }
 .exercise-card.accent-plum::before   { background: var(--plum); }
 .exercise-card.accent-teal::before   { background: var(--teal); }
 .exercise-card.accent-indigo::before { background: var(--indigo); }
 .exercise-card.accent-coral::before  { background: var(--coral); }
-.exercise-card.accent-green::before  { background: var(--green); }
+.exercise-card.accent-green::before  { background: var(--accent); }
 
 .exercise-card-header {
     display: flex;
@@ -455,12 +449,12 @@ ul.staff li {
     transform: scale(1.05);
 }
 
-.exercise-card.accent-gold .icon-wrapper   { background: var(--gold-soft); color: var(--gold); }
+.exercise-card.accent-main .icon-wrapper   { background: var(--accent-soft); color: var(--accent); }
 .exercise-card.accent-plum .icon-wrapper   { background: var(--plum-soft); color: var(--plum); }
 .exercise-card.accent-teal .icon-wrapper   { background: var(--teal-soft); color: var(--teal); }
 .exercise-card.accent-indigo .icon-wrapper { background: var(--indigo-soft); color: var(--indigo); }
 .exercise-card.accent-coral .icon-wrapper  { background: var(--coral-soft); color: var(--coral); }
-.exercise-card.accent-green .icon-wrapper  { background: var(--green-soft); color: var(--green); }
+.exercise-card.accent-green .icon-wrapper  { background: var(--accent-soft); color: var(--accent); }
 
 .exercise-card .icon-wrapper svg {
     width: 22px;
@@ -508,7 +502,7 @@ ul.staff li {
 
 .exercise-card-footer .arrow {
     transition: transform 0.18s ease;
-    color: var(--gold);
+    color: var(--accent);
 }
 
 .exercise-card:hover .exercise-card-footer .arrow {
@@ -538,7 +532,7 @@ ul.staff li {
     left: 0;
     bottom: 0;
     width: 4px;
-    background: var(--gold);
+    background: var(--accent);
 }
 
 .daily-warmup-content h3 {
@@ -604,7 +598,7 @@ ul.staff li {
 }
 
 .page-content .card .plain-list li::marker {
-    color: var(--gold);
+    color: var(--accent);
 }
 
 .exercise-page {

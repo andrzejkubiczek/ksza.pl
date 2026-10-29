@@ -22,7 +22,15 @@ B. Zapis nutowy (Verovio 6.3):
    - Nuty na pięciolinii renderowane są dynamicznie do formatu SVG na podstawie
      kodu MusicXML (z użyciem czcionki nutowej Leland).
 
-C. Publikacja na serwerze:
+C. Testy i czcionki:
+   - `npm test` uruchamia testy jednostkowe (Vitest, katalog "tests/") logiki
+     z music-theory.js.
+   - Czcionki Manrope i Outfit są hostowane lokalnie (pakiety @fontsource-variable),
+     bez połączeń z Google Fonts.
+   - Wspólne zachowania witryny (site.js, ładowany z layoutu): menu mobilne,
+     rok w stopce, suwak tempa, rozgrzewka dźwięku i skróty klawiaturowe: Spacja = odtwórz, Enter = dalej/sprawdź.
+
+D. Publikacja na serwerze:
    - Po wykonaniu polecenia `npm run build` gotowe pliki statyczne trafiają do
      katalogu "dist/". Zawartość tego folderu wystarczy wgrać na dowolny serwer
      HTTP.
@@ -44,16 +52,26 @@ public/assets/css/widgets.css       - style widżetów ćwiczeń, pięciolinii, 
 public/assets/audio/                - lokalne próbki MP3 instrumentów orkiestrowych
 public/assets/vendor/smplr.js       - biblioteka obsługująca odtwarzanie próbek dźwiękowych
 
-public/assets/js/core.js            - obsługa dźwięku (KszaAudio), tempa i skal poszczególnych instrumentów
-public/assets/js/interval-filter.js - obsługa filtra zakresu interwałów z zapisem ustawień w localStorage
-public/assets/js/music-theory.js    - obliczenia diatoniczne, znaki chromatyczne i budowanie struktur MusicXML
-public/assets/js/verovio-render.js  - inicjalizacja biblioteki Verovio i renderowanie nut
-public/assets/js/gesture-layer.js   - obsługa przesuwania nut na pięciolinii za pomocą myszki lub dotyku
-public/assets/js/puzzle-engine.js   - wspólny moduł dla puzzli melodycznych i rytmicznych
-public/assets/js/scale-tonics.js    - zestaw tonacji i dobór oktawy odpowiedniej dla wybranego instrumentu
-public/assets/js/klasa-filter.js    - filtrowanie dyktand i rytmów według klasy (IV/6 – IV/4)
-public/assets/js/piano-keyboard.js  - pomocnicza klawiatura fortepianu pod pięciolinią
-public/assets/js/*.js (pozostałe)   - skrypty obsługujące logikę poszczególnych ćwiczeń
+src/scripts/                        - moduły ES (importy zamiast zmiennych globalnych window.Ksza*);
+                                      Astro/Vite łączy je w pliki z hashem w nazwie (/_astro/)
+src/scripts/site.js                 - zachowania wspólne dla wszystkich stron (importowany w Layout.astro)
+src/scripts/core.js                 - obsługa dźwięku (KszaAudio), tempa, zakresów instrumentów i komunikatów (KszaUI)
+src/scripts/interval-filter.js      - obsługa filtra zakresu interwałów z zapisem ustawień w localStorage
+src/scripts/intervals.js            - wspólne definicje 13 interwałów (symbol, stopnie, półtony, nazwa)
+src/scripts/storage.js              - bezpieczny odczyt/zapis localStorage (błędy są ignorowane)
+src/scripts/music-theory.js         - obliczenia diatoniczne, znaki chromatyczne i budowanie struktur MusicXML
+src/scripts/verovio-render.js       - inicjalizacja biblioteki Verovio i renderowanie nut
+src/scripts/gesture-layer.js        - obsługa przesuwania nut na pięciolinii za pomocą myszki lub dotyku
+src/scripts/puzzle-engine.js        - wspólny moduł dla puzzli melodycznych i rytmicznych
+src/scripts/scale-tonics.js         - zestaw tonacji i dobór oktawy odpowiedniej dla wybranego instrumentu
+src/scripts/klasa-filter.js         - filtrowanie dyktand i rytmów według klasy (IV/6 – IV/4)
+src/scripts/piano-keyboard.js       - pomocnicza klawiatura fortepianu pod pięciolinią (ładowana tylko dla efektu ubocznego)
+src/scripts/*.js (pozostałe)        - kontrolery poszczególnych ćwiczeń; każda strona importuje jeden taki moduł
+                                      w tagu <script> w pliku .astro
+Biblioteki zewnętrzne smplr, Verovio i SortableJS pozostają zwykłymi skryptami globalnymi
+(<script is:inline>), ładowanymi przed modułami.
+
+tests/                              - testy jednostkowe (Vitest) importujące moduły z src/scripts/
 
 public/dyktanda/puzzle/             - pliki MusicXML oraz lista (puzzle.json) dla puzzli melodycznych
 public/dyktanda/wysokosciowe/       - pliki MusicXML oraz lista (dyktanda.json) dla dyktand wysokościowych

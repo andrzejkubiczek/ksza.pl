@@ -1,4 +1,4 @@
-window.KszaKlasaFilter = (() => {
+export const KszaKlasaFilter = (() => {
     const ORDER = ['IV/6', 'V/6', 'VI/6', 'I/4', 'II/4', 'III/4', 'IV/4'];
     const ALL_VALUE = '';
 

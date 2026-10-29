@@ -92,8 +92,8 @@ import IntervalFilter from '../../components/IntervalFilter.astro';
 
   <Fragment slot="scripts">
     <script is:inline src="/assets/vendor/smplr.js"></script>
-    <script is:inline src="/assets/js/core.js"></script>
-    <script is:inline src="/assets/js/interval-filter.js"></script>
-    <script is:inline src="/assets/js/interwaly.js"></script>
+    <script>
+      import '../../scripts/interwaly.js';
+    </script>
   </Fragment>
 </Layout>

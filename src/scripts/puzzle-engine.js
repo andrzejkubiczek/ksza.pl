@@ -1,4 +1,8 @@
-window.KszaPuzzleEngine = (() => {
+import { KszaAudio, KszaInstrumentRange, KszaTempo } from './core.js';
+import { KszaKlasaFilter } from './klasa-filter.js';
+import { KszaVerovio } from './verovio-render.js';
+
+export const KszaPuzzleEngine = (() => {
     const TEMPO_SLOWDOWN = 1.25;
 
     function parseMusicXML(xmlText, notation, minFragmentsMessage, rhythmStaff) {
@@ -192,7 +196,7 @@ window.KszaPuzzleEngine = (() => {
         }
 
         function getOctaveShift() {
-            if (!active || typeof KszaInstrumentRange === 'undefined') return 0;
+            if (!active) return 0;
             const allPitches = active.fragments
                 .flatMap(fragmentEvents)
                 .map((e) => e.pitch)
@@ -202,7 +206,7 @@ window.KszaPuzzleEngine = (() => {
         }
 
         function adaptPitch(pitch) {
-            if (!pitch || typeof KszaInstrumentRange === 'undefined') return pitch;
+            if (!pitch) return pitch;
             const shift = getOctaveShift();
             return shift !== 0 ? KszaInstrumentRange.transposeNoteName(pitch, shift) : pitch;
         }

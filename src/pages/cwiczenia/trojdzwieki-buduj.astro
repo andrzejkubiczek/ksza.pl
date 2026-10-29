@@ -85,11 +85,9 @@ import SubNav from '../../components/SubNav.astro';
 
   <Fragment slot="scripts">
     <script is:inline src="https://cdn.jsdelivr.net/npm/verovio@6.3.0/dist/verovio-toolkit-wasm.js"></script>
-    <script is:inline src="/assets/js/core.js"></script>
-    <script is:inline src="/assets/js/music-theory.js"></script>
-    <script is:inline src="/assets/js/verovio-render.js"></script>
-    <script is:inline src="/assets/js/gesture-layer.js"></script>
-    <script is:inline src="/assets/js/piano-keyboard.js"></script>
-    <script is:inline src="/assets/js/trojdzwieki-buduj.js"></script>
+    <script>
+      import '../../scripts/piano-keyboard.js';
+      import '../../scripts/trojdzwieki-buduj.js';
+    </script>
   </Fragment>
 </Layout>

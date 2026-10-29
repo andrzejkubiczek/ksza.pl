@@ -1,4 +1,4 @@
-window.KszaVerovio = (() => {
+export const KszaVerovio = (() => {
     let toolkit = null;
     let readyPromise = null;
 
@@ -11,6 +11,8 @@ window.KszaVerovio = (() => {
             }
 
             let settled = false;
+            let pollId;
+            let timeoutId;
             const tryInit = () => {
                 if (settled) return;
                 try {
@@ -26,8 +28,8 @@ window.KszaVerovio = (() => {
             if (verovio.module) {
                 verovio.module.onRuntimeInitialized = tryInit;
             }
-            const pollId = setInterval(tryInit, 50);
-            const timeoutId = setTimeout(() => {
+            pollId = setInterval(tryInit, 50);
+            timeoutId = setTimeout(() => {
                 settled = true;
                 clearInterval(pollId);
                 reject(new Error('Przekroczono limit czasu ładowania Verovio.'));

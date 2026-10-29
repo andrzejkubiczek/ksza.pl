@@ -1,4 +1,4 @@
-window.KszaGestureLayer = {
+export const KszaGestureLayer = {
     setup(layerId, handlers) {
         const layer = document.getElementById(layerId);
         if (!layer) return;

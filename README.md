@@ -38,7 +38,8 @@ src/pages/cwiczenia/*.astro    Podstrony poszczególnych ćwiczeń
 public/assets/css/             Arkusze stylów (site.css, widgets.css)
 public/assets/audio/           Lokalne próbki akustyczne orkiestry Versilian VSCO2
 public/assets/vendor/          Lekki silnik samplera Web Audio API (smplr.js)
-public/assets/js/              Moduły logiki, teorii muzyki, Verovio i kontrolery ćwiczeń
+src/scripts/                   Moduły ES: logika, teoria muzyki, Verovio i kontrolery ćwiczeń
+tests/                         Testy jednostkowe (Vitest, npm test)
 public/dyktanda/               Manifesty JSON i pliki MusicXML dyktand
 dist/                          Wygenerowane statyczne pliki produkcyjne (po npm run build)
 ```

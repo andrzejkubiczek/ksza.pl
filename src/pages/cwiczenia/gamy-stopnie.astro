@@ -78,8 +78,8 @@ import SubNav from '../../components/SubNav.astro';
 
   <Fragment slot="scripts">
     <script is:inline src="/assets/vendor/smplr.js"></script>
-    <script is:inline src="/assets/js/core.js"></script>
-    <script is:inline src="/assets/js/scale-tonics.js"></script>
-    <script is:inline src="/assets/js/gamy-stopnie.js"></script>
+    <script>
+      import '../../scripts/gamy-stopnie.js';
+    </script>
   </Fragment>
 </Layout>

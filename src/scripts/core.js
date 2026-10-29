@@ -1,4 +1,4 @@
-window.KszaAudio = (() => {
+export const KszaAudio = (() => {
     let audioCtx = null;
     let cacheStorage = null;
     const samplerCache = {};
@@ -234,7 +234,7 @@ window.KszaAudio = (() => {
     };
 })();
 
-window.KszaTempo = (() => {
+export const KszaTempo = (() => {
     const DEFAULT = 1.0;
     let current = DEFAULT;
 
@@ -249,7 +249,7 @@ window.KszaTempo = (() => {
     };
 })();
 
-window.KszaInstrumentRange = (() => {
+export const KszaInstrumentRange = (() => {
     const CHROMATIC = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
     const RANGES = {
@@ -332,7 +332,7 @@ window.KszaInstrumentRange = (() => {
     };
 })();
 
-window.KszaUI = (() => {
+export const KszaUI = (() => {
     function setStatus(message, type = null) {
         const el = document.getElementById('status-line');
         if (el) {
@@ -357,41 +357,3 @@ window.KszaUI = (() => {
         createAudioStateHandler
     };
 })();
-
-document.addEventListener('DOMContentLoaded', () => {
-    const footerYear = document.getElementById('footer-year');
-    if (footerYear) {
-        footerYear.textContent = new Date().getFullYear();
-    }
-
-    const toggle = document.querySelector('.nav-toggle');
-    const nav = document.querySelector('.site-nav');
-    if (toggle && nav) {
-        toggle.addEventListener('click', () => {
-            const isOpen = nav.classList.toggle('is-open');
-            toggle.setAttribute('aria-expanded', String(isOpen));
-        });
-    }
-
-    const slider = document.getElementById('tempo-slider');
-    const valueLabel = document.getElementById('tempo-value');
-    if (slider) {
-        const initialPercent = Math.round(KszaTempo.get() * 100);
-        slider.value = initialPercent;
-        if (valueLabel) valueLabel.textContent = `${initialPercent}%`;
-
-        slider.addEventListener('input', () => {
-            const percent = parseInt(slider.value, 10);
-            KszaTempo.set(percent / 100);
-            if (valueLabel) valueLabel.textContent = `${percent}%`;
-        });
-    }
-
-    if (typeof KszaAudio !== 'undefined' && KszaAudio.prewarmDefaultInstrument) {
-        if ('requestIdleCallback' in window) {
-            window.requestIdleCallback(KszaAudio.prewarmDefaultInstrument);
-        } else {
-            setTimeout(KszaAudio.prewarmDefaultInstrument, 300);
-        }
-    }
-});

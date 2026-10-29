@@ -1,4 +1,6 @@
-window.KszaScaleTonics = (() => {
+import { KszaInstrumentRange } from './core.js';
+
+export const KszaScaleTonics = (() => {
     const CHROMATIC = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
     const TONIC_OCTAVE_OPTIONS = [3, 4];
 

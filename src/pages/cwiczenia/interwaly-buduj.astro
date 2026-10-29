@@ -83,12 +83,9 @@ import IntervalFilter from '../../components/IntervalFilter.astro';
 
   <Fragment slot="scripts">
     <script is:inline src="https://cdn.jsdelivr.net/npm/verovio@6.3.0/dist/verovio-toolkit-wasm.js"></script>
-    <script is:inline src="/assets/js/core.js"></script>
-    <script is:inline src="/assets/js/music-theory.js"></script>
-    <script is:inline src="/assets/js/verovio-render.js"></script>
-    <script is:inline src="/assets/js/gesture-layer.js"></script>
-    <script is:inline src="/assets/js/piano-keyboard.js"></script>
-    <script is:inline src="/assets/js/interval-filter.js"></script>
-    <script is:inline src="/assets/js/interwaly-buduj.js"></script>
+    <script>
+      import '../../scripts/piano-keyboard.js';
+      import '../../scripts/interwaly-buduj.js';
+    </script>
   </Fragment>
 </Layout>

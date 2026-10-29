@@ -1,4 +1,6 @@
-window.KszaIntervalFilter = (() => {
+import { readStorage, writeStorage } from './storage.js';
+
+export const KszaIntervalFilter = (() => {
     const STORAGE_KEY = 'ksza_interval_filter_v1';
 
     const ALL_SYMBOLS = ['1', '2>', '2', '3>', '3', '4', '4<', '5', '6>', '6', '7', '7<', '8'];
@@ -43,14 +45,12 @@ window.KszaIntervalFilter = (() => {
     }
 
     function saveToStorage() {
-        try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(activeSymbols));
-        } catch (e) {}
+        writeStorage(STORAGE_KEY, JSON.stringify(activeSymbols));
     }
 
     function loadFromStorage() {
         try {
-            const raw = localStorage.getItem(STORAGE_KEY);
+            const raw = readStorage(STORAGE_KEY);
             if (!raw) return null;
             const parsed = JSON.parse(raw);
             if (Array.isArray(parsed) && parsed.length >= 2) {

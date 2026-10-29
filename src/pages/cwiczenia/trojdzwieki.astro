@@ -88,7 +88,8 @@ import SubNav from '../../components/SubNav.astro';
 
   <Fragment slot="scripts">
     <script is:inline src="/assets/vendor/smplr.js"></script>
-    <script is:inline src="/assets/js/core.js"></script>
-    <script is:inline src="/assets/js/trojdzwieki.js"></script>
+    <script>
+      import '../../scripts/trojdzwieki.js';
+    </script>
   </Fragment>
 </Layout>

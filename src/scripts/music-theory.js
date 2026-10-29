@@ -1,4 +1,4 @@
-window.KszaMusicTheory = (() => {
+export const KszaMusicTheory = (() => {
     const LETTERS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
     const LETTER_NATURAL_OFFSET = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
     const ACCIDENTAL_NAMES = { '-2': 'flat-flat', '-1': 'flat', '0': 'natural', '1': 'sharp', '2': 'double-sharp' };
